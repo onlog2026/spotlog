@@ -1,8 +1,10 @@
+import { SolucoesGrid } from "@/components/public/solucoes-grid";
+import { Processo } from "@/components/public/processo";
 import { CtaBanner } from "@/components/public/cta-banner";
 
-export const metadata = { title: "Contato — Solicitar proposta" };
+export const metadata = { title: "Soluções" };
 
-export default function ContatoPage() {
+export default function SolucoesPage() {
   return (
     <div>
       <section className="relative pt-32 lg:pt-44 pb-8 bg-gradient-soft hero-pattern">
@@ -10,18 +12,17 @@ export default function ContatoPage() {
         <div className="container relative">
           <div className="max-w-3xl mx-auto text-center">
             <div className="text-sm font-semibold text-spotorange-600 uppercase tracking-wider mb-4">
-              Contato comercial
+              Soluções
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-navy-950 leading-[1.1] text-balance">
-              Vamos <span className="text-gradient-spotlog">conversar?</span>
+              Soluções logísticas pra{" "}
+              <span className="text-gradient-spotlog">cada necessidade.</span>
             </h1>
-            <p className="mt-5 text-lg text-ink-600">
-              Conta um pouco do seu negócio e nosso time desenha uma proposta
-              sob medida pra você.
-            </p>
           </div>
         </div>
       </section>
+      <SolucoesGrid />
+      <Processo />
       <CtaBanner />
     </div>
   );

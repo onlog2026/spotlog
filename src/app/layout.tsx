@@ -8,10 +8,9 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
-// Resolve URL base limpando BOM/whitespace que podem aparecer em env vars
-// importadas com encoding ruim. Cai pra VERCEL_URL → localhost em dev.
 function resolveBaseUrl(): string {
   const raw =
     process.env.NEXT_PUBLIC_APP_URL ||
@@ -29,30 +28,36 @@ export const metadata: Metadata = {
   metadataBase: new URL(resolveBaseUrl()),
   title: {
     default:
-      "Spotlog — Prospecção automatizada, CRM e propostas em uma só plataforma",
+      "Spotlog — Logística inteligente com controle do início ao fim",
     template: "%s | Spotlog",
   },
   description:
-    "Encontre os decisores certos, abra conversas em escala por e-mail e WhatsApp, organize o pipeline e envie propostas comerciais profissionais. Tudo automatizado, com IA e dados reais.",
+    "Logística para e-commerce, farma, manipulação, correlatos e operações B2B com rastreabilidade, atendimento integrado, controle operacional e tecnologia de ponta.",
   keywords: [
     "Spotlog",
-    "SDR",
-    "prospecção",
-    "CRM",
-    "IA",
-    "automação de vendas",
-    "outbound",
-    "pipeline",
-    "proposta comercial",
+    "logística",
+    "entregas",
+    "e-commerce",
+    "farma",
+    "manipulação",
+    "correlatos",
+    "rastreamento",
+    "coleta programada",
+    "rota dedicada",
+    "São Paulo",
+    "motoboy",
+    "express",
   ],
+  authors: [{ name: "Spotlog" }],
   openGraph: {
-    title: "Spotlog",
+    title: "Spotlog — Logística inteligente",
     description:
-      "A plataforma de prospecção, CRM e propostas com agente IA.",
+      "Entregas para e-commerce, farma, manipulação e correlatos com rastreabilidade ponta a ponta.",
     type: "website",
     locale: "pt_BR",
+    siteName: "Spotlog",
   },
-  twitter: { card: "summary_large_image" },
+  twitter: { card: "summary_large_image", title: "Spotlog — Logística inteligente" },
   robots: { index: true, follow: true },
 };
 
@@ -63,11 +68,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans`}>
+      <body className={`${inter.variable} font-sans bg-background text-foreground`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem
+          defaultTheme="light"
+          forcedTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}

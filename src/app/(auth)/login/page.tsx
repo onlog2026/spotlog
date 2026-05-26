@@ -9,18 +9,20 @@ export default function LoginPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Entrar na Spotlog</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Bem-vindo de volta. Acesse sua conta pra continuar.
+        <h1 className="text-3xl font-bold text-navy-900 tracking-tight">
+          Entrar
+        </h1>
+        <p className="text-sm text-ink-600 mt-2">
+          Acesse a área do cliente da Spotlog
         </p>
       </div>
-      <Suspense fallback={<div className="h-64 animate-pulse rounded-md bg-white/5" />}>
+      <Suspense fallback={<div className="h-64 animate-pulse rounded-md bg-navy-50" />}>
         <LoginForm />
       </Suspense>
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-center text-sm text-ink-600">
         Ainda não tem conta?{" "}
-        <Link href="/cadastro" className="text-brand-400 font-medium">
-          Cadastre-se grátis
+        <Link href="/cadastro" className="text-spotorange-600 font-semibold">
+          Criar acesso
         </Link>
       </p>
     </div>

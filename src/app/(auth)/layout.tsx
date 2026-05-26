@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles } from "lucide-react";
+import { Package, CheckCircle2, Truck, MapPin } from "lucide-react";
 
 export default function AuthLayout({
   children,
@@ -7,55 +7,73 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid md:grid-cols-2 bg-background">
-      <div className="hidden md:flex relative overflow-hidden bg-gradient-to-br from-brand-700 via-purple-700 to-cyan-600">
-        <div className="absolute inset-0 noise opacity-20" />
-        <div className="absolute inset-0 grid-pattern opacity-20" />
-        <div className="relative z-10 p-12 flex flex-col justify-between text-white">
-          <Link href="/" className="flex items-center gap-2 font-bold">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/15 backdrop-blur">
-              <Sparkles className="h-5 w-5" />
+    <div className="min-h-screen grid lg:grid-cols-2 bg-white">
+      <div className="hidden lg:flex relative bg-navy-950 overflow-hidden">
+        <div className="absolute inset-0 dot-grid opacity-10" />
+        <div className="absolute top-0 right-0 w-80 h-80 bg-spotorange-500/10 rounded-full -translate-y-32 translate-x-32 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-navy-700/30 rounded-full translate-y-32 -translate-x-32 blur-3xl" />
+
+        <div className="relative z-10 p-12 flex flex-col justify-between text-white w-full">
+          <Link href="/" className="inline-flex items-center gap-2.5 group w-fit">
+            <div className="grid h-11 w-11 place-items-center rounded-xl bg-white">
+              <Package className="h-6 w-6 text-spotorange-500" strokeWidth={2.5} />
             </div>
-            Spotlog
+            <div className="flex flex-col leading-none">
+              <span className="font-bold text-xl tracking-tight">Spotlog</span>
+              <span className="text-[10px] text-ink-300 font-medium tracking-wide uppercase">
+                Logística inteligente
+              </span>
+            </div>
           </Link>
 
-          <div className="space-y-6 max-w-md">
-            <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-              A operação comercial que <em>não para de produzir</em>.
+          <div className="space-y-8 max-w-md">
+            <h2 className="text-3xl lg:text-4xl font-bold leading-tight text-balance">
+              Logística que entrega <em className="text-spotorange-400">controle</em>,
+              não só pacote.
             </h2>
-            <p className="text-white/80">
-              Você define o ICP. O agente prospecta, escreve, dispara, organiza
-              o funil e te avisa quando tem reunião pra fechar.
+            <p className="text-ink-300 text-lg leading-relaxed">
+              Acompanhe coletas, entregas, ocorrências, SLA e chamados em um
+              único painel. Tudo conectado, do CD ao destinatário.
             </p>
-            <div className="grid grid-cols-3 gap-4 pt-6">
+
+            <div className="space-y-3">
               {[
-                { v: "3.2x", l: "+ reuniões" },
-                { v: "47%", l: "- CAC" },
-                { v: "12h", l: "economizadas / sem" },
-              ].map((s) => (
-                <div key={s.l}>
-                  <div className="text-2xl font-bold">{s.v}</div>
-                  <div className="text-xs text-white/70 mt-1">{s.l}</div>
+                { icon: Truck, label: "Rastreamento em tempo real" },
+                { icon: MapPin, label: "Cobertura em São Paulo e Grande SP" },
+                { icon: CheckCircle2, label: "Atendimento humano + IA" },
+              ].map((f, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-white/10 backdrop-blur">
+                    <f.icon className="h-5 w-5 text-spotorange-400" />
+                  </div>
+                  <span className="text-sm">{f.label}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <p className="text-xs text-white/60">
-            © {new Date().getFullYear()} Spotlog — Feito no Brasil.
+          <p className="text-xs text-ink-400">
+            © {new Date().getFullYear()} Spotlog. Todos os direitos reservados.
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col p-8 md:p-12 justify-center">
+      <div className="flex flex-col px-6 py-12 lg:px-12 lg:py-16 justify-center">
         <Link
           href="/"
-          className="md:hidden flex items-center gap-2 font-bold mb-8"
+          className="lg:hidden flex items-center gap-2.5 mb-8 group"
         >
-          <div className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-brand">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-navy-900">
+            <Package className="h-6 w-6 text-spotorange-500" strokeWidth={2.5} />
           </div>
-          <span className="text-gradient">Spotlog</span>
+          <div className="flex flex-col leading-none">
+            <span className="font-bold text-xl text-navy-900 tracking-tight">
+              Spotlog
+            </span>
+            <span className="text-[10px] text-ink-500 font-medium tracking-wide uppercase">
+              Logística inteligente
+            </span>
+          </div>
         </Link>
         <div className="mx-auto w-full max-w-md">{children}</div>
       </div>

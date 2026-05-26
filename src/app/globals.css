@@ -4,62 +4,44 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
+    --background: 215 100% 99%;
+    --foreground: 224 71% 4%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
+    --card-foreground: 224 71% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 226 100% 58%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 226 100% 58%;
-
+    --popover-foreground: 224 71% 4%;
+    --primary: 230 79% 31%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 30% 96%;
+    --secondary-foreground: 224 71% 4%;
+    --muted: 220 20% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 19 100% 53%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 230 79% 31%;
     --radius: 0.75rem;
   }
-
   .dark {
     --background: 224 71% 4%;
     --foreground: 213 31% 91%;
-
     --card: 224 71% 6%;
     --card-foreground: 213 31% 91%;
-
     --popover: 224 71% 4%;
     --popover-foreground: 213 31% 91%;
-
     --primary: 226 100% 64%;
     --primary-foreground: 222 47% 11%;
-
     --secondary: 222 47% 11%;
     --secondary-foreground: 210 40% 98%;
-
     --muted: 223 47% 11%;
     --muted-foreground: 215 20% 65%;
-
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 40% 98%;
-
+    --accent: 19 100% 53%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
-
     --border: 216 34% 17%;
     --input: 216 34% 17%;
     --ring: 226 100% 64%;
@@ -67,40 +49,40 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
   body {
     @apply bg-background text-foreground antialiased;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
   }
+  html { scroll-behavior: smooth; }
 }
 
 @layer utilities {
-  .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
-  }
-  .glass-strong {
-    @apply bg-white/10 backdrop-blur-2xl border border-white/20;
-  }
-  .text-gradient {
-    @apply bg-gradient-brand bg-clip-text text-transparent;
-  }
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 3px;
-  }
+  .text-balance { text-wrap: balance; }
   .grid-pattern {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(rgba(28, 42, 131, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28, 42, 131, 0.05) 1px, transparent 1px);
+    background-size: 48px 48px;
   }
-  .noise {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  .text-gradient-spotlog {
+    background: linear-gradient(135deg, #1c2a83 0%, #2540f0 60%, #ff5410 120%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
+  .hero-pattern {
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(37, 64, 240, 0.10) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(255, 84, 16, 0.08) 0%, transparent 55%);
+  }
+  .dot-grid {
+    background-image: radial-gradient(circle, rgba(28, 42, 131, 0.12) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(28, 42, 131, 0.15); border-radius: 3px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(28, 42, 131, 0.3); }
 }

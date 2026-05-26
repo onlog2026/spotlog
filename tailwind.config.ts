@@ -11,7 +11,7 @@ const config: Config = {
     container: {
       center: true,
       padding: "1.5rem",
-      screens: { "2xl": "1400px" },
+      screens: { "2xl": "1320px" },
     },
     extend: {
       colors: {
@@ -48,18 +48,20 @@ const config: Config = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        brand: {
-          50: "#eef4ff",
-          100: "#dbe6ff",
-          200: "#bfd3ff",
-          300: "#93b6ff",
-          400: "#608dff",
-          500: "#3b66ff",
-          600: "#2543f5",
-          700: "#1e33de",
-          800: "#1d2db4",
-          900: "#1d2c8e",
-          950: "#151b54",
+        navy: {
+          50: "#eef3ff", 100: "#dde7ff", 200: "#bccfff", 300: "#8eafff",
+          400: "#5d83ff", 500: "#3a5cff", 600: "#2540f0", 700: "#1d31cf",
+          800: "#1b2ba6", 900: "#1c2a83", 950: "#0c1240",
+        },
+        ink: {
+          50: "#f8faff", 100: "#eef3fa", 200: "#dde6f3", 300: "#c1cfe3",
+          400: "#8aa0bf", 500: "#5e7497", 600: "#465a78", 700: "#374863",
+          800: "#2a3850", 900: "#1b2438", 950: "#0e1424",
+        },
+        spotorange: {
+          50: "#fff5ed", 100: "#ffe7d3", 200: "#ffcaa5", 300: "#ffa56d",
+          400: "#ff7333", 500: "#ff5410", 600: "#f03b06", 700: "#c72b08",
+          800: "#9e240f", 900: "#7f2010", 950: "#450c06",
         },
       },
       borderRadius: {
@@ -67,42 +69,27 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
-      backgroundImage: {
-        "gradient-hero":
-          "radial-gradient(at 20% 20%, rgba(59,102,255,0.35) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(168,85,247,0.30) 0px, transparent 50%), radial-gradient(at 60% 80%, rgba(34,211,238,0.25) 0px, transparent 50%)",
-        "gradient-card":
-          "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%)",
-        "gradient-brand":
-          "linear-gradient(135deg, #3b66ff 0%, #8b5cf6 50%, #22d3ee 100%)",
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       },
       keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-        shimmer: {
-          "0%": { backgroundPosition: "-700px 0" },
-          "100%": { backgroundPosition: "700px 0" },
-        },
-        "fade-in": {
-          from: { opacity: "0", transform: "translateY(8px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        glow: {
-          "0%, 100%": { boxShadow: "0 0 20px rgba(59,102,255,0.3)" },
-          "50%": { boxShadow: "0 0 40px rgba(59,102,255,0.6)" },
-        },
+        "fade-in": { from: { opacity: "0", transform: "translateY(8px)" }, to: { opacity: "1", transform: "translateY(0)" } },
+        "slide-in-right": { from: { opacity: "0", transform: "translateX(20px)" }, to: { opacity: "1", transform: "translateX(0)" } },
+        "pulse-soft": { "0%, 100%": { opacity: "1" }, "50%": { opacity: "0.6" } },
+        "float-y": { "0%, 100%": { transform: "translateY(0px)" }, "50%": { transform: "translateY(-8px)" } },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 2s linear infinite",
-        "fade-in": "fade-in 0.5s ease-out",
-        glow: "glow 3s ease-in-out infinite",
+        "fade-in": "fade-in 0.6s ease-out",
+        "slide-in-right": "slide-in-right 0.5s ease-out",
+        "pulse-soft": "pulse-soft 2s ease-in-out infinite",
+        "float-y": "float-y 4s ease-in-out infinite",
+      },
+      boxShadow: {
+        soft: "0 2px 12px -2px rgba(28,42,131,0.08), 0 4px 24px -4px rgba(28,42,131,0.06)",
+        card: "0 4px 20px -4px rgba(28,42,131,0.1), 0 8px 32px -8px rgba(28,42,131,0.08)",
+        "card-hover": "0 12px 40px -4px rgba(28,42,131,0.18), 0 20px 56px -8px rgba(28,42,131,0.14)",
+        "orange-glow": "0 10px 28px -4px rgba(255,84,16,0.35)",
+        "navy-glow": "0 10px 28px -4px rgba(37,64,240,0.3)",
       },
     },
   },
