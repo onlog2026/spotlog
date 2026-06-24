@@ -10,8 +10,19 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: { DEFAULT: "1.25rem", lg: "2rem", xl: "2.5rem" },
-      screens: { "2xl": "1440px" },
+      padding: {
+        DEFAULT: "1.25rem",
+        lg: "2rem",
+        xl: "3rem",
+        "2xl": "4rem",
+      },
+      screens: {
+        sm: "100%",
+        md: "100%",
+        lg: "100%",
+        xl: "100%",
+        "2xl": "100%",
+      },
     },
     extend: {
       colors: {

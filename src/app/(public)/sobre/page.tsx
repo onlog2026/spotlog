@@ -1,17 +1,38 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Target, Users, Heart, Award, ArrowRight } from "lucide-react";
+import { Users, Shirt, MapPin, Sparkles, ArrowRight, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { QuemSomos } from "@/components/public/quem-somos";
 import { CtaBanner } from "@/components/public/cta-banner";
 
 export const metadata = { title: "Quem Somos" };
 
 const valores = [
-  { icon: Target, title: "Foco operacional", desc: "Cada detalhe da operação é pensado pra reduzir falhas e aumentar previsibilidade." },
-  { icon: Users, title: "Atendimento humano", desc: "Pessoas reais resolvendo problemas reais — sem você ficar preso em URA." },
-  { icon: Heart, title: "Cuidado com produto", desc: "Embalagens, manuseio e processo orientados pelo tipo de carga." },
-  { icon: Award, title: "Compromisso com prazo", desc: "SLA acompanhado por cliente, com transparência total nos relatórios." },
+  {
+    icon: Users,
+    title: "Equipe treinada",
+    desc: "Profissionais capacitados continuamente para entregar o melhor serviço à sua empresa.",
+  },
+  {
+    icon: Shirt,
+    title: "Time uniformizado",
+    desc: "Identidade visual padronizada — sua marca é representada com seriedade no destino.",
+  },
+  {
+    icon: MapPin,
+    title: "Cobertura SP + Grande SP",
+    desc: "Operamos em todo o estado de São Paulo e em toda a região metropolitana.",
+  },
+  {
+    icon: Sparkles,
+    title: "Qualidade, rapidez e satisfação",
+    desc: "Os três pilares que orientam cada serviço prestado pela Spotlog.",
+  },
+];
+
+const servicosBase = [
+  "Motoboy",
+  "Utilitários",
+  "Mão de obra operacional",
 ];
 
 export default function SobrePage() {
@@ -26,19 +47,39 @@ export default function SobrePage() {
                 Quem somos
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-navy-950 leading-[1.1] text-balance">
-                A Spotlog nasceu pra resolver o que{" "}
-                <span className="text-gradient-spotlog">logística genérica não resolve.</span>
+                A melhor ideia em{" "}
+                <span className="text-gradient-spotlog">soluções logísticas.</span>
               </h1>
               <p className="mt-6 text-lg lg:text-xl text-ink-600 leading-relaxed">
-                Acreditamos que entregar não é só transportar. É comunicar, dar
-                visibilidade, oferecer suporte de verdade e cuidar de cada pedido
-                como se fosse o único.
+                Nós entregamos realizações.
               </p>
+              <p className="mt-4 text-base lg:text-lg text-ink-600 leading-relaxed">
+                A Spotlog vem oferecendo diversos serviços com motoboy,
+                utilitários e mão de obra operacional. Somos uma empresa de
+                logística e transportes séria e responsável, que oferece soluções
+                de logística para diversos segmentos de negócios em todo o estado
+                de São Paulo e região metropolitana.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {servicosBase.map((s) => (
+                  <span
+                    key={s}
+                    className="text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full bg-navy-50 text-navy-900 border border-navy-100"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Button variant="orange" size="xl" asChild>
                   <Link href="/contato">
                     Falar com a Spotlog
                     <ArrowRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button variant="outline" size="xl" asChild>
+                  <Link href="/farma">
+                    Conheça a Anvisa AFE
                   </Link>
                 </Button>
               </div>
@@ -56,27 +97,39 @@ export default function SobrePage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950/55 to-transparent" />
               </div>
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-card border border-ink-100 p-5 hidden md:block">
-                <div className="text-[10px] uppercase tracking-wider font-bold text-ink-500 mb-1">Nosso time</div>
-                <div className="text-base font-bold text-navy-900">Pessoas + tecnologia</div>
-                <div className="text-xs text-ink-600 mt-1">Especialistas em logística que conhecem cada operação como a própria.</div>
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-card border border-ink-100 p-5 hidden md:block max-w-xs">
+                <Quote className="h-5 w-5 text-spotorange-500 mb-2" />
+                <div className="text-sm font-bold text-navy-900 leading-snug">
+                  &ldquo;Nós entregamos realizações.&rdquo;
+                </div>
+                <div className="text-xs text-ink-500 mt-1">Slogan oficial Spotlog</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <QuemSomos />
+      {/* Frase em destaque */}
+      <section className="py-16 lg:py-20 bg-navy-950 relative overflow-hidden">
+        <div className="absolute inset-0 dot-grid opacity-10" />
+        <div className="container relative text-center max-w-4xl mx-auto">
+          <p className="text-2xl lg:text-3xl font-bold text-white leading-snug text-balance">
+            Contamos com uma equipe treinada, uniformizada e pronta a prestar o
+            melhor serviço para sua empresa, garantindo{" "}
+            <span className="text-spotorange-400">qualidade, rapidez e satisfação.</span>
+          </p>
+        </div>
+      </section>
 
       <section className="py-20 lg:py-28 bg-navy-50/40">
         <div className="container">
           <div className="text-center max-w-3xl mx-auto mb-14">
             <div className="text-sm font-semibold text-spotorange-600 uppercase tracking-wider mb-3">
-              Nossos valores
+              Nossos diferenciais
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold text-navy-950 tracking-tight text-balance">
-              O que nos move{" "}
-              <span className="text-gradient-spotlog">todos os dias.</span>
+              Como cuidamos da{" "}
+              <span className="text-gradient-spotlog">sua operação.</span>
             </h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">

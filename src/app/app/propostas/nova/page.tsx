@@ -4,30 +4,44 @@ import { NewProposalForm } from "@/components/proposals/new-proposal-form";
 
 export const dynamic = "force-dynamic";
 
+async function safeFetch<T>(fn: () => Promise<{ data: T | null }>): Promise<T[]> {
+  try {
+    const res = await fn();
+    return (res?.data as unknown as T[]) ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export default async function NovaPropostaPage() {
   const ctx = await requireSession();
   const supabase = await createClient();
 
-  const [{ data: tables }, { data: contacts }, { data: companies }] =
-    await Promise.all([
+  const [tables, contacts, companies] = await Promise.all([
+    safeFetch(() =>
       supabase
         .from("price_tables")
         .select("id, name, currency")
         .eq("organization_id", ctx.org.id),
+    ),
+    safeFetch(() =>
       supabase
         .from("contacts")
         .select("id, full_name, email")
         .eq("organization_id", ctx.org.id)
         .limit(500),
+    ),
+    safeFetch(() =>
       supabase
         .from("companies")
         .select("id, name")
         .eq("organization_id", ctx.org.id)
         .limit(500),
-    ]);
+    ),
+  ]);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">Nova proposta</h1>
         <p className="text-muted-foreground mt-1">
@@ -36,9 +50,9 @@ export default async function NovaPropostaPage() {
         </p>
       </div>
       <NewProposalForm
-        tables={(tables ?? []) as never}
-        contacts={(contacts ?? []) as never}
-        companies={(companies ?? []) as never}
+        tables={tables as never}
+        contacts={contacts as never}
+        companies={companies as never}
       />
     </div>
   );

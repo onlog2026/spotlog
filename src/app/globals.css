@@ -31,7 +31,8 @@
     --ring: 229 98% 19%;
     --radius: 0.75rem;
   }
-  .dark {
+  .dark,
+  :root[data-theme="dark"] {
     --background: 229 98% 8%;
     --foreground: 213 31% 91%;
     --card: 229 98% 10%;
@@ -52,15 +53,65 @@
     --input: 216 34% 20%;
     --ring: 229 98% 35%;
   }
+
+  :root[data-theme="gray"] {
+    --background: 210 20% 96%;
+    --foreground: 222 13% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 13% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 13% 12%;
+    --primary: 220 9% 25%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 16% 92%;
+    --secondary-foreground: 222 13% 12%;
+    --muted: 210 16% 92%;
+    --muted-foreground: 220 9% 40%;
+    --accent: 220 9% 30%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 86%;
+    --input: 220 13% 86%;
+    --ring: 220 9% 25%;
+  }
+
+  :root[data-theme="neon"] {
+    --background: 230 96% 6%;
+    --foreground: 210 40% 98%;
+    --card: 230 96% 9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 230 96% 6%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 360 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 230 96% 14%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 230 96% 14%;
+    --muted-foreground: 215 25% 70%;
+    --accent: 269 95% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 360 100% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 230 50% 25%;
+    --input: 230 50% 25%;
+    --ring: 360 100% 60%;
+  }
 }
 
 @layer base {
   * { @apply border-border; }
+  html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
   }
   html { scroll-behavior: smooth; }
+  /* Garantia: imagens nunca estouram viewport mobile */
+  img, video { max-width: 100%; height: auto; }
 }
 
 @layer utilities {
@@ -158,4 +209,90 @@
 
   .img-zoom { @apply transition-transform duration-500; }
   .group:hover .img-zoom { transform: scale(1.05); }
+
+  /* === Logo shimmer (luz percorrendo as linhas do mark) === */
+  @keyframes spotlog-shimmer {
+    0% { transform: translate(-100px, 0) rotate(20deg); opacity: 0; }
+    8% { opacity: 0.85; }
+    28% { transform: translate(180px, 0) rotate(20deg); opacity: 0; }
+    100% { transform: translate(180px, 0) rotate(20deg); opacity: 0; }
+  }
+  .spotlog-shimmer-rect {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: spotlog-shimmer 3.6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spotlog-shimmer-rect { animation: none; }
+  }
+
+  /* ===========================================
+   * NEON THEME — glows por categoria
+   * =========================================== */
+  [data-theme="neon"] body {
+    background:
+      radial-gradient(circle at 18% 10%, rgba(59, 130, 246, 0.18) 0%, transparent 55%),
+      radial-gradient(circle at 82% 88%, rgba(186, 1, 2, 0.16) 0%, transparent 55%),
+      #010d3a;
+  }
+  [data-theme="neon"] .neon-glow-red    { box-shadow: 0 0 16px rgba(255, 58, 58, 0.55), 0 0 32px rgba(255, 58, 58, 0.30); }
+  [data-theme="neon"] .neon-glow-blue   { box-shadow: 0 0 16px rgba(59, 130, 246, 0.55), 0 0 32px rgba(59, 130, 246, 0.30); }
+  [data-theme="neon"] .neon-glow-orange { box-shadow: 0 0 16px rgba(249, 115, 22, 0.55), 0 0 32px rgba(249, 115, 22, 0.30); }
+  [data-theme="neon"] .neon-glow-purple { box-shadow: 0 0 16px rgba(139, 92, 246, 0.55), 0 0 32px rgba(139, 92, 246, 0.30); }
+  [data-theme="neon"] .neon-glow-green  { box-shadow: 0 0 16px rgba(16, 185, 129, 0.55), 0 0 32px rgba(16, 185, 129, 0.30); }
+  [data-theme="neon"] .neon-glow-yellow { box-shadow: 0 0 16px rgba(202, 138, 4, 0.55), 0 0 32px rgba(202, 138, 4, 0.30); }
+  [data-theme="neon"] .neon-glow-navy   { box-shadow: 0 0 16px rgba(30, 64, 175, 0.55), 0 0 32px rgba(30, 64, 175, 0.30); }
+  [data-theme="neon"] .neon-glow-gray   { box-shadow: 0 0 16px rgba(148, 163, 184, 0.40), 0 0 32px rgba(148, 163, 184, 0.20); }
+  [data-theme="neon"] .neon-glow-brown  { box-shadow: 0 0 16px rgba(146, 64, 14, 0.55), 0 0 32px rgba(146, 64, 14, 0.30); }
+
+  /* NEON — força contraste pra textos azul-escuro virarem claros */
+  [data-theme="neon"] .text-navy-900,
+  [data-theme="neon"] .text-navy-950,
+  [data-theme="neon"] .text-navy-800,
+  [data-theme="neon"] .text-navy-700,
+  [data-theme="neon"] .text-primary { color: #f1f5f9 !important; }
+  [data-theme="neon"] .text-ink-900,
+  [data-theme="neon"] .text-ink-800,
+  [data-theme="neon"] .text-ink-700,
+  [data-theme="neon"] .text-ink-600 { color: #cbd5e1 !important; }
+  [data-theme="neon"] .text-ink-500,
+  [data-theme="neon"] .text-ink-400,
+  [data-theme="neon"] .text-muted-foreground { color: #94a3b8 !important; }
+  [data-theme="neon"] .bg-white,
+  [data-theme="neon"] .bg-card { background-color: rgba(15, 23, 42, 0.7) !important; backdrop-filter: blur(8px); }
+  [data-theme="neon"] .bg-navy-50,
+  [data-theme="neon"] .bg-navy-100 { background-color: rgba(59, 130, 246, 0.12) !important; }
+  [data-theme="neon"] .border-navy-100,
+  [data-theme="neon"] .border-navy-200,
+  [data-theme="neon"] .border-ink-100,
+  [data-theme="neon"] .border-ink-200 { border-color: rgba(255, 255, 255, 0.15) !important; }
+  [data-theme="neon"] input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  [data-theme="neon"] textarea,
+  [data-theme="neon"] select {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    color: #f1f5f9 !important;
+    border-color: rgba(59, 130, 246, 0.35) !important;
+  }
+  [data-theme="neon"] input::placeholder,
+  [data-theme="neon"] textarea::placeholder { color: #64748b !important; }
+
+  /* No tema gray, neutraliza glows e cores intensas da sidebar */
+  [data-theme="gray"] .cat-badge,
+  [data-theme="gray"] .cat-active-border,
+  [data-theme="gray"] .cat-hover-tint,
+  [data-theme="gray"] .cat-icon {
+    color: #475569 !important;
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+  }
+  [data-theme="gray"] .neon-glow-red,
+  [data-theme="gray"] .neon-glow-blue,
+  [data-theme="gray"] .neon-glow-orange,
+  [data-theme="gray"] .neon-glow-purple,
+  [data-theme="gray"] .neon-glow-green,
+  [data-theme="gray"] .neon-glow-yellow,
+  [data-theme="gray"] .neon-glow-navy,
+  [data-theme="gray"] .neon-glow-brown {
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
+  }
 }

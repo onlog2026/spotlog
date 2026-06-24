@@ -20,6 +20,8 @@ export type SessionContext = {
     email: string | null;
     full_name: string | null;
     avatar_url: string | null;
+    is_super_admin?: boolean;
+    theme_preference?: string | null;
   };
   org: {
     id: string;
@@ -32,6 +34,8 @@ export type SessionContext = {
   };
   memberships: Membership[];
 };
+
+const SUPER_ADMIN_EMAIL_FALLBACK = "onlogjf@gmail.com";
 
 /**
  * Carrega contexto autenticado completo. Redireciona pra login se não tiver
@@ -51,6 +55,26 @@ export async function requireSession(): Promise<SessionContext> {
     .eq("id", user.id)
     .maybeSingle();
 
+  // Best-effort: lê flags opcionais (podem não existir em todos os ambientes)
+  let isSuperAdmin = (user.email ?? "") === SUPER_ADMIN_EMAIL_FALLBACK;
+  let themePreference: string | null = null;
+  try {
+    const { data: extra } = await supabase
+      .from("profiles")
+      .select("is_super_admin, theme_preference")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (extra) {
+      if ((extra as { is_super_admin?: boolean }).is_super_admin === true) {
+        isSuperAdmin = true;
+      }
+      themePreference =
+        (extra as { theme_preference?: string | null }).theme_preference ?? null;
+    }
+  } catch {
+    // colunas opcionais inexistentes — ignora
+  }
+
   const { data: memberships } = await supabase
     .from("organization_members")
     .select(
@@ -60,7 +84,7 @@ export async function requireSession(): Promise<SessionContext> {
 
   const list = (memberships ?? []) as unknown as Membership[];
 
-  if (list.length === 0) redirect("/app/onboarding");
+  if (list.length === 0) redirect("/onboarding");
 
   const currentId =
     (profile as { current_org_id?: string } | null)?.current_org_id ??
@@ -80,6 +104,8 @@ export async function requireSession(): Promise<SessionContext> {
         (profile as { avatar_url?: string } | null)?.avatar_url ??
         user.user_metadata?.avatar_url ??
         null,
+      is_super_admin: isSuperAdmin,
+      theme_preference: themePreference,
     },
     org: {
       id: org.id,

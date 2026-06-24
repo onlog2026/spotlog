@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,12 +21,29 @@ const schema = z.object({
 });
 type Values = z.infer<typeof schema>;
 
+function translateAuthError(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("user already registered") || m.includes("already been registered")) {
+    return "Este e-mail já tem cadastro. Tente entrar.";
+  }
+  if (m.includes("password should be") || m.includes("weak password")) {
+    return "Senha muito fraca. Use ao menos 8 caracteres com letras e números.";
+  }
+  if (m.includes("rate limit") || m.includes("too many requests")) {
+    return "Muitas tentativas. Aguarde alguns minutos e tente novamente.";
+  }
+  if (m.includes("invalid email")) return "E-mail inválido.";
+  return message;
+}
+
 export function SignupForm() {
   const router = useRouter();
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
   const form = useForm<Values>({ resolver: zodResolver(schema) });
 
   async function onSubmit(values: Values) {
+    setServerError(null);
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({
       email: values.email,
@@ -38,13 +55,15 @@ export function SignupForm() {
     });
 
     if (error) {
-      toast.error(error.message);
+      const friendly = translateAuthError(error.message);
+      setServerError(friendly);
+      toast.error(friendly);
       return;
     }
 
     // Se confirmação por e-mail está ativada, a sessão pode estar null.
     if (data.session) {
-      // já logado: cria org
+      // Já logado: cria org E redireciona pro app (não onboarding pois acabou de criar org)
       const slug = `${slugify(values.org_name)}-${Math.random()
         .toString(36)
         .slice(2, 6)}`;
@@ -53,41 +72,49 @@ export function SignupForm() {
         org_slug: slug,
       });
       if (rpcError) {
-        toast.error("Conta criada mas houve erro ao criar a organização.");
-      } else {
-        toast.success("Tudo certo. Bora começar!");
+        setServerError("Conta criada, mas houve erro ao criar a organização: " + rpcError.message);
+        toast.error("Erro ao criar organização. Vamos pra tela de onboarding pra tentar de novo.");
+        window.location.assign("/onboarding");
+        return;
       }
-      router.push("/app/onboarding");
-      router.refresh();
+      toast.success("Tudo certo. Bora começar!");
+      window.location.assign("/app");
       return;
     }
 
-    toast.success(
-      "Conta criada! Verifique seu e-mail pra confirmar e entrar.",
-    );
+    toast.success("Conta criada! Verifique seu e-mail pra confirmar e entrar.");
     router.push(`/login?confirm=1&email=${encodeURIComponent(values.email)}`);
   }
 
   async function signupWithGoogle() {
+    setServerError(null);
     setGoogleLoading(true);
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/api/auth/callback?next=/app/onboarding`,
+        redirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent("/onboarding")}`,
       },
     });
     if (error) {
-      toast.error(error.message);
+      const friendly = translateAuthError(error.message);
+      setServerError(friendly);
+      toast.error(friendly);
       setGoogleLoading(false);
     }
   }
 
   return (
     <div className="space-y-4">
+      {serverError && (
+        <div className="flex items-start gap-2 rounded-md border border-red-300/40 bg-red-50/70 p-3 text-sm text-red-900">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <span>{serverError}</span>
+        </div>
+      )}
       <Button
         type="button"
-        variant="glass"
+        variant="outline"
         className="w-full"
         size="lg"
         onClick={signupWithGoogle}
@@ -138,7 +165,7 @@ export function SignupForm() {
         </Field>
         <Button
           type="submit"
-          variant="gradient"
+          variant="orange"
           size="lg"
           className="w-full"
           disabled={form.formState.isSubmitting}

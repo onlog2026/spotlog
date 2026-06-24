@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plug, Users2, Building2, Webhook, Sparkles } from "lucide-react";
+import { Plug, Users2, Building2, Webhook, Sparkles, KeyRound, Bot, FileText } from "lucide-react";
 import { requireSession } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -11,28 +11,28 @@ const items = [
     desc: "IA, e-mail, WhatsApp, Apollo, Google Places.",
   },
   {
+    href: "/app/admin/chatbot",
+    icon: Bot,
+    title: "Chatbot IA",
+    desc: "Base de conhecimento, sessões e perguntas sem resposta.",
+  },
+  {
+    href: "/app/admin/forms",
+    icon: FileText,
+    title: "Formulários",
+    desc: "Construa formulários do site e canalize as respostas como leads no CRM.",
+  },
+  {
     href: "/app/admin/equipe",
     icon: Users2,
     title: "Equipe",
     desc: "Convidar usuários, gerir papéis e permissões.",
   },
   {
-    href: "/app/admin/organizacao",
-    icon: Building2,
-    title: "Organização",
-    desc: "Dados da empresa, marca, slug, domínio.",
-  },
-  {
-    href: "/app/admin/webhooks",
-    icon: Webhook,
-    title: "Webhooks",
-    desc: "Eventos do sistema enviados pra outros serviços.",
-  },
-  {
-    href: "/app/admin/billing",
-    icon: Sparkles,
-    title: "Plano e faturamento",
-    desc: "Trial, plano atual, upgrade.",
+    href: "/app/admin/api-keys",
+    icon: KeyRound,
+    title: "API Keys",
+    desc: "Tokens pra integração com plataformas externas (tickets + pedidos).",
   },
 ];
 

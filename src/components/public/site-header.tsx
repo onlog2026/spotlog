@@ -1,27 +1,39 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SpotlogLogo } from "@/components/brand/spotlog-logo";
 import { cn } from "@/lib/utils";
 
-const links = [
+type NavLink = {
+  href?: string;
+  label: string;
+  badge?: string;
+  children?: { href: string; label: string; badge?: string }[];
+};
+
+const links: NavLink[] = [
   { href: "/", label: "Início" },
   { href: "/sobre", label: "Quem Somos" },
   {
     label: "Soluções",
     children: [
       { href: "/solucoes", label: "Todas as soluções" },
-      { href: "/ecommerce", label: "E-commerce" },
-      { href: "/farma", label: "Farma & Manipulação" },
+      { href: "/ecommerce", label: "E-commerce Express" },
+      { href: "/farma", label: "Farma — AFE Anvisa", badge: "AFE" },
     ],
   },
-  { href: "/tecnologia", label: "Tecnologia" },
+  { href: "/farma", label: "Farma", badge: "AFE" },
   { href: "/atendimento", label: "Atendimento" },
   { href: "/abrangencia", label: "Abrangência" },
+  { href: "/cases", label: "Cases" },
+  { href: "/blog", label: "Blog" },
   { href: "/contato", label: "Contato" },
 ];
+
+const TRACK_URL =
+  "https://octatracking.com.br/prerastreio?logo=aHR0cHM6Ly9zaXN0ZW1hLnNwb3Rsb2cuY29tLmJyL2ltYWdlcy9zcG90bG9nL2xvZ29zL2xvZ282MDEtNDA2LnBuZw==";
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -37,6 +49,7 @@ export function SiteHeader() {
 
   return (
     <header
+      id="top"
       className={cn(
         "fixed top-0 inset-x-0 z-50 transition-all duration-300",
         scrolled
@@ -44,8 +57,8 @@ export function SiteHeader() {
           : "bg-transparent",
       )}
     >
-      <div className="container flex h-20 items-center justify-between">
-        <Link href="/" className="group">
+      <div className="container flex h-20 items-center justify-between gap-2">
+        <Link href="/" className="group shrink-0 min-w-0">
           <SpotlogLogo variant="full" />
         </Link>
 
@@ -69,9 +82,14 @@ export function SiteHeader() {
                         <Link
                           key={c.href}
                           href={c.href}
-                          className="block px-3 py-2 text-sm text-ink-700 hover:bg-navy-50 hover:text-navy-900 rounded-lg transition-colors"
+                          className="px-3 py-2 text-sm text-ink-700 hover:bg-navy-50 hover:text-navy-900 rounded-lg transition-colors flex items-center justify-between gap-2"
                         >
-                          {c.label}
+                          <span>{c.label}</span>
+                          {c.badge && (
+                            <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                              {c.badge}
+                            </span>
+                          )}
                         </Link>
                       ))}
                     </div>
@@ -82,28 +100,52 @@ export function SiteHeader() {
               <Link
                 key={l.href}
                 href={l.href!}
-                className="px-3 py-2 text-sm font-medium text-ink-700 hover:text-navy-900 transition-colors"
+                className="px-3 py-2 text-sm font-medium text-ink-700 hover:text-navy-900 transition-colors inline-flex items-center gap-1.5"
               >
                 {l.label}
+                {l.badge && (
+                  <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                    {l.badge}
+                  </span>
+                )}
               </Link>
             ),
           )}
         </nav>
 
         <div className="hidden lg:flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/rastreamento">Rastrear</Link>
-          </Button>
+          {/* CTA destacado: Acompanhe seu pedido (vermelho oficial) */}
+          <a
+            href={TRACK_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-spotorange-500 hover:bg-spotorange-600 text-white px-4 py-2 text-sm font-bold shadow-orange-glow transition-all hover:scale-[1.03]"
+          >
+            <Package className="h-4 w-4" />
+            Acompanhe seu pedido
+          </a>
           <Button variant="soft" size="sm" asChild>
             <Link href="/login">Área do Cliente</Link>
           </Button>
-          <Button variant="orange" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild>
             <Link href="/contato">Solicitar proposta</Link>
           </Button>
         </div>
 
+        {/* CTA Acompanhe seu pedido — compacto mobile (sempre visível) */}
+        <a
+          href={TRACK_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="lg:hidden inline-flex items-center gap-1.5 rounded-full bg-spotorange-500 hover:bg-spotorange-600 text-white px-3 py-2 text-xs font-bold shadow-orange-glow shrink-0"
+          aria-label="Acompanhe seu pedido"
+        >
+          <Package className="h-3.5 w-3.5" />
+          <span className="hidden xs:inline sm:inline">Acompanhar</span>
+        </a>
+
         <button
-          className="lg:hidden p-2 text-navy-900"
+          className="lg:hidden p-2 text-navy-900 shrink-0"
           onClick={() => setOpen(!open)}
           aria-label="Menu"
         >
@@ -125,9 +167,14 @@ export function SiteHeader() {
                       key={c.href}
                       href={c.href}
                       onClick={() => setOpen(false)}
-                      className="block px-5 py-2 text-sm text-ink-700 hover:bg-navy-50 rounded-lg"
+                      className="px-5 py-2 text-sm text-ink-700 hover:bg-navy-50 rounded-lg flex items-center justify-between gap-2"
                     >
-                      {c.label}
+                      <span>{c.label}</span>
+                      {c.badge && (
+                        <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                          {c.badge}
+                        </span>
+                      )}
                     </Link>
                   ))}
                 </div>
@@ -136,21 +183,33 @@ export function SiteHeader() {
                   key={l.href}
                   href={l.href!}
                   onClick={() => setOpen(false)}
-                  className="px-3 py-2 text-sm font-medium text-ink-700 hover:bg-navy-50 rounded-lg"
+                  className="px-3 py-2 text-sm font-medium text-ink-700 hover:bg-navy-50 rounded-lg flex items-center gap-2"
                 >
-                  {l.label}
+                  <span>{l.label}</span>
+                  {l.badge && (
+                    <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                      {l.badge}
+                    </span>
+                  )}
                 </Link>
               ),
             )}
             <div className="flex flex-col gap-2 pt-3 border-t border-ink-200 mt-2">
-              <Button variant="soft" asChild>
-                <Link href="/rastreamento">Rastrear entrega</Link>
-              </Button>
+              <a
+                href={TRACK_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-spotorange-500 hover:bg-spotorange-600 text-white px-4 py-3 text-sm font-bold shadow-orange-glow"
+              >
+                <Package className="h-4 w-4" />
+                Acompanhe seu pedido
+              </a>
               <Button variant="outline" asChild>
-                <Link href="/login">Área do Cliente</Link>
+                <Link href="/login" onClick={() => setOpen(false)}>Área do Cliente</Link>
               </Button>
               <Button variant="orange" asChild>
-                <Link href="/contato">Solicitar proposta</Link>
+                <Link href="/contato" onClick={() => setOpen(false)}>Solicitar proposta</Link>
               </Button>
             </div>
           </div>

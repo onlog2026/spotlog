@@ -284,14 +284,14 @@ export function NewCampaignForm({
           </div>
           <Field label="Cadência a inscrever os leads (opcional)">
             <Select
-              value={form.sequence_id}
-              onValueChange={(v) => setForm({ ...form, sequence_id: v })}
+              value={form.sequence_id || "__none"}
+              onValueChange={(v) => setForm({ ...form, sequence_id: v === "__none" ? "" : v })}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Não inscrever automaticamente" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Não inscrever automaticamente</SelectItem>
+                <SelectItem value="__none">Não inscrever automaticamente</SelectItem>
                 {sequences.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     {s.name}
@@ -339,7 +339,7 @@ export function NewCampaignForm({
           Salvar rascunho
         </Button>
         <Button
-          variant="gradient"
+          variant="orange"
           onClick={() => submit(true)}
           disabled={loading || !form.name || noSources}
         >

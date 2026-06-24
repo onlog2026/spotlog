@@ -7,12 +7,12 @@ import { CtaBanner } from "@/components/public/cta-banner";
 export const metadata = { title: "E-commerce" };
 
 const beneficios = [
-  { icon: Zap, title: "Entregas expressas", desc: "Same-day onde disponível, com SLA monitorado em tempo real." },
-  { icon: Calendar, title: "Coletas programadas", desc: "Equipe passa no seu CD nos horários definidos." },
-  { icon: Bell, title: "Notificações automáticas", desc: "Comprador recebe atualizações por e-mail, SMS e WhatsApp." },
-  { icon: RotateCcw, title: "Logística reversa", desc: "Devoluções e trocas com mesma qualidade da ida." },
-  { icon: BarChart3, title: "Relatórios", desc: "SLA, taxa de sucesso, tempo médio — direto no painel." },
-  { icon: Package, title: "Rastreio pro comprador", desc: "Link público de acompanhamento com sua marca." },
+  { icon: Zap, title: "Same Day Delivery", desc: "Entrega de produtos aos clientes feita no mesmo dia da compra — ideal para e-commerces que precisam encantar." },
+  { icon: Calendar, title: "Coletas programadas", desc: "Equipe passa no seu CD ou loja nos horários definidos, com checklist e confirmação." },
+  { icon: Bell, title: "Atendimento personalizado", desc: "Orçamentos flexíveis e planos diferenciados para adequar às suas entregas." },
+  { icon: RotateCcw, title: "Logística reversa", desc: "Devoluções e trocas com a mesma qualidade da ida." },
+  { icon: BarChart3, title: "Acompanhamento", desc: "Visibilidade da operação — da coleta no seu CD ao comprovante no destino." },
+  { icon: Package, title: "Transporte ágil", desc: "A melhor solução com orçamentos flexíveis de acordo com sua operação." },
 ];
 
 const integracoes = [
@@ -43,13 +43,15 @@ export default function EcommercePage() {
                 </span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-navy-950 leading-[1.1] text-balance">
-                Entregas para e-commerce com mais{" "}
-                <span className="text-gradient-spotlog">controle e previsibilidade.</span>
+                E-commerce Express com{" "}
+                <span className="text-gradient-spotlog">Same Day Delivery.</span>
               </h1>
               <p className="mt-6 text-lg lg:text-xl text-ink-600 max-w-2xl leading-relaxed">
-                Reduza chamados de pós-venda, melhore a experiência do comprador
-                e tenha visibilidade total da operação — da coleta no seu CD ao
-                comprovante no destino.
+                O Same Day Delivery permite a entrega de produtos aos clientes
+                feita no mesmo dia da compra. Esse formato vem ganhando cada vez
+                mais espaço no mercado atual, principalmente quando nos referimos
+                aos e-commerces. Transporte ágil, com a melhor solução com
+                orçamentos flexíveis de acordo com sua operação.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row gap-3">
                 <Button variant="orange" size="xl" asChild>

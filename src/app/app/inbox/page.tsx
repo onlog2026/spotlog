@@ -72,7 +72,7 @@ export default async function InboxPage() {
                       {formatDateTime(co.last_message_at)}
                     </div>
                     {co.unread_count > 0 && (
-                      <Badge variant="gradient">{co.unread_count}</Badge>
+                      <Badge variant="orange">{co.unread_count}</Badge>
                     )}
                   </li>
                 );

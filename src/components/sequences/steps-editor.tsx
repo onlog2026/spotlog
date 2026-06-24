@@ -181,17 +181,17 @@ export function SequenceStepsEditor({
       ))}
 
       <div className="flex flex-wrap gap-2 pt-2">
-        <Button variant="glass" size="sm" onClick={() => add(defaultChannel)}>
+        <Button variant="outline" size="sm" onClick={() => add(defaultChannel)}>
           <Plus className="h-3 w-3" /> {defaultChannel === "email" ? "E-mail" : "WhatsApp"}
         </Button>
-        <Button variant="glass" size="sm" onClick={() => add("wait")}>
+        <Button variant="outline" size="sm" onClick={() => add("wait")}>
           <Plus className="h-3 w-3" /> Espera
         </Button>
-        <Button variant="glass" size="sm" onClick={() => add("manual_task")}>
+        <Button variant="outline" size="sm" onClick={() => add("manual_task")}>
           <Plus className="h-3 w-3" /> Tarefa
         </Button>
         <div className="flex-1" />
-        <Button variant="gradient" onClick={save} disabled={saving}>
+        <Button variant="orange" onClick={save} disabled={saving}>
           <Save className="h-4 w-4" /> Salvar
         </Button>
       </div>

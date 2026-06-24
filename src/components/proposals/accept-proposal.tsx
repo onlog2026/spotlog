@@ -83,7 +83,7 @@ export function AcceptProposal({
         validade legal conforme a MP 2.200-2/2001 e a LGPD.
       </label>
       <Button
-        variant="gradient"
+        variant="orange"
         size="lg"
         className="w-full"
         onClick={accept}

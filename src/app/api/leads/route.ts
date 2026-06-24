@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { dispatchEvent } from "@/lib/integrations/dispatcher";
 
 const schema = z.object({
   full_name: z.string().min(2),
@@ -54,14 +55,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Fallback final
+    // Fallback final 1: env var
     if (!orgId) orgId = process.env.NEXT_PUBLIC_DEFAULT_ORG_ID;
+
+    // Fallback final 2: se ainda não tem, pega a primeira (ÚNICA em deploy single-tenant)
+    if (!orgId) {
+      const { data: firstOrg } = await supabase
+        .from("organizations")
+        .select("id")
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      orgId = (firstOrg as { id: string } | null)?.id;
+    }
 
     if (!orgId) {
       return NextResponse.json(
         {
           error:
-            "Nenhuma organização-destino encontrada. Configure NEXT_PUBLIC_DEFAULT_ORG_ID ou passe organization_id.",
+            "Nenhuma organização-destino encontrada. Configure NEXT_PUBLIC_DEFAULT_ORG_ID ou crie a primeira organização.",
         },
         { status: 400 },
       );
@@ -102,7 +114,7 @@ export async function POST(req: NextRequest) {
     if (error) {
       console.error("[/api/leads] insert error", error);
       return NextResponse.json(
-        { error: "Não foi possível registrar o lead." },
+        { error: "Não foi possível registrar o lead.", details: error.message },
         { status: 500 },
       );
     }
@@ -130,6 +142,16 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       console.warn("[/api/leads] notify failed", e);
     }
+
+    // Dispara para integrações nativas (Slack, Discord, Telegram, webhook genérico)
+    dispatchEvent(orgId, "lead.created", {
+      id: (lead as { id: string }).id,
+      full_name: data.full_name,
+      email: data.email,
+      phone: data.phone,
+      company_name: data.company_name,
+      source: data.source,
+    });
 
     return NextResponse.json({ ok: true, id: (lead as { id: string }).id });
   } catch (err) {

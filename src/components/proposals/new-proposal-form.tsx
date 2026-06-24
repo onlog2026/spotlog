@@ -115,10 +115,19 @@ export function NewProposalForm({
       return;
     }
     setLoading(true);
+    const body = {
+      ...form,
+      contact_id: form.contact_id || null,
+      company_id: form.company_id || null,
+      price_table_id: form.price_table_id || null,
+      items,
+      subtotal,
+      total,
+    };
     const res = await fetch("/api/proposals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, items, subtotal, total }),
+      body: JSON.stringify(body),
     });
     const data = await res.json();
     setLoading(false);
@@ -149,14 +158,16 @@ export function NewProposalForm({
             <div className="space-y-1.5">
               <Label className="text-xs">Contato</Label>
               <Select
-                value={form.contact_id}
-                onValueChange={(v) => setForm({ ...form, contact_id: v })}
+                value={form.contact_id || "__none"}
+                onValueChange={(v) =>
+                  setForm({ ...form, contact_id: v === "__none" ? "" : v })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar contato" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhum</SelectItem>
+                  <SelectItem value="__none">Nenhum</SelectItem>
                   {contacts.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.full_name}
@@ -168,14 +179,16 @@ export function NewProposalForm({
             <div className="space-y-1.5">
               <Label className="text-xs">Empresa</Label>
               <Select
-                value={form.company_id}
-                onValueChange={(v) => setForm({ ...form, company_id: v })}
+                value={form.company_id || "__none"}
+                onValueChange={(v) =>
+                  setForm({ ...form, company_id: v === "__none" ? "" : v })
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar empresa" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
+                  <SelectItem value="__none">Nenhuma</SelectItem>
                   {companies.map((c) => (
                     <SelectItem key={c.id} value={c.id}>
                       {c.name}
@@ -217,19 +230,25 @@ export function NewProposalForm({
                   ))}
                 </SelectContent>
               </Select>
-              <Select onValueChange={(v) => addItem(v)}>
+              <Select onValueChange={(v) => addItem(v)} disabled={products.length === 0}>
                 <SelectTrigger className="w-48 h-9 text-xs">
-                  <SelectValue placeholder="+ Item da tabela" />
+                  <SelectValue placeholder={products.length === 0 ? "Tabela sem itens" : "+ Item da tabela"} />
                 </SelectTrigger>
                 <SelectContent>
-                  {products.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name} · {formatCurrency(Number(p.price))}
+                  {products.length === 0 ? (
+                    <SelectItem value="__empty" disabled>
+                      Suba uma tabela com itens em /app/propostas/tabelas
                     </SelectItem>
-                  ))}
+                  ) : (
+                    products.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name} · {formatCurrency(Number(p.price))}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
-              <Button variant="glass" size="sm" onClick={() => addItem()}>
+              <Button variant="outline" size="sm" onClick={() => addItem()}>
                 <Plus className="h-3 w-3" /> Manual
               </Button>
             </div>
@@ -366,7 +385,7 @@ export function NewProposalForm({
           Cancelar
         </Button>
         <Button
-          variant="gradient"
+          variant="orange"
           size="lg"
           onClick={submit}
           disabled={loading}

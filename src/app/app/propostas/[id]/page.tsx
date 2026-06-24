@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ExternalLink, Mail, MessageCircle, Copy } from "lucide-react";
+import { ArrowLeft, ExternalLink, Mail, MessageCircle, Copy, Sparkles } from "lucide-react";
 import { requireSession } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -69,7 +69,12 @@ export default async function ProposalDetailPage({
           <Badge variant={p.status === "accepted" ? "success" : "outline"}>
             {p.status}
           </Badge>
-          <Button variant="glass" asChild>
+          <Button variant="outline" asChild>
+            <Link href={`/app/propostas/${p.id}/ia`}>
+              <Sparkles className="h-4 w-4" /> Editor IA
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
             <a href={publicUrl} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4" /> Ver pública
             </a>

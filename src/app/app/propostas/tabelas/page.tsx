@@ -74,7 +74,7 @@ export default async function TabelasPage() {
                         </Link>
                       </div>
                       {tb.is_default && (
-                        <Badge variant="gradient" className="text-[10px]">
+                        <Badge variant="default" className="text-[10px]">
                           Default
                         </Badge>
                       )}

@@ -13,6 +13,12 @@ import {
   Building2,
   Map,
   Brain,
+  Hash,
+  Send,
+  Smartphone,
+  Calendar,
+  Webhook,
+  Zap,
 } from "lucide-react";
 import {
   Card,
@@ -132,32 +138,197 @@ const DEFS: IntegrationDef[] = [
     fields: [{ key: "api_key", label: "API Key" }],
     docs: "https://developers.google.com/maps/documentation/places/web-service",
   },
+  {
+    provider: "slack",
+    name: "Slack",
+    category: "Comunicação",
+    icon: Hash,
+    color: "from-purple-600 to-fuchsia-500",
+    desc: "Notifica um canal Slack quando lead/ticket/deal acontece.",
+    fields: [
+      {
+        key: "webhook_url",
+        label: "Incoming Webhook URL",
+        placeholder: "https://hooks.slack.com/services/T.../B.../...",
+      },
+    ],
+    docs: "https://api.slack.com/messaging/webhooks",
+  },
+  {
+    provider: "discord",
+    name: "Discord",
+    category: "Comunicação",
+    icon: MessageCircle,
+    color: "from-indigo-500 to-violet-500",
+    desc: "Notifica um canal Discord via webhook.",
+    fields: [
+      {
+        key: "webhook_url",
+        label: "Channel Webhook URL",
+        placeholder: "https://discord.com/api/webhooks/...",
+      },
+    ],
+    docs: "https://support.discord.com/hc/articles/228383668",
+  },
+  {
+    provider: "telegram",
+    name: "Telegram",
+    category: "Comunicação",
+    icon: Send,
+    color: "from-sky-500 to-blue-500",
+    desc: "Bot envia mensagem pra chat (pessoal ou grupo).",
+    fields: [
+      { key: "bot_token", label: "Bot Token (@BotFather)" },
+      { key: "chat_id", label: "Chat ID", placeholder: "-100...." },
+    ],
+    docs: "https://core.telegram.org/bots#how-do-i-create-a-bot",
+  },
+  {
+    provider: "twilio",
+    name: "Twilio SMS",
+    category: "SMS",
+    icon: Smartphone,
+    color: "from-rose-500 to-red-500",
+    desc: "Envio de SMS transacional via Twilio.",
+    fields: [
+      { key: "account_sid", label: "Account SID", placeholder: "AC..." },
+      { key: "auth_token", label: "Auth Token" },
+      { key: "from", label: "From (E.164)", placeholder: "+15005550006" },
+    ],
+    docs: "https://www.twilio.com/console",
+  },
+  {
+    provider: "google_calendar",
+    name: "Google Calendar",
+    category: "Agenda",
+    icon: Calendar,
+    color: "from-blue-500 to-indigo-500",
+    desc: "Sync de appointments com Google Calendar (OAuth — em breve).",
+    fields: [
+      { key: "oauth_token", label: "OAuth Token (cole manualmente por enquanto)" },
+      { key: "calendar_id", label: "Calendar ID", placeholder: "primary" },
+    ],
+    docs: "https://developers.google.com/calendar/api/quickstart/js",
+  },
+  {
+    provider: "webhook",
+    name: "Webhook genérico",
+    category: "Automação",
+    icon: Webhook,
+    color: "from-slate-600 to-zinc-500",
+    desc: "Dispara POST JSON pra qualquer URL nos eventos selecionados. HMAC-SHA256 opcional.",
+    fields: [
+      { key: "url", label: "URL", placeholder: "https://meusite.com/webhook" },
+      { key: "secret", label: "Secret (opcional, p/ assinar payload)", placeholder: "whsec_..." },
+    ],
+  },
+  {
+    provider: "openrouter",
+    name: "OpenRouter",
+    category: "IA",
+    icon: Brain,
+    color: "from-cyan-500 to-teal-500",
+    desc: "Acessa Claude, Gemini, Llama e dezenas de modelos via uma única API.",
+    fields: [{ key: "api_key", label: "API Key", placeholder: "sk-or-..." }],
+    docs: "https://openrouter.ai/keys",
+  },
 ];
+
+// "n8n / Make / Zapier" usam o mesmo handler do webhook genérico (provider="webhook").
+// Aparecem como cards informativos pra UX, mas guardam config no mesmo registro.
+
+const EVENT_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "lead.created", label: "Lead criado" },
+  { value: "lead.converted", label: "Lead convertido" },
+  { value: "ticket.created", label: "Ticket criado" },
+  { value: "ticket.replied", label: "Ticket respondido" },
+  { value: "appointment.created", label: "Agendamento criado" },
+  { value: "appointment.confirmed", label: "Agendamento confirmado" },
+  { value: "deal.won", label: "Negócio ganho" },
+  { value: "deal.lost", label: "Negócio perdido" },
+];
+
+const EVENT_PROVIDERS = new Set(["slack", "discord", "telegram", "webhook"]);
 
 export function IntegrationsPanel({
   existing,
 }: {
-  existing: Record<string, { id: string; is_active: boolean; last_test_ok: boolean | null }>;
+  existing: Record<
+    string,
+    {
+      id: string;
+      is_active: boolean;
+      last_test_ok: boolean | null;
+      settings?: Record<string, unknown> | null;
+    }
+  >;
 }) {
-  const groups = Array.from(new Set(DEFS.map((d) => d.category)));
+  const [query, setQuery] = useState("");
+  const [activeCat, setActiveCat] = useState<string>("Todas");
+  const groups = ["Todas", ...Array.from(new Set(DEFS.map((d) => d.category)))];
+  const filtered = DEFS.filter((d) => {
+    if (activeCat !== "Todas" && d.category !== activeCat) return false;
+    if (query.trim() === "") return true;
+    const q = query.toLowerCase();
+    return (
+      d.name.toLowerCase().includes(q) ||
+      d.desc.toLowerCase().includes(q) ||
+      d.provider.includes(q)
+    );
+  });
+
   return (
-    <div className="space-y-8">
-      {groups.map((cat) => (
-        <section key={cat}>
-          <h2 className="text-sm font-semibold text-muted-foreground mb-3 uppercase tracking-wide">
-            {cat}
-          </h2>
-          <div className="grid md:grid-cols-2 gap-4">
-            {DEFS.filter((d) => d.category === cat).map((def) => (
-              <IntegrationCard
-                key={def.provider}
-                def={def}
-                row={existing[def.provider]}
-              />
-            ))}
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <Input
+          placeholder="Buscar integração (slack, twilio, webhook…)"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="md:max-w-sm"
+        />
+        <div className="flex flex-wrap gap-2">
+          {groups.map((g) => (
+            <Button
+              key={g}
+              size="sm"
+              variant={activeCat === g ? "gradient" : "outline"}
+              onClick={() => setActiveCat(g)}
+            >
+              {g}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filtered.map((def) => (
+          <IntegrationCard
+            key={def.provider}
+            def={def}
+            row={existing[def.provider]}
+          />
+        ))}
+      </div>
+
+      {filtered.length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-12">
+          Nenhuma integração encontrada.
+        </p>
+      )}
+
+      <div className="rounded-xl border border-dashed border-white/10 p-4 bg-card/30">
+        <div className="flex items-start gap-3">
+          <Zap className="h-5 w-5 text-amber-400 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-medium text-sm">n8n, Zapier, Make — use o Webhook genérico</p>
+            <p className="text-xs text-muted-foreground">
+              Crie um workflow nessas plataformas com trigger "Webhook" e cole a URL
+              aqui no card "Webhook genérico". Eventos selecionados serão enviados
+              em tempo real como POST JSON.
+            </p>
           </div>
-        </section>
-      ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -167,13 +338,23 @@ function IntegrationCard({
   row,
 }: {
   def: IntegrationDef;
-  row?: { id: string; is_active: boolean; last_test_ok: boolean | null };
+  row?: {
+    id: string;
+    is_active: boolean;
+    last_test_ok: boolean | null;
+    settings?: Record<string, unknown> | null;
+  };
 }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const [testing, setTesting] = useState(false);
   const [saving, setSaving] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
+  const supportsEvents = EVENT_PROVIDERS.has(def.provider);
+  const initialEvents = Array.isArray(row?.settings?.events)
+    ? (row!.settings!.events as string[])
+    : [];
+  const [events, setEvents] = useState<string[]>(initialEvents);
 
   const status = row
     ? row.is_active
@@ -183,12 +364,25 @@ function IntegrationCard({
       : "inactive"
     : "missing";
 
+  function toggleEvent(ev: string) {
+    setEvents((cur) =>
+      cur.includes(ev) ? cur.filter((e) => e !== ev) : [...cur, ev],
+    );
+  }
+
   async function save() {
     setSaving(true);
+    const payload: Record<string, unknown> = {
+      provider: def.provider,
+      credentials: values,
+    };
+    if (supportsEvents) {
+      payload.settings = { events };
+    }
     const res = await fetch("/api/integrations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ provider: def.provider, credentials: values }),
+      body: JSON.stringify(payload),
     });
     setSaving(false);
     if (!res.ok) {
@@ -307,7 +501,7 @@ function IntegrationCard({
               )}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 py-2">
+          <div className="space-y-3 py-2 max-h-[60vh] overflow-y-auto">
             {def.fields.map((f) => (
               <div key={f.key} className="space-y-1.5">
                 <Label>{f.label}</Label>
@@ -321,12 +515,37 @@ function IntegrationCard({
                 />
               </div>
             ))}
+
+            {supportsEvents && (
+              <div className="space-y-2 pt-2 border-t border-white/10">
+                <Label>Disparar em:</Label>
+                <p className="text-xs text-muted-foreground">
+                  Selecione quais eventos enviam notificação pra essa integração.
+                </p>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  {EVENT_OPTIONS.map((ev) => (
+                    <label
+                      key={ev.value}
+                      className="flex items-center gap-2 text-xs cursor-pointer rounded-md border border-white/10 px-2 py-1.5 hover:bg-white/5"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={events.includes(ev.value)}
+                        onChange={() => toggleEvent(ev.value)}
+                        className="accent-current"
+                      />
+                      <span>{ev.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={() => setOpen(false)}>
               Cancelar
             </Button>
-            <Button variant="gradient" onClick={save} disabled={saving}>
+            <Button variant="orange" onClick={save} disabled={saving}>
               {saving && <Loader2 className="h-3 w-3 animate-spin" />}
               Salvar e ativar
             </Button>

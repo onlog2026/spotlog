@@ -86,6 +86,69 @@ export async function POST(req: NextRequest) {
         error: ok ? undefined : `status ${res.status}`,
       });
     }
+    if (provider === "slack" || provider === "discord") {
+      const url = i.credentials.webhook_url ?? "";
+      const body =
+        provider === "slack"
+          ? JSON.stringify({ text: "Spotlog: teste de conexão ✅" })
+          : JSON.stringify({ content: "Spotlog: teste de conexão ✅" });
+      const r = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body,
+      });
+      const ok = r.ok || r.status === 204;
+      await markOk(ctx.org.id, provider, ok);
+      return NextResponse.json({ ok, error: ok ? undefined : `status ${r.status}` });
+    }
+    if (provider === "telegram") {
+      const t = i.credentials.bot_token ?? "";
+      const c = i.credentials.chat_id ?? "";
+      const r = await fetch(`https://api.telegram.org/bot${t}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: c, text: "Spotlog: teste de conexão ✅" }),
+      });
+      const data = (await r.json().catch(() => ({}))) as { ok?: boolean; description?: string };
+      const ok = !!data.ok;
+      await markOk(ctx.org.id, provider, ok, ok ? undefined : data.description);
+      return NextResponse.json({ ok, error: ok ? undefined : data.description });
+    }
+    if (provider === "twilio") {
+      const sid = i.credentials.account_sid ?? "";
+      const tok = i.credentials.auth_token ?? "";
+      const auth = Buffer.from(`${sid}:${tok}`).toString("base64");
+      const r = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+        headers: { Authorization: `Basic ${auth}` },
+      });
+      const ok = r.ok;
+      await markOk(ctx.org.id, provider, ok);
+      return NextResponse.json({ ok, error: ok ? undefined : `status ${r.status}` });
+    }
+    if (provider === "webhook") {
+      const r = await fetch(i.credentials.url ?? "", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event: "test", timestamp: new Date().toISOString() }),
+      });
+      const ok = r.ok;
+      await markOk(ctx.org.id, provider, ok);
+      return NextResponse.json({ ok, error: ok ? undefined : `status ${r.status}` });
+    }
+    if (provider === "openrouter") {
+      const r = await fetch("https://openrouter.ai/api/v1/models", {
+        headers: { Authorization: `Bearer ${i.credentials.api_key}` },
+      });
+      const ok = r.ok;
+      await markOk(ctx.org.id, provider, ok);
+      return NextResponse.json({ ok, error: ok ? undefined : `status ${r.status}` });
+    }
+    if (provider === "google_calendar") {
+      // OAuth verdadeiro virá depois; por ora, marca como OK se tem token
+      const ok = !!i.credentials.oauth_token;
+      await markOk(ctx.org.id, provider, ok, ok ? undefined : "OAuth token ausente");
+      return NextResponse.json({ ok });
+    }
     if (provider === "zapi") {
       const res = await fetch(
         `https://api.z-api.io/instances/${i.credentials.instance_id}/token/${i.credentials.token}/status`,

@@ -1,225 +1,231 @@
 "use client";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { toast } from "sonner";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import { CheckCircle2, Loader2, Send, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-const schema = z.object({
-  full_name: z.string().min(2, "Informe seu nome completo"),
-  email: z.string().email("E-mail inválido"),
-  whatsapp: z.string().min(10, "Informe seu WhatsApp"),
-  company_name: z.string().min(2, "Informe a empresa"),
-  job_title: z.string().optional(),
-  team_size: z.string().optional(),
-  message: z.string().min(10, "Conta um pouco do que precisa"),
-  consent: z.literal(true, {
-    errorMap: () => ({ message: "Precisamos do seu consentimento (LGPD)" }),
-  }),
-});
+/**
+ * Formulário de contato geral.
+ * Submit vai direto pro endpoint /api/leads que cria lead no CRM.
+ */
+type FormState = {
+  full_name: string;
+  email: string;
+  whatsapp: string;
+  company_name: string;
+  subject: string;
+  message: string;
+  consent: boolean;
+};
 
-type FormValues = z.infer<typeof schema>;
+const initialState: FormState = {
+  full_name: "",
+  email: "",
+  whatsapp: "",
+  company_name: "",
+  subject: "comercial",
+  message: "",
+  consent: false,
+};
 
 export function ContactForm() {
-  const [done, setDone] = useState(false);
-  const form = useForm<FormValues>({
-    resolver: zodResolver(schema),
-    defaultValues: { consent: undefined as unknown as true },
-  });
+  const [data, setData] = useState<FormState>(initialState);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  async function onSubmit(values: FormValues) {
+  function update<K extends keyof FormState>(key: K, value: FormState[K]) {
+    setData((d) => ({ ...d, [key]: value }));
+  }
+
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+
+    if (!data.consent) {
+      setError("Você precisa concordar com a Política de Privacidade.");
+      return;
+    }
+    if (!data.full_name || !data.email || !data.message) {
+      setError("Preencha nome, e-mail e mensagem.");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const utm = new URLSearchParams(window.location.search);
+      const params = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...values,
-          source: "form",
-          source_detail: "site/contato",
-          utm_source: utm.get("utm_source"),
-          utm_medium: utm.get("utm_medium"),
-          utm_campaign: utm.get("utm_campaign"),
-          page_url: window.location.href,
-          referrer: document.referrer,
+          source: "site",
+          source_detail: "contato-geral",
+          full_name: data.full_name,
+          email: data.email,
+          whatsapp: data.whatsapp || undefined,
+          company_name: data.company_name || undefined,
+          message: data.message,
+          custom_fields: { subject: data.subject },
+          utm_source: params?.get("utm_source") ?? undefined,
+          utm_medium: params?.get("utm_medium") ?? undefined,
+          utm_campaign: params?.get("utm_campaign") ?? undefined,
+          page_url: typeof window !== "undefined" ? window.location.href : undefined,
+          referrer: typeof document !== "undefined" ? document.referrer || undefined : undefined,
+          consent: data.consent,
         }),
       });
-      if (!res.ok) throw new Error((await res.json()).error ?? "Erro");
-      setDone(true);
-      toast.success("Recebemos seu contato. Vamos responder em até 1 dia útil.");
-      form.reset();
-    } catch (e) {
-      toast.error(
-        e instanceof Error
-          ? e.message
-          : "Não foi possível enviar agora. Tente de novo em alguns minutos.",
-      );
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error ?? "Falha ao enviar.");
+      }
+      setSuccess(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
+      setLoading(false);
     }
   }
 
-  if (done) {
+  if (success) {
     return (
-      <div className="text-center py-12 space-y-4">
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-500/15">
-          <CheckCircle2 className="h-8 w-8 text-emerald-400" />
+      <div className="rounded-3xl bg-white/10 border border-white/20 p-8 md:p-10 text-center backdrop-blur">
+        <div className="inline-grid h-16 w-16 place-items-center rounded-full bg-success-500/30 mb-4">
+          <CheckCircle2 className="h-8 w-8 text-success-300" />
         </div>
-        <h3 className="text-xl font-bold">Recebemos! 🎉</h3>
-        <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-          Em até 1 dia útil um especialista entra em contato pelo WhatsApp ou
-          e-mail informado.
+        <h3 className="text-2xl font-bold text-white mb-2">Obrigado pelo contato! 🙌</h3>
+        <p className="text-white/80 mb-6">
+          Recebemos sua mensagem. Vamos responder em até <strong>1 dia útil</strong>.
         </p>
-        <Button
-          variant="glass"
-          onClick={() => setDone(false)}
-          className="mt-2"
-        >
-          Enviar outra mensagem
+        <Button variant="outline" asChild className="bg-white text-navy-900 hover:bg-white/90">
+          <Link href="/">Voltar pro site</Link>
         </Button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit} className="rounded-3xl bg-white/10 border border-white/20 p-6 md:p-8 backdrop-blur space-y-4">
       <div className="grid sm:grid-cols-2 gap-4">
-        <Field
-          label="Nome completo *"
-          error={form.formState.errors.full_name?.message}
-        >
-          <Input {...form.register("full_name")} placeholder="Maria Silva" />
+        <Field label="Nome" required>
+          <input
+            type="text"
+            required
+            value={data.full_name}
+            onChange={(e) => update("full_name", e.target.value)}
+            placeholder="Seu nome"
+            className={inputDark}
+          />
         </Field>
-        <Field
-          label="E-mail corporativo *"
-          error={form.formState.errors.email?.message}
-        >
-          <Input
+        <Field label="E-mail" required>
+          <input
             type="email"
-            {...form.register("email")}
-            placeholder="maria@empresa.com.br"
+            required
+            value={data.email}
+            onChange={(e) => update("email", e.target.value)}
+            placeholder="voce@email.com"
+            className={inputDark}
           />
         </Field>
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Field
-          label="WhatsApp *"
-          error={form.formState.errors.whatsapp?.message}
-        >
-          <Input
-            {...form.register("whatsapp")}
+        <Field label="WhatsApp">
+          <input
+            type="tel"
+            value={data.whatsapp}
+            onChange={(e) => update("whatsapp", e.target.value)}
             placeholder="(11) 99999-9999"
-            inputMode="tel"
+            className={inputDark}
           />
         </Field>
-        <Field
-          label="Empresa *"
-          error={form.formState.errors.company_name?.message}
-        >
-          <Input
-            {...form.register("company_name")}
+        <Field label="Empresa">
+          <input
+            type="text"
+            value={data.company_name}
+            onChange={(e) => update("company_name", e.target.value)}
             placeholder="Sua empresa"
+            className={inputDark}
           />
         </Field>
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Field label="Cargo">
-          <Input {...form.register("job_title")} placeholder="Diretor comercial" />
-        </Field>
-        <Field label="Tamanho do time de vendas">
-          <Select
-            onValueChange={(v) => form.setValue("team_size", v)}
-            defaultValue=""
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1">Só eu</SelectItem>
-              <SelectItem value="2-5">2 a 5</SelectItem>
-              <SelectItem value="6-15">6 a 15</SelectItem>
-              <SelectItem value="16-50">16 a 50</SelectItem>
-              <SelectItem value="50+">Mais de 50</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-      </div>
+      <Field label="Assunto">
+        <select
+          value={data.subject}
+          onChange={(e) => update("subject", e.target.value)}
+          className={inputDark}
+        >
+          <option value="comercial">Comercial / proposta</option>
+          <option value="farma">Transporte farmacêutico</option>
+          <option value="sac">SAC / suporte</option>
+          <option value="parceria">Parceria</option>
+          <option value="outro">Outro</option>
+        </select>
+      </Field>
 
-      <Field
-        label="O que você quer resolver? *"
-        error={form.formState.errors.message?.message}
-      >
-        <Textarea
-          {...form.register("message")}
-          rows={4}
-          placeholder="Quero automatizar a prospecção pra meu time de SDR..."
+      <Field label="Mensagem" required>
+        <textarea
+          required
+          value={data.message}
+          onChange={(e) => update("message", e.target.value)}
+          rows={5}
+          placeholder="Como podemos ajudar?"
+          className={inputDark + " resize-y"}
         />
       </Field>
 
-      <div className="flex items-start gap-2 pt-2">
-        <Checkbox
-          id="consent"
-          onCheckedChange={(c) =>
-            form.setValue("consent", c === true ? true : (undefined as never))
-          }
+      <label className="flex items-start gap-3 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={data.consent}
+          onChange={(e) => update("consent", e.target.checked)}
+          className="mt-1 h-4 w-4 rounded border-white/30 text-spotorange-500"
         />
-        <label htmlFor="consent" className="text-xs text-muted-foreground">
+        <span className="text-sm text-white/80 leading-relaxed">
           Concordo com o tratamento dos meus dados conforme a{" "}
-          <a href="/privacidade" className="text-brand-400 underline">
+          <Link href="/privacidade" className="text-spotorange-300 font-semibold underline">
             Política de Privacidade
-          </a>{" "}
-          pra que a Spotlog entre em contato.
-        </label>
-      </div>
-      {form.formState.errors.consent && (
-        <p className="text-xs text-destructive">
-          {form.formState.errors.consent.message}
-        </p>
+          </Link>
+          .
+        </span>
+      </label>
+
+      {error && (
+        <div className="rounded-xl bg-red-500/20 border border-red-300/30 px-4 py-3 text-sm text-red-100">
+          {error}
+        </div>
       )}
 
-      <Button
-        type="submit"
-        variant="gradient"
-        size="lg"
-        className="w-full"
-        disabled={form.formState.isSubmitting}
-      >
-        {form.formState.isSubmitting && (
-          <Loader2 className="h-4 w-4 animate-spin" />
-        )}
-        Enviar mensagem
-      </Button>
+      <div className="flex items-center gap-3 flex-wrap">
+        <Button type="submit" variant="orange" size="xl" disabled={loading}>
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Enviando…
+            </>
+          ) : (
+            <>
+              <Send className="h-5 w-5" />
+              Enviar mensagem
+            </>
+          )}
+        </Button>
+        <span className="inline-flex items-center gap-1.5 text-xs text-white/60">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          Dados protegidos (LGPD)
+        </span>
+      </div>
     </form>
   );
 }
 
-function Field({
-  label,
-  error,
-  children,
-}: {
-  label: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
+const inputDark =
+  "w-full rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-white/40 focus:border-spotorange-400 focus:outline-none focus:ring-2 focus:ring-spotorange-400/30 transition-all";
+
+function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs">{label}</Label>
+    <label className="block">
+      <span className="block text-sm font-semibold text-white mb-1.5">
+        {label} {required && <span className="text-spotorange-300">*</span>}
+      </span>
       {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-    </div>
+    </label>
   );
 }

@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendConvertedEmail } from "@/lib/email/lead-converted-notification";
 
 const schema = z.object({
   stage_id: z.string().uuid(),
@@ -47,5 +48,25 @@ export async function POST(
     .eq("organization_id", ctx.org.id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ ok: true });
+
+  // Se virou WON, dispara conversion side effects (email + notif + lead status)
+  if ((stage as { is_won: boolean }).is_won) {
+    try {
+      const { data: leadLink } = await admin
+        .from("leads")
+        .select("id")
+        .eq("organization_id", ctx.org.id)
+        .eq("converted_deal_id", id)
+        .maybeSingle();
+      const leadId = (leadLink as { id?: string } | null)?.id;
+      if (leadId) {
+        await admin.rpc("convert_lead", { p_lead_id: leadId, p_deal_id: id });
+        sendConvertedEmail(ctx.org.id, leadId).catch(() => {});
+      }
+    } catch {
+      // best-effort
+    }
+  }
+
+  return NextResponse.json({ ok: true, won: (stage as { is_won: boolean }).is_won });
 }

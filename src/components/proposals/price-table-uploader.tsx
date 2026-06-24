@@ -34,9 +34,26 @@ export function PriceTableUploader() {
     const buf = await f.arrayBuffer();
     const wb = XLSX.read(buf);
     const ws = wb.Sheets[wb.SheetNames[0]];
-    const data = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
+    // 1ª tentativa: header na primeira linha
+    let data = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
       defval: "",
     });
+    // Se vazio, tenta detectar header procurando primeira linha com >= 2 valores não-vazios
+    if (data.length === 0) {
+      const aoa = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, defval: "" });
+      let headerRow = -1;
+      for (let i = 0; i < Math.min(aoa.length, 15); i++) {
+        const row = aoa[i] ?? [];
+        const filled = row.filter((c) => String(c ?? "").trim() !== "").length;
+        if (filled >= 2) { headerRow = i; break; }
+      }
+      if (headerRow >= 0) {
+        data = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, {
+          defval: "",
+          range: headerRow,
+        });
+      }
+    }
     setRows(data);
     if (data.length) {
       const cols = Object.keys(data[0]);
@@ -159,16 +176,16 @@ export function PriceTableUploader() {
                       : field}
                 </Label>
                 <Select
-                  value={mapping[field] ?? ""}
+                  value={mapping[field] ?? "__none"}
                   onValueChange={(v) =>
-                    setMapping({ ...mapping, [field]: v })
+                    setMapping({ ...mapping, [field]: v === "__none" ? "" : v })
                   }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="—" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">— ignorar —</SelectItem>
+                    <SelectItem value="__none">— ignorar —</SelectItem>
                     {columns.map((c) => (
                       <SelectItem key={c} value={c}>
                         {c}
@@ -184,7 +201,7 @@ export function PriceTableUploader() {
 
       {rows.length > 0 && (
         <Button
-          variant="gradient"
+          variant="orange"
           size="lg"
           onClick={submit}
           disabled={saving || !mapping.name || !mapping.price}

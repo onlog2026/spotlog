@@ -1,46 +1,29 @@
-import { NewCampaignForm } from "@/components/prospecting/new-campaign-form";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { requireSession } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { NewCampaignForm } from "@/components/prospeccao/new-campaign-form";
 
 export const dynamic = "force-dynamic";
 
 export default async function NovaCampanhaPage() {
-  const ctx = await requireSession();
-  const supabase = await createClient();
-
-  const [{ data: sequences }, { data: integrations }] = await Promise.all([
-    supabase
-      .from("sequences")
-      .select("id, name")
-      .eq("organization_id", ctx.org.id)
-      .eq("is_active", true),
-    supabase
-      .from("integrations")
-      .select("provider, is_active")
-      .eq("organization_id", ctx.org.id)
-      .eq("is_active", true),
-  ]);
-
-  const enabledSources = (integrations ?? []).map(
-    (i) => (i as { provider: string }).provider,
-  );
-  const possibleSources = ["apollo", "google_places"].filter((s) =>
-    enabledSources.includes(s),
-  );
+  await requireSession();
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
+        <Link
+          href="/app/prospeccao"
+          className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3"
+        >
+          <ArrowLeft className="h-3 w-3" /> Campanhas
+        </Link>
         <h1 className="text-2xl md:text-3xl font-bold">Nova campanha</h1>
         <p className="text-muted-foreground mt-1">
-          Defina quem o agente deve procurar. Quanto mais específico o ICP,
-          melhor o resultado.
+          Use BrasilAPI (gratuita) pra enriquecer uma lista de CNPJs, filtre o
+          banco de empresas por segmento, ou cole uma lista de domínios.
         </p>
       </div>
-      <NewCampaignForm
-        sequences={(sequences ?? []) as never}
-        availableSources={possibleSources}
-      />
+      <NewCampaignForm />
     </div>
   );
 }

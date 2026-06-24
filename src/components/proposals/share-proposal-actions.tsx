@@ -46,13 +46,13 @@ export function ShareProposalActions({
     <div className="space-y-4">
       <div className="flex gap-2">
         <Input value={publicUrl} readOnly />
-        <Button variant="glass" size="icon" onClick={copyLink}>
+        <Button variant="outline" size="icon" onClick={copyLink}>
           <Copy className="h-4 w-4" />
         </Button>
       </div>
       <div className="grid sm:grid-cols-2 gap-2">
         <Button
-          variant="glass"
+          variant="outline"
           onClick={() => sendByChannel("email")}
           disabled={!contact?.email || sending !== null}
         >
@@ -65,7 +65,7 @@ export function ShareProposalActions({
           {contact?.email ? `(${contact.email})` : "(sem e-mail)"}
         </Button>
         <Button
-          variant="glass"
+          variant="outline"
           onClick={() => sendByChannel("whatsapp")}
           disabled={!(contact?.whatsapp || contact?.phone) || sending !== null}
         >

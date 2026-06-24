@@ -109,7 +109,7 @@ export default function NovaCadenciaPage() {
         <Button variant="ghost" onClick={() => router.back()}>
           Cancelar
         </Button>
-        <Button variant="gradient" onClick={submit} disabled={loading || !form.name}>
+        <Button variant="orange" onClick={submit} disabled={loading || !form.name}>
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
           Criar cadência
         </Button>

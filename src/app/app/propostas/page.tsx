@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, Plus, ArrowRight } from "lucide-react";
+import { FileText, Plus, ArrowRight, Sparkles } from "lucide-react";
 import { requireSession } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -38,10 +38,16 @@ export default async function PropostasPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="glass" asChild>
+          <Button variant="outline" asChild>
             <Link href="/app/propostas/tabelas">Tabelas de preço</Link>
           </Button>
-          <Button variant="gradient" asChild>
+          <Button variant="outline" asChild>
+            <Link href="/app/propostas/nova-ia">
+              <Sparkles className="h-4 w-4" />
+              Nova com IA
+            </Link>
+          </Button>
+          <Button variant="orange" asChild>
             <Link href="/app/propostas/nova">
               <Plus className="h-4 w-4" />
               Nova proposta
@@ -63,10 +69,10 @@ export default async function PropostasPage() {
                 propostas em segundos.
               </p>
               <div className="mt-6 flex gap-2 justify-center">
-                <Button variant="glass" asChild>
+                <Button variant="outline" asChild>
                   <Link href="/app/propostas/tabelas">Subir tabela</Link>
                 </Button>
-                <Button variant="gradient" asChild>
+                <Button variant="orange" asChild>
                   <Link href="/app/propostas/nova">Criar proposta</Link>
                 </Button>
               </div>

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
+import { WelcomeBanner } from "@/components/onboarding/welcome-banner";
 
 export const dynamic = "force-dynamic";
 
@@ -114,6 +115,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-8">
+      <WelcomeBanner />
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">
@@ -124,13 +126,13 @@ export default async function DashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="glass" asChild>
+          <Button variant="outline" asChild>
             <Link href="/app/prospeccao/nova">
               <Bot className="h-4 w-4" />
               Nova campanha
             </Link>
           </Button>
-          <Button variant="gradient" asChild>
+          <Button variant="orange" asChild>
             <Link href="/app/leads/novo">
               <Target className="h-4 w-4" />
               Adicionar lead

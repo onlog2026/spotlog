@@ -41,3 +41,13 @@ next-env.d.ts
 .claude/
 .vercel/
 
+
+# Internos — nunca commitar (dados de preço, prompts com secrets, dumps)
+*.xlsx
+CLAUDE.md
+CLAUDE_INIT_PROMPT.md
+ALL_MISSING_MIGRATIONS.sql
+MISSING_RPCS_PART2.sql
+pdf_text_extracted.txt
+ajuste Landing Page.pdf
+scripts/set-passwords.mjs

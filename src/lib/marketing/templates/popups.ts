@@ -1,0 +1,116 @@
+import { type PopupTemplate, pollinationsCover } from "./types";
+
+const cover = (p: string) => pollinationsCover(p, 600, 400);
+
+export const POPUP_TEMPLATES: PopupTemplate[] = [
+  {
+    slug: "exit-intent-oferta-15pct",
+    title: "Exit Intent — 15% off na primeira coleta",
+    description: "Dispara quando o visitante move o mouse pra fechar a aba. Oferta agressiva pra recuperar.",
+    category: "exit-intent",
+    cover_url: cover("popup exit intent discount offer modal Brazil professional"),
+    preset: {
+      name: "Exit Intent — 15% off",
+      title: "Saiu sem cotar? Leva 15% off",
+      body: "Cota com a Spotlog ainda hoje e ganhe 15% de desconto na primeira coleta. Oferta válida só hoje.",
+      cta_label: "Quero meu desconto",
+      cta_url: "/contato?utm_campaign=exit-15off",
+      cta_form_slug: "solicitar-proposta",
+      trigger_type: "exit_intent",
+      trigger_value: "",
+      display_on_paths: ["/", "/precos", "/farma", "/ecommerce"],
+    },
+  },
+  {
+    slug: "scroll-50-newsletter",
+    title: "Scroll 50% — Newsletter logística",
+    description: "Quando rolou metade da página, mostra inscrição na newsletter.",
+    category: "scroll",
+    cover_url: cover("newsletter signup popup modal email logistics professional"),
+    preset: {
+      name: "Scroll 50 — Newsletter",
+      title: "Receba dicas semanais de logística",
+      body: "Estratégias de redução de custo, tendências do setor e cases reais. Toda terça no seu e-mail.",
+      cta_label: "Quero receber",
+      cta_url: "",
+      cta_form_slug: "newsletter-blog",
+      trigger_type: "scroll",
+      trigger_value: "50",
+      display_on_paths: ["/blog", "/blog/*"],
+    },
+  },
+  {
+    slug: "time-5s-anvisa",
+    title: "Time 5s — Selo AFE Anvisa",
+    description: "Após 5 segundos na página de farma, destaca certificação Anvisa.",
+    category: "time",
+    cover_url: cover("Anvisa seal certification pharmaceutical popup professional Brazil"),
+    preset: {
+      name: "Time 5s — Selo AFE Anvisa",
+      title: "Sabia que somos AFE Anvisa?",
+      body: "Spotlog é uma das poucas transportadoras com Autorização de Funcionamento da Anvisa pra transporte farmacêutico.",
+      cta_label: "Quero saber mais",
+      cta_url: "/farma?utm_campaign=popup-afe",
+      trigger_type: "time",
+      trigger_value: "5",
+      display_on_paths: ["/farma", "/"],
+    },
+  },
+  {
+    slug: "time-10s-whatsapp",
+    title: "Time 10s — Fale com comercial",
+    description: "Após 10s, oferece atendimento direto pelo WhatsApp.",
+    category: "time",
+    cover_url: cover("WhatsApp chat popup commercial sales Brazil professional"),
+    preset: {
+      name: "Time 10s — WhatsApp comercial",
+      title: "Quer falar com nosso comercial agora?",
+      body: "Resposta em até 5 minutos no horário comercial. Sem robô, sem fila.",
+      cta_label: "Abrir WhatsApp",
+      cta_url: "https://wa.me/5511999990000?text=Vim%20pelo%20site%20da%20Spotlog%20e%20quero%20cota%C3%A7%C3%A3o",
+      trigger_type: "time",
+      trigger_value: "10",
+      display_on_paths: ["/"],
+    },
+  },
+  {
+    slug: "page-pricing-cta",
+    title: "Página /precos — Plano Enterprise",
+    description: "Quando visita a página de preços, oferece falar com vendas pra plano custom.",
+    category: "page-visit",
+    cover_url: cover("enterprise sales contact popup pricing page professional"),
+    preset: {
+      name: "Pricing — Enterprise",
+      title: "Volume alto? Temos plano Enterprise",
+      body: "Acima de 500 entregas/dia? Falamos com você pra desenhar um plano sob medida com SLA personalizado.",
+      cta_label: "Falar com vendas",
+      cta_url: "/contato?utm_campaign=enterprise",
+      cta_form_slug: "solicitar-proposta",
+      trigger_type: "page_visit",
+      trigger_value: "/precos",
+      display_on_paths: ["/precos"],
+    },
+  },
+  {
+    slug: "exit-intent-checklist",
+    title: "Exit Intent — Checklist Anvisa",
+    description: "Antes de sair, oferece checklist gratuito de conformidade.",
+    category: "exit-intent",
+    cover_url: cover("checklist download popup exit intent Anvisa compliance Brazil"),
+    preset: {
+      name: "Exit Intent — Checklist Anvisa",
+      title: "Antes de sair: leva o checklist Anvisa grátis",
+      body: "38 itens da RDC 304/2019 pra você auditar sua operação. PDF + Excel.",
+      cta_label: "Quero o checklist",
+      cta_url: "/contato?utm_campaign=exit-checklist",
+      cta_form_slug: "baixar-ebook",
+      trigger_type: "exit_intent",
+      trigger_value: "",
+      display_on_paths: ["/farma", "/blog/*"],
+    },
+  },
+];
+
+export function findPopupTemplate(slug: string): PopupTemplate | undefined {
+  return POPUP_TEMPLATES.find((t) => t.slug === slug);
+}

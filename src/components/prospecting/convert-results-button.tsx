@@ -27,7 +27,7 @@ export function ConvertResultsButton({ campaignId }: { campaignId: string }) {
   }
 
   return (
-    <Button variant="glass" size="sm" onClick={convert} disabled={loading}>
+    <Button variant="outline" size="sm" onClick={convert} disabled={loading}>
       {loading ? (
         <Loader2 className="h-3 w-3 animate-spin" />
       ) : (

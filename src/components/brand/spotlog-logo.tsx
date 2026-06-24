@@ -1,4 +1,6 @@
+"use client";
 import { cn } from "@/lib/utils";
+import { useId } from "react";
 
 /**
  * Logo oficial Spotlog
@@ -11,14 +13,19 @@ import { cn } from "@/lib/utils";
  *    - S esquerda: BRANCO  (contraste com azul de fundo)
  *    - S direita:  vermelho mais claro #e23a3a
  *    - SPOT em branco, LOG em vermelho claro
+ *
+ *  animated (default true): aplica um shimmer/luz que percorre o mark
+ *  a cada ciclo. Apenas afeta variantes que mostram o mark (full/stacked/mark).
  */
 export function SpotlogLogo({
   variant = "full",
   light = false,
+  animated = true,
   className,
 }: {
   variant?: "full" | "stacked" | "mark" | "wordmark";
   light?: boolean;
+  animated?: boolean;
   className?: string;
 }) {
   // Cores do "S" — adaptam ao fundo
@@ -26,6 +33,11 @@ export function SpotlogLogo({
   const rightStroke = light ? "#ff3a3a" : "#ba0102";
   const dashLeft = light ? "#011960" : "#ffffff";
   const dashRight = light ? "#ffffff" : "#ffffff";
+
+  // IDs únicos para defs SVG (evita colisão quando vários logos coexistem)
+  const uid = useId().replace(/:/g, "");
+  const maskId = `spotlog-mask-${uid}`;
+  const gradId = `spotlog-shimmer-grad-${uid}`;
 
   const Mark = (
     <svg
@@ -35,6 +47,29 @@ export function SpotlogLogo({
       className="h-full w-full"
       aria-hidden="true"
     >
+      <defs>
+        {/* Gradiente do brilho — linha branca semi-transparente diagonal */}
+        <linearGradient id={gradId} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="45%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="50%" stopColor="#ffffff" stopOpacity="0.85" />
+          <stop offset="55%" stopColor="#ffffff" stopOpacity="0" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+        </linearGradient>
+
+        {/* Máscara: o shimmer só aparece DENTRO dos paths do logo */}
+        <mask id={maskId} maskUnits="userSpaceOnUse">
+          <path
+            d="M 78 12 C 60 10, 32 12, 22 28 C 12 42, 24 54, 44 54 L 54 54 L 54 38 L 44 38 C 38 38, 36 32, 40 28 C 46 22, 64 22, 78 26 Z"
+            fill="white"
+          />
+          <path
+            d="M 22 88 C 40 90, 68 88, 78 72 C 88 58, 76 46, 56 46 L 46 46 L 46 62 L 56 62 C 62 62, 64 68, 60 72 C 54 78, 36 78, 22 74 Z"
+            fill="white"
+          />
+        </mask>
+      </defs>
+
       {/* Metade superior do "S" */}
       <path
         d="M 78 12 C 60 10, 32 12, 22 28 C 12 42, 24 54, 44 54 L 54 54 L 54 38 L 44 38 C 38 38, 36 32, 40 28 C 46 22, 64 22, 78 26 Z"
@@ -62,6 +97,21 @@ export function SpotlogLogo({
         strokeLinecap="round"
         fill="none"
       />
+
+      {/* Camada de brilho — só renderiza se animated=true */}
+      {animated && (
+        <g mask={`url(#${maskId})`} style={{ pointerEvents: "none" }}>
+          <rect
+            x="-100"
+            y="0"
+            width="80"
+            height="100"
+            fill={`url(#${gradId})`}
+            className="spotlog-shimmer-rect"
+            transform="rotate(20 50 50)"
+          />
+        </g>
+      )}
     </svg>
   );
 

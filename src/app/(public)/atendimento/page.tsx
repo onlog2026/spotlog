@@ -11,15 +11,17 @@ export default function AtendimentoPage() {
         <div className="container relative">
           <div className="max-w-3xl mx-auto text-center">
             <div className="text-sm font-semibold text-spotorange-600 uppercase tracking-wider mb-4">
-              Atendimento
+              Atendimento Spotlog
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-navy-950 leading-[1.1] text-balance">
-              Suporte que <span className="text-gradient-spotlog">resolve.</span>{" "}
-              Não suporte que esquece.
+              Equipe sempre em{" "}
+              <span className="text-gradient-spotlog">prontidão.</span>
             </h1>
             <p className="mt-6 text-lg lg:text-xl text-ink-600 leading-relaxed">
-              Cada chamado, cada conversa, cada solicitação — registrada,
-              priorizada e tratada por gente que conhece sua operação.
+              Possuímos uma equipe de atendimento que está sempre em prontidão
+              para atender todas as suas solicitações sempre que necessário,
+              além de te manter informado sobre qualquer situação referente à
+              solicitação realizada.
             </p>
           </div>
         </div>

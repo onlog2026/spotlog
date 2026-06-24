@@ -14,12 +14,22 @@ export default async function IntegracoesPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Integrações</h1>
-        <p className="text-muted-foreground mt-1">
-          Conecte sua IA, e-mail, WhatsApp e bases de prospecção. Sem chave,
-          essas funções ficam em modo manual.
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold">Marketplace de integrações</h1>
+          <p className="text-muted-foreground mt-1">
+            Conecte Slack, Discord, Telegram, Twilio, WhatsApp, e-mail, calendários,
+            IA, prospecção e disparo de webhooks pra n8n/Zapier/Make.
+          </p>
+        </div>
+        <a
+          href="/api-docs"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm rounded-md border border-white/10 px-3 py-1.5 hover:bg-white/5"
+        >
+          Ver API pública →
+        </a>
       </div>
       <IntegrationsPanel
         existing={

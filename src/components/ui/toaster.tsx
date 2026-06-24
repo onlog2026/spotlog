@@ -1,12 +1,14 @@
 "use client";
 import { Toaster as SonnerToaster } from "sonner";
-import { useTheme } from "next-themes";
+import { useSpotlogTheme } from "@/components/theme-provider";
 
 export function Toaster() {
-  const { theme } = useTheme();
+  const { theme } = useSpotlogTheme();
+  const sonnerTheme: "light" | "dark" =
+    theme === "dark" || theme === "neon" ? "dark" : "light";
   return (
     <SonnerToaster
-      theme={(theme as "light" | "dark" | "system") || "system"}
+      theme={sonnerTheme}
       position="top-right"
       richColors
       closeButton

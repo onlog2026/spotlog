@@ -28,7 +28,7 @@ export default async function CadenciasPage() {
             cada contato.
           </p>
         </div>
-        <Button variant="gradient" asChild>
+        <Button variant="orange" asChild>
           <Link href="/app/cadencias/nova">
             <Plus className="h-4 w-4" />
             Nova cadência
@@ -46,7 +46,7 @@ export default async function CadenciasPage() {
             Cadências são as sequências de mensagens que o agente envia
             automaticamente pra cada contato inscrito.
           </p>
-          <Button variant="gradient" className="mt-6" asChild>
+          <Button variant="orange" className="mt-6" asChild>
             <Link href="/app/cadencias/nova">Criar primeira cadência</Link>
           </Button>
         </div>
