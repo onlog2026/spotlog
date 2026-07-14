@@ -1,0 +1,145 @@
+[
+  {
+    "section": "beneficios",
+    "slot": "clients_eyebrow",
+    "title": "Marcas que confiam na Spotlog",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "beneficios",
+    "slot": "eyebrow",
+    "title": "Por que escolher a Spotlog?",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "beneficios",
+    "slot": "heading",
+    "title": "Não somos uma\ntransportadora.\nSomos seu *operador logístico*.",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "beneficios",
+    "slot": "lead",
+    "title": null,
+    "description": "Última milha, armazenagem, logística farmacêutica, operações dedicadas, distribuição recorrente e crescimento regional. Tudo em um único parceiro — com indicadores que você acompanha em tempo real.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 3,
+    "metadata": {}
+  },
+  {
+    "section": "beneficios",
+    "slot": "client-1",
+    "title": "Ultrafarma",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 4,
+    "metadata": {}
+  },
+  {
+    "section": "beneficios",
+    "slot": "client-2",
+    "title": "Drogaria São Paulo",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 5,
+    "metadata": {}
+  },
+  {
+    "section": "beneficios",
+    "slot": "client-3",
+    "title": "Miess",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 6,
+    "metadata": { "tag": "novo" }
+  },
+  {
+    "section": "beneficios",
+    "slot": "client-4",
+    "title": "Bouclé",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 7,
+    "metadata": { "tag": "novo" }
+  },
+  {
+    "section": "beneficios",
+    "slot": "client-5",
+    "title": "Dandas Cosméticos",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 8,
+    "metadata": { "tag": "novo" }
+  },
+  {
+    "section": "beneficios",
+    "slot": "metric-1",
+    "title": "Entregas com sucesso",
+    "description": "%",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 9,
+    "metadata": { "target": 98, "decimals": 0, "suffix": "" }
+  },
+  {
+    "section": "beneficios",
+    "slot": "metric-2",
+    "title": "Entregas realizadas",
+    "description": "mil",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 10,
+    "metadata": { "target": 500, "decimals": 0, "suffix": "+" }
+  },
+  {
+    "section": "beneficios",
+    "slot": "metric-3",
+    "title": "Marcas atendidas",
+    "description": "",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 11,
+    "metadata": { "target": 220, "decimals": 0, "suffix": "+" }
+  },
+  {
+    "section": "beneficios",
+    "slot": "metric-4",
+    "title": "Clientes atendidos/mês",
+    "description": "",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 12,
+    "metadata": { "target": 1200, "decimals": 0, "suffix": "+" }
+  }
+]

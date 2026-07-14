@@ -1,0 +1,222 @@
+[
+  {
+    "section": "cobertura",
+    "slot": "area-eyebrow",
+    "title": "Área de atuação",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "area-heading",
+    "title": "interior do estado",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "area-lead",
+    "title": null,
+    "description": "Operamos a capital e toda a Região Metropolitana — e levamos sua carga ao interior de SP: Campinas, Sorocaba, Jundiaí, São José dos Campos, Ribeirão Preto, Baixada Santista e além, com estrutura para crescimento regional.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "controle-eyebrow",
+    "title": "Controle operacional",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 3,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "controle-heading",
+    "title": "gera confiança",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 4,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "controle-lead",
+    "title": null,
+    "description": "Do pedido à entrega, tudo acompanhado em tempo real. Menos chamados perdidos. Mais previsibilidade.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 5,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "ctrl-1",
+    "title": "Rastreabilidade",
+    "description": "Cada parada com geolocalização, hora e status.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 6,
+    "metadata": { "icon": "Pin" }
+  },
+  {
+    "section": "cobertura",
+    "slot": "ctrl-2",
+    "title": "Evidência de entrega",
+    "description": "Foto e assinatura digital por pedido.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 7,
+    "metadata": { "icon": "Camera" }
+  },
+  {
+    "section": "cobertura",
+    "slot": "ctrl-3",
+    "title": "Gestão de ocorrências",
+    "description": "Causa, evidência e tratativa registradas.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 8,
+    "metadata": { "icon": "Doc" }
+  },
+  {
+    "section": "cobertura",
+    "slot": "ctrl-4",
+    "title": "SLA dedicado",
+    "description": "Acordos por cliente e tipo de entrega.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 9,
+    "metadata": { "icon": "Shield" }
+  },
+  {
+    "section": "cobertura",
+    "slot": "ctrl-5",
+    "title": "Coletas & rotas",
+    "description": "Programadas, recorrentes e otimizadas.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 10,
+    "metadata": { "icon": "Truck" }
+  },
+  {
+    "section": "cobertura",
+    "slot": "ctrl-6",
+    "title": "Relatórios",
+    "description": "Performance por rota, cliente e período.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 11,
+    "metadata": { "icon": "Star" }
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-eyebrow",
+    "title": "Atendimento",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 12,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-heading",
+    "title": "clareza e agilidade",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 13,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-lead",
+    "title": null,
+    "description": "Quando você abre um chamado ou liga, quem responde é alguém do time que conhece o seu segmento e tem o histórico da operação na frente. Tecnologia onde precisa ser invisível, gente quando precisa ser humano.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 14,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-image",
+    "title": null,
+    "description": null,
+    "image_url": "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=900&auto=format&fit=crop&q=80",
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 15,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-1",
+    "title": "WhatsApp Business",
+    "description": "Resposta em poucos minutos, com humano.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 16,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-2",
+    "title": "SAC e chamados",
+    "description": "Cada ocorrência vira ticket com SLA.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 17,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-3",
+    "title": "E-mail dedicado",
+    "description": "SAC, financeiro e regulatório separados.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 18,
+    "metadata": {}
+  },
+  {
+    "section": "cobertura",
+    "slot": "atend-4",
+    "title": "Gerente de conta",
+    "description": "Para operações dedicadas e premium.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 19,
+    "metadata": {}
+  }
+]

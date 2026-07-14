@@ -30,6 +30,8 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vercel-token
+vercel-token.txt
 
 # typescript
 *.tsbuildinfo
@@ -51,3 +53,10 @@ MISSING_RPCS_PART2.sql
 pdf_text_extracted.txt
 ajuste Landing Page.pdf
 scripts/set-passwords.mjs
+
+# Extração temporária do Spotlog.zip
+_zip_inspect/
+Spotlog.zip
+scripts/seed-hero.mjs
+
+SPOTLOG_HANDOFF.md

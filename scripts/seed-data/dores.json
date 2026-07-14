@@ -1,0 +1,145 @@
+[
+  {
+    "section": "dores",
+    "slot": "eyebrow",
+    "title": "O bloco que mais converte",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "heading",
+    "title": "Sua operação enfrenta",
+    "description": "algum ",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "heading-emphasis",
+    "title": "desses desafios?",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "lead",
+    "title": null,
+    "description": "Se você se identificou com pelo menos um, a gente resolve isso.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 3,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "item-1",
+    "title": "Entregas atrasadas",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 4,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "item-2",
+    "title": "Reclamações de clientes",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 5,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "item-3",
+    "title": "Falta de visibilidade",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 6,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "item-4",
+    "title": "Dificuldade para escalar",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 7,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "item-5",
+    "title": "Custos logísticos elevados",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 8,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "item-6",
+    "title": "Problemas com transportadoras",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 9,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "callout",
+    "title": "Nós resolvemos isso.",
+    "description": "Descubra como reduzir prazos de entrega e aumentar a satisfação dos seus clientes — sem compromisso e sem custo.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 10,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "cta",
+    "title": null,
+    "description": null,
+    "image_url": null,
+    "cta_label": "Solicitar diagnóstico gratuito",
+    "cta_url": "#contato",
+    "sort": 11,
+    "metadata": {}
+  },
+  {
+    "section": "dores",
+    "slot": "cta-secondary",
+    "title": null,
+    "description": null,
+    "image_url": null,
+    "cta_label": "Receber estudo operacional sem custo",
+    "cta_url": "#contato",
+    "sort": 12,
+    "metadata": {}
+  }
+]

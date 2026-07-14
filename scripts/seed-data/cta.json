@@ -1,0 +1,101 @@
+[
+  {
+    "section": "cta",
+    "slot": "eyebrow",
+    "title": "Vamos otimizar sua logística",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "heading",
+    "title": "Descubra quanto\nsua operação pode *melhorar*.",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "lead",
+    "title": null,
+    "description": "Receba um estudo operacional sem custo: onde estão os gargalos, quanto dá pra reduzir em prazo e custo, e como escalar com segurança. Sem compromisso.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "item-whatsapp",
+    "title": "WhatsApp",
+    "description": null,
+    "image_url": null,
+    "cta_label": "(11) 9 0000-0000",
+    "cta_url": "https://wa.me/5511900000000",
+    "sort": 3,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "item-mail",
+    "title": "E-mail",
+    "description": null,
+    "image_url": null,
+    "cta_label": "comercial@spotlog.com.br",
+    "cta_url": "mailto:comercial@spotlog.com.br",
+    "sort": 4,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "item-base",
+    "title": "Base",
+    "description": null,
+    "image_url": null,
+    "cta_label": "São Paulo · SP · RMSP",
+    "cta_url": null,
+    "sort": 5,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "success",
+    "title": "Recebemos sua solicitação.",
+    "description": "Um especialista da Spotlog prepara seu diagnóstico e entra em contato em até 1 dia útil.",
+    "image_url": null,
+    "cta_label": "Enviar outro",
+    "cta_url": null,
+    "sort": 6,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "form_submit",
+    "title": null,
+    "description": null,
+    "image_url": null,
+    "cta_label": "Receber diagnóstico gratuito",
+    "cta_url": null,
+    "sort": 7,
+    "metadata": {}
+  },
+  {
+    "section": "cta",
+    "slot": "form_consent",
+    "title": null,
+    "description": "Concordo com o tratamento dos meus dados para contato comercial, conforme a Política de Privacidade e a LGPD.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 8,
+    "metadata": {}
+  }
+]

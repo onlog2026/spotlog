@@ -1,0 +1,68 @@
+[
+  {
+    "section": "blog",
+    "slot": "eyebrow",
+    "title": "Conteúdo",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "blog",
+    "slot": "heading",
+    "title": "Logística que ensina, não só entrega.",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "blog",
+    "slot": "lead",
+    "title": null,
+    "description": "Conteúdo prático sobre logística para ecommerce e farma, rastreabilidade e operação — para quem quer entregar melhor e crescer com previsibilidade.",
+    "image_url": null,
+    "cta_label": "Ver todos os artigos",
+    "cta_url": "#",
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "blog",
+    "slot": "item-1",
+    "title": "Por que a logística farma exige mais controle?",
+    "description": "Produtos sensíveis pedem processo, rastreabilidade e documentação. Veja o que muda na operação.",
+    "image_url": "https://images.unsplash.com/photo-1581093588401-fbb62a02f120?w=800&auto=format&fit=crop&q=80",
+    "cta_label": null,
+    "cta_url": "#",
+    "sort": 10,
+    "metadata": { "tag": "Logística farma", "read": "5 min", "scene": "pharmacy" }
+  },
+  {
+    "section": "blog",
+    "slot": "item-2",
+    "title": "Como o rastreamento reduz reclamações no pós-venda",
+    "description": "Comunicação proativa derruba chamados em até 40%. Entenda a mecânica por trás disso.",
+    "image_url": "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=800&auto=format&fit=crop&q=80",
+    "cta_label": null,
+    "cta_url": "#",
+    "sort": 11,
+    "metadata": { "tag": "Ecommerce", "read": "4 min", "scene": "boxes" }
+  },
+  {
+    "section": "blog",
+    "slot": "item-3",
+    "title": "Quanto sua empresa economiza com fulfillment profissional",
+    "description": "Crescer sem aumentar estrutura é possível. Fazemos a conta junto com você.",
+    "image_url": "https://images.unsplash.com/photo-1553413077-190dd305871c?w=800&auto=format&fit=crop&q=80",
+    "cta_label": null,
+    "cta_url": "#",
+    "sort": 12,
+    "metadata": { "tag": "Fulfillment", "read": "6 min", "scene": "warehouse" }
+  }
+]

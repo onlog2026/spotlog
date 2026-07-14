@@ -1,0 +1,10 @@
+[
+  { "section": "showcase", "slot": "eyebrow", "title": "Spotlog na rua", "sort": 0, "metadata": {} },
+  { "section": "showcase", "slot": "heading", "title": "A marca que seu cliente vê na *porta de casa*.", "sort": 1, "metadata": {} },
+  { "section": "showcase", "slot": "lead", "description": "Frota padronizada, uniforme oficial, embalagem com sua identidade e atendimento humano. Veja como a Spotlog chega na ponta.", "sort": 2, "metadata": {} },
+  { "section": "showcase", "slot": "item-1", "title": "Controle total da coleta à entrega", "image_url": "/creatives/spotlog-creative-1.png", "sort": 3, "metadata": { "type": "image", "tag": "Story" } },
+  { "section": "showcase", "slot": "item-2", "title": "Tecnologia + suporte humano", "image_url": "/videos/spotlog-creative-2.mp4", "sort": 4, "metadata": { "type": "video", "tag": "Vídeo", "poster": "/creatives/spotlog-creative-2.png" } },
+  { "section": "showcase", "slot": "item-3", "title": "Sua marca em boas mãos", "image_url": "/creatives/spotlog-creative-2.png", "sort": 5, "metadata": { "type": "image", "tag": "Story" } },
+  { "section": "showcase", "slot": "item-4", "title": "Logística inteligente", "image_url": "/creatives/spotlog-creative-3.png", "sort": 6, "metadata": { "type": "image", "tag": "Foto" } },
+  { "section": "showcase", "slot": "item-5", "title": "Spotlog na operação", "image_url": "/creatives/spotlog-creative-4.png", "sort": 7, "metadata": { "type": "image", "tag": "Foto" } }
+]

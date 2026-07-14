@@ -1,0 +1,112 @@
+[
+  {
+    "section": "rastreio",
+    "slot": "eyebrow",
+    "title": "Acompanhe sua operação",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "rastreio",
+    "slot": "heading",
+    "title": "Do pedido à entrega,",
+    "description": "de qualquer lugar",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "rastreio",
+    "slot": "lead",
+    "title": null,
+    "description": "Cole o código que você recebeu e veja status, motorista, previsão e evidência. Seu cliente final também acompanha — menos chamados, mais satisfação.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "rastreio",
+    "slot": "status_eyebrow",
+    "title": "Transparência",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 3,
+    "metadata": {}
+  },
+  {
+    "section": "rastreio",
+    "slot": "status_heading",
+    "title": "O que cada status significa",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 4,
+    "metadata": {}
+  },
+  {
+    "section": "rastreio",
+    "slot": "item-1",
+    "title": "Pedido criado",
+    "description": "Recebemos seu pedido no sistema.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 5,
+    "metadata": { "color": "var(--navy)", "icon": "box" }
+  },
+  {
+    "section": "rastreio",
+    "slot": "item-2",
+    "title": "Coletado",
+    "description": "Mercadoria retirada e conferida.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 6,
+    "metadata": { "color": "var(--navy)", "icon": "truck" }
+  },
+  {
+    "section": "rastreio",
+    "slot": "item-3",
+    "title": "Em rota",
+    "description": "A caminho do endereço de entrega.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 7,
+    "metadata": { "color": "var(--red)", "icon": "pin" }
+  },
+  {
+    "section": "rastreio",
+    "slot": "item-4",
+    "title": "Entregue",
+    "description": "Com foto e assinatura do recebedor.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 8,
+    "metadata": { "color": "var(--green)", "icon": "check" }
+  },
+  {
+    "section": "rastreio",
+    "slot": "item-5",
+    "title": "Ocorrência",
+    "description": "Algo precisou de atenção — tratado e registrado.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 9,
+    "metadata": { "color": "var(--amber)", "icon": "doc" }
+  }
+]

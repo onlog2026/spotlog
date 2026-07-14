@@ -1,0 +1,112 @@
+[
+  {
+    "section": "portfolio",
+    "slot": "eyebrow",
+    "title": "Portfólio de serviços",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "portfolio",
+    "slot": "lead",
+    "title": null,
+    "description": "O cliente não compra \"frete\". Compra crescimento, escalabilidade, previsibilidade e tranquilidade. Clique em cada serviço para ver como funciona.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-1",
+    "title": "Ecommerce",
+    "description": "Crescimento das vendas",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": { "n": "01", "svc": "same-day", "d": "Integração com as maiores plataformas e marketplaces, expedição rápida e melhor experiência do consumidor. Atendimento Same Day e Next Day." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-2",
+    "title": "Fulfillment",
+    "description": "Escalabilidade",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 3,
+    "metadata": { "n": "02", "svc": "fulfillment", "d": "Recebimento, armazenagem, separação, embalagem e expedição. Cresça sem aumentar a estrutura. Black Friday e picos deixam de ser problema." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-3",
+    "title": "Coleta Programada",
+    "description": "Previsibilidade",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 4,
+    "metadata": { "n": "03", "svc": "coleta", "d": "Retiradas em horários e frequências acordadas, rotas otimizadas e integração com Same Day e Next Day. Uma rotina logística confiável." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-4",
+    "title": "Entregador Dedicado",
+    "description": "Exclusividade",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 5,
+    "metadata": { "n": "04", "svc": "dedicado", "d": "Entregadores atuando como extensão da sua equipe, com disponibilidade exclusiva para coletas, entregas e atendimentos urgentes. Ideal para laboratórios, farmácias, hospitais e clínicas." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-5",
+    "title": "Logística Reversa",
+    "description": "Experiência do cliente",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 6,
+    "metadata": { "n": "05", "svc": "reversa", "d": "Coleta de devoluções, trocas, garantias e retornos com rastreabilidade total. Transforme devoluções em oportunidades de fidelização." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-6",
+    "title": "Operação Sob Demanda",
+    "description": "Flexibilidade",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 7,
+    "metadata": { "n": "06", "svc": "sob-demanda", "d": "Recursos logísticos adicionais sob demanda — motos, utilitários e equipes de apoio — para absorver picos de volume sem comprometer prazos." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-7",
+    "title": "Fármaco",
+    "description": "Segurança e conformidade",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 8,
+    "metadata": { "n": "07", "svc": "farmaco", "d": "Transporte de medicamentos, cosméticos e produtos regulados, com processos e documentação adequados às exigências do setor." }
+  },
+  {
+    "section": "portfolio",
+    "slot": "item-8",
+    "title": "Distribuição Inteligente",
+    "description": "Capilaridade e eficiência",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 9,
+    "metadata": { "n": "08", "svc": "distribuicao", "d": "Operações de distribuição que aproximam sua marca dos clientes, reduzem prazos e aumentam a eficiência da cadeia. Ideal para indústrias, distribuidores e redes de farmácia." }
+  }
+]

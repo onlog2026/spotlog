@@ -1,0 +1,79 @@
+[
+  {
+    "section": "processo",
+    "slot": "eyebrow",
+    "title": "Como operamos",
+    "description": null,
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 0,
+    "metadata": {}
+  },
+  {
+    "section": "processo",
+    "slot": "heading",
+    "title": "Um processo simples,",
+    "description": "monitorado e eficiente",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 1,
+    "metadata": {}
+  },
+  {
+    "section": "processo",
+    "slot": "lead",
+    "title": null,
+    "description": "Do recebimento da mercadoria à entrega na porta do seu cliente. Passe o cursor sobre a imagem para ver a operação acontecer — recebimento, triagem pelo time interno, carregamento e entrega.",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 2,
+    "metadata": {}
+  },
+  {
+    "section": "processo",
+    "slot": "item-1",
+    "title": "Recebimento",
+    "description": "Conferência item a item na entrada",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 3,
+    "metadata": { "n": "01", "scene": "boxes", "src": "1586528116311-ad8dd3c8310d" }
+  },
+  {
+    "section": "processo",
+    "slot": "item-2",
+    "title": "Triagem & separação",
+    "description": "Time interno separando por rota e janela",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 4,
+    "metadata": { "n": "02", "scene": "warehouse", "src": "1553413077-190dd305871c" }
+  },
+  {
+    "section": "processo",
+    "slot": "item-3",
+    "title": "Carregamento",
+    "description": "Carga em moto e utilitário",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 5,
+    "metadata": { "n": "03", "scene": "van", "src": "1568010567469-8622db8079bf" }
+  },
+  {
+    "section": "processo",
+    "slot": "item-4",
+    "title": "Entrega",
+    "description": "Última milha com evidência",
+    "image_url": null,
+    "cta_label": null,
+    "cta_url": null,
+    "sort": 6,
+    "metadata": { "n": "04", "scene": "courier", "src": "1601584115197-04ecc0da31d7" }
+  }
+]

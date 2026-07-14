@@ -1,0 +1,26 @@
+[
+  { "section": "integracoes", "slot": "eyebrow", "title": "Integrações", "description": null, "image_url": null, "cta_label": null, "cta_url": null, "sort": 0, "metadata": {} },
+  { "section": "integracoes", "slot": "heading", "title": "Conectada às melhores plataformas do mercado.", "description": null, "image_url": null, "cta_label": null, "cta_url": null, "sort": 1, "metadata": {} },
+  { "section": "integracoes", "slot": "lead", "title": null, "description": "Seus pedidos entram automaticamente na operação — sem digitação manual, sem retrabalho. Integramos com plataformas de ecommerce, marketplaces e sistemas de gestão.", "image_url": null, "cta_label": null, "cta_url": null, "sort": 2, "metadata": {} },
+
+  { "section": "integracoes", "slot": "plataforma-1", "title": "Shopify", "description": null, "image_url": "#5E8E3E", "cta_label": null, "cta_url": null, "sort": 0, "metadata": { "n": "Shopify", "c": "#5E8E3E", "s": "on" } },
+  { "section": "integracoes", "slot": "plataforma-2", "title": "Nuvemshop", "description": null, "image_url": "#2D5BFF", "cta_label": null, "cta_url": null, "sort": 1, "metadata": { "n": "Nuvemshop", "c": "#2D5BFF", "s": "on" } },
+  { "section": "integracoes", "slot": "plataforma-3", "title": "WooCommerce", "description": null, "image_url": "#7F54B3", "cta_label": null, "cta_url": null, "sort": 2, "metadata": { "n": "WooCommerce", "c": "#7F54B3", "s": "on" } },
+  { "section": "integracoes", "slot": "plataforma-4", "title": "VTEX", "description": null, "image_url": "#F71963", "cta_label": null, "cta_url": null, "sort": 3, "metadata": { "n": "VTEX", "c": "#F71963", "s": "on" } },
+  { "section": "integracoes", "slot": "plataforma-5", "title": "Tray", "description": null, "image_url": "#FF6A00", "cta_label": null, "cta_url": null, "sort": 4, "metadata": { "n": "Tray", "c": "#FF6A00", "s": "impl" } },
+  { "section": "integracoes", "slot": "plataforma-6", "title": "Loja Integrada", "description": null, "image_url": "#13B0A5", "cta_label": null, "cta_url": null, "sort": 5, "metadata": { "n": "Loja Integrada", "c": "#13B0A5", "s": "on" } },
+  { "section": "integracoes", "slot": "plataforma-7", "title": "Magento", "description": null, "image_url": "#EE672F", "cta_label": null, "cta_url": null, "sort": 6, "metadata": { "n": "Magento", "c": "#EE672F", "s": "impl" } },
+  { "section": "integracoes", "slot": "plataforma-8", "title": "Wake", "description": null, "image_url": "#6C2BD9", "cta_label": null, "cta_url": null, "sort": 7, "metadata": { "n": "Wake", "c": "#6C2BD9", "s": "req" } },
+
+  { "section": "integracoes", "slot": "marketplace-1", "title": "Mercado Livre", "description": null, "image_url": "#FFE600", "cta_label": null, "cta_url": null, "sort": 0, "metadata": { "n": "Mercado Livre", "c": "#FFE600", "s": "on", "dark": true } },
+  { "section": "integracoes", "slot": "marketplace-2", "title": "Shopee", "description": null, "image_url": "#EE4D2D", "cta_label": null, "cta_url": null, "sort": 1, "metadata": { "n": "Shopee", "c": "#EE4D2D", "s": "on" } },
+  { "section": "integracoes", "slot": "marketplace-3", "title": "Amazon", "description": null, "image_url": "#FF9900", "cta_label": null, "cta_url": null, "sort": 2, "metadata": { "n": "Amazon", "c": "#FF9900", "s": "impl" } },
+  { "section": "integracoes", "slot": "marketplace-4", "title": "Magalu", "description": null, "image_url": "#0086FF", "cta_label": null, "cta_url": null, "sort": 3, "metadata": { "n": "Magalu", "c": "#0086FF", "s": "impl" } },
+  { "section": "integracoes", "slot": "marketplace-5", "title": "Americanas", "description": null, "image_url": "#E60014", "cta_label": null, "cta_url": null, "sort": 4, "metadata": { "n": "Americanas", "c": "#E60014", "s": "req" } },
+
+  { "section": "integracoes", "slot": "gestao-1", "title": "Bling", "description": null, "image_url": "#1B72E8", "cta_label": null, "cta_url": null, "sort": 0, "metadata": { "n": "Bling", "c": "#1B72E8", "s": "on" } },
+  { "section": "integracoes", "slot": "gestao-2", "title": "Tiny", "description": null, "image_url": "#3B82F6", "cta_label": null, "cta_url": null, "sort": 1, "metadata": { "n": "Tiny", "c": "#3B82F6", "s": "on" } },
+  { "section": "integracoes", "slot": "gestao-3", "title": "Omie", "description": null, "image_url": "#00B0F0", "cta_label": null, "cta_url": null, "sort": 2, "metadata": { "n": "Omie", "c": "#00B0F0", "s": "impl" } },
+  { "section": "integracoes", "slot": "gestao-4", "title": "API REST", "description": null, "image_url": "#1F9D6B", "cta_label": null, "cta_url": null, "sort": 3, "metadata": { "n": "API REST", "c": "#1F9D6B", "s": "on" } },
+  { "section": "integracoes", "slot": "gestao-5", "title": "Webhooks", "description": null, "image_url": "#E11B22", "cta_label": null, "cta_url": null, "sort": 4, "metadata": { "n": "Webhooks", "c": "#E11B22", "s": "on" } }
+]
