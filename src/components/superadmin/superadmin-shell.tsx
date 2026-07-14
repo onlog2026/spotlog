@@ -17,12 +17,16 @@ import {
   Lock,
   Briefcase,
   Megaphone,
+  CreditCard,
+  Boxes,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/app/superadmin", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/app/superadmin/organizacoes", label: "Organizações", icon: Building2 },
+  { href: "/app/superadmin/planos", label: "Planos & Módulos", icon: CreditCard },
+  { href: "/app/superadmin/modulos", label: "Catálogo de Módulos", icon: Boxes },
   { href: "/app/superadmin/clientes", label: "Clientes (Todos)", icon: Briefcase },
   { href: "/app/superadmin/broadcast", label: "Broadcast", icon: Megaphone },
   { href: "/app/superadmin/usuarios", label: "Usuários", icon: Users },

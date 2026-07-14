@@ -11,6 +11,12 @@ import {
   deleteOrganization,
   promoteOwnerToSuperAdmin,
 } from "./actions";
+import { OrgEntitlements } from "./org-entitlements";
+import {
+  listPlans,
+  getOrgModuleMatrix,
+  isEnforcementOn,
+} from "@/lib/superadmin/entitlements-admin";
 import { Users, Plug, Target, FileText, Ticket } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +46,13 @@ export default async function OrgDetailPage({ params }: { params: Params }) {
 
   if (!orgData) notFound();
   const org = orgData as unknown as OrgRow;
+
+  // Entitlements (Eixo A): plano, matriz de módulos e status do enforcement
+  const [plans, moduleMatrix, enforced] = await Promise.all([
+    listPlans(),
+    getOrgModuleMatrix(org.id, org.plan),
+    isEnforcementOn(),
+  ]);
 
   const [
     { data: members },
@@ -189,6 +202,21 @@ export default async function OrgDetailPage({ params }: { params: Params }) {
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
+        <OrgEntitlements
+          orgId={org.id}
+          plan={org.plan}
+          plans={plans.map((p) => ({ key: p.key, name: p.name }))}
+          enforced={enforced}
+          rows={moduleMatrix.map((r) => ({
+            key: r.module.key,
+            label: r.module.label,
+            group: r.module.module_group ?? "Outros",
+            inPlan: r.inPlan,
+            override: r.override,
+            effective: r.effective,
+          }))}
+        />
+
         <div className="rounded-xl border border-white/10 bg-white/[0.03] p-5">
           <h3 className="font-semibold mb-3">Membros</h3>
           {memberList.length === 0 ? (

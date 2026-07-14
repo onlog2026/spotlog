@@ -33,6 +33,14 @@ export type SessionContext = {
     trial_ends_at: string | null;
   };
   memberships: Membership[];
+  /**
+   * Módulos (Eixo A) que a organização tem habilitados. Populado no layout do
+   * app via getOrgModules (entitlements.ts). Opcional: callers de requireSession
+   * fora do layout não setam — nesse caso trate ausência como "tudo liberado"
+   * (estado neutro / fail-open). Não populado aqui para evitar import circular
+   * auth ↔ entitlements.
+   */
+  enabledModules?: string[];
 };
 
 const SUPER_ADMIN_EMAIL_FALLBACK = "onlogjf@gmail.com";
