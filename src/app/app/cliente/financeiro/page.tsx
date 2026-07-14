@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/operacao/empty-state";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { getClienteInvoices } from "@/lib/queries/cliente";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ function InvoiceBadge({ status }: { status: InvoiceStatus }) {
 }
 
 export default async function FinanceiroPage() {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("cliente_financeiro"); // Eixo A — neutro enquanto enforcement OFF
   const faturas = await getClienteInvoices(ctx.org.id);
 
   const emAberto = faturas

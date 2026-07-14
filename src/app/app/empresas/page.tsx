@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Plus, Building2, Search } from "lucide-react";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -38,7 +38,7 @@ export default async function EmpresasPage({
     error?: string;
   }>;
 }) {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("crm"); // Eixo A — neutro enquanto enforcement OFF
   const { q, industry, state, city, created, deleted, error } =
     await searchParams;
   const data = await listCompanies(ctx.org.id, {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Plus, KanbanSquare } from "lucide-react";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { Button } from "@/components/ui/button";
 import { KanbanBoard } from "@/components/pipeline/kanban-board";
 import { PipelineSummary } from "@/components/pipeline/pipeline-summary";
@@ -20,7 +20,7 @@ export default async function PipelinePage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("pipeline"); // Eixo A — neutro enquanto enforcement OFF
   const sp = await searchParams;
 
   const pipeline = await getOrCreateDefaultPipeline(ctx.org.id);

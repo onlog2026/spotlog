@@ -61,10 +61,10 @@ export default function AppError({
           <p className="text-xs text-ink-500">
             Se persistir, fala com o suporte pelo WhatsApp{" "}
             <a
-              href="https://wa.me/5511914791442"
+              href="https://wa.me/5511978348288"
               className="text-spotorange-600 font-semibold underline"
             >
-              (11) 91479-1442
+              (11) 97834-8288
             </a>
           </p>
         </div>

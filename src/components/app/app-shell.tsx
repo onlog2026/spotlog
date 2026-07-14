@@ -41,6 +41,7 @@ import {
   AlertTriangle,
   Tags,
   ListChecks,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,12 @@ type NavItem = {
   exact?: boolean;
   notifKey?: NotificationModule;
   tourId?: string;
+  /**
+   * Módulo vendável (Eixo A) deste item. Se setado e a org NÃO tiver o módulo
+   * (não está em ctx.enabledModules), o item é escondido. Sem `module` → sempre
+   * aparece. Chave string local — NÃO importar de entitlements.ts (server-only).
+   */
+  module?: string;
 };
 
 type Category = {
@@ -97,6 +104,14 @@ type Category = {
   subGroups?: SubGroup[];
   /** Se true, só aparece quando ctx.user.is_super_admin */
   superAdminOnly?: boolean;
+  /** Se true, a categoria fica oculta do menu (desligada manualmente). */
+  hidden?: boolean;
+  /**
+   * Módulo vendável (Eixo A) da categoria inteira. Se setado e a org não tiver
+   * o módulo, a categoria some por completo. Sem `module` → sempre aparece
+   * (sujeita ainda a esconder se TODOS os itens forem filtrados).
+   */
+  module?: string;
   /** Estado padrão (expandido) */
   defaultOpen?: boolean;
   /** Atributo data-tour pra cabeçalho da categoria */
@@ -135,13 +150,14 @@ const CATEGORIES: Category[] = [
     neonGlow: "neon-glow-blue",
     defaultOpen: true,
     tourId: "cat-crm",
+    module: "crm",
     items: [
       { href: "/app/leads", label: "Leads", icon: Target, notifKey: "leads", tourId: "nav-leads" },
-      { href: "/app/pipeline", label: "Pipeline", icon: KanbanSquare, notifKey: "deals", tourId: "nav-pipeline" },
+      { href: "/app/pipeline", label: "Pipeline", icon: KanbanSquare, notifKey: "deals", tourId: "nav-pipeline", module: "pipeline" },
       { href: "/app/empresas", label: "Empresas", icon: Building2 },
       { href: "/app/contatos", label: "Contatos", icon: Users2 },
-      { href: "/app/propostas", label: "Propostas", icon: FileText },
-      { href: "/app/propostas/tabelas", label: "Tabelas de Preço", icon: Tags },
+      { href: "/app/propostas", label: "Propostas", icon: FileText, module: "propostas" },
+      { href: "/app/propostas/tabelas", label: "Tabelas de Preço", icon: Tags, module: "propostas" },
     ],
   },
   {
@@ -158,6 +174,7 @@ const CATEGORIES: Category[] = [
     },
     neonGlow: "neon-glow-orange",
     tourId: "cat-marketing",
+    module: "marketing",
     items: [
       { href: "/app/marketing", label: "Visão Geral", icon: Megaphone, exact: true },
     ],
@@ -185,12 +202,11 @@ const CATEGORIES: Category[] = [
       {
         label: "Relacionar",
         items: [
-          { href: "/app/marketing/relacionar/segmentacao", label: "Segmentação", icon: Users2 },
+          { href: "/app/marketing/relacionar/segmentos", label: "Segmentação", icon: Users2 },
           { href: "/app/marketing/relacionar/validador", label: "Validador Email", icon: FileCheck2 },
           { href: "/app/marketing/relacionar/sms", label: "SMS", icon: Send },
-          { href: "/app/marketing/relacionar/smart-leads", label: "Smart Leads", icon: Target },
-          { href: "/app/inbox", label: "Inbox", icon: ListChecks },
-          { href: "/app/cadencias", label: "Cadências", icon: Send },
+          { href: "/app/marketing/relacionar/inteligentes", label: "Smart Leads", icon: Target },
+          { href: "/app/cadencias", label: "Cadências", icon: Send, module: "cadencias" },
         ],
       },
       {
@@ -220,12 +236,13 @@ const CATEGORIES: Category[] = [
       activeText: "text-violet-900 dark:text-violet-100",
     },
     neonGlow: "neon-glow-purple",
+    module: "sdr",
     items: [
+      { href: "/app/prospeccao", label: "Campanhas", icon: Send, module: "prospeccao" },
       { href: "/app/sdr", label: "Visão Geral", icon: Bot, exact: true },
       { href: "/app/sdr/leads", label: "Leads SDR", icon: Target },
       { href: "/app/sdr/enriquecer", label: "Enriquecer", icon: Sparkles },
       { href: "/app/sdr/lgpd", label: "LGPD", icon: Shield },
-      { href: "/app/prospeccao", label: "Campanhas", icon: Send },
     ],
   },
   {
@@ -242,6 +259,8 @@ const CATEGORIES: Category[] = [
     },
     neonGlow: "neon-glow-navy",
     tourId: "cat-operacao",
+    module: "operacao",
+    hidden: true, // ocultada do menu a pedido do dono
     items: [
       { href: "/app/operacao", label: "Dashboard", icon: LayoutDashboard, exact: true },
       { href: "/app/operacao/shipments", label: "Remessas", icon: Truck },
@@ -265,11 +284,14 @@ const CATEGORIES: Category[] = [
     },
     neonGlow: "neon-glow-green",
     items: [
+      { href: "/app/inbox", label: "Atendimento WhatsApp", icon: ListChecks, module: "inbox" },
+      { href: "/app/flows", label: "Robô / Fluxos", icon: Bot, module: "flow_builder" },
       {
         href: "/app/sac",
         label: "Tickets",
         icon: Headphones,
         notifKey: "tickets_sac",
+        module: "tickets_sac",
       },
       {
         href: "/app/admin/chatbot",
@@ -292,11 +314,12 @@ const CATEGORIES: Category[] = [
       activeText: "text-yellow-900 dark:text-yellow-100",
     },
     neonGlow: "neon-glow-yellow",
+    hidden: true, // ocultada do menu a pedido do dono (portal do cliente final)
     items: [
       { href: "/app/cliente", label: "Dashboard", icon: LayoutDashboard, exact: true },
-      { href: "/app/cliente/remessas", label: "Remessas", icon: Truck },
-      { href: "/app/cliente/chamados", label: "Chamados", icon: Headphones },
-      { href: "/app/cliente/financeiro", label: "Financeiro", icon: Receipt },
+      { href: "/app/cliente/remessas", label: "Remessas", icon: Truck, module: "cliente_remessas" },
+      { href: "/app/cliente/chamados", label: "Chamados", icon: Headphones, module: "cliente_chamados" },
+      { href: "/app/cliente/financeiro", label: "Financeiro", icon: Receipt, module: "cliente_financeiro" },
     ],
   },
   {
@@ -330,6 +353,7 @@ const CATEGORIES: Category[] = [
       activeText: "text-amber-900 dark:text-amber-100",
     },
     neonGlow: "neon-glow-brown",
+    module: "cms",
     items: [
       { href: "/app/cms/posts", label: "Posts", icon: Newspaper },
       { href: "/app/cms/cases", label: "Cases", icon: Briefcase },
@@ -352,13 +376,13 @@ const CATEGORIES: Category[] = [
     items: [
       { href: "/app/admin/equipe", label: "Equipe", icon: Users2, tourId: "nav-equipe" },
       { href: "/app/admin/integracoes", label: "Integrações", icon: Briefcase },
+      { href: "/app/admin/email", label: "Layout de e-mail", icon: Mail },
       { href: "/app/admin/forms", label: "Formulários", icon: ClipboardList },
       { href: "/app/admin/api-keys", label: "API Keys", icon: KeyRound },
       { href: "/app/admin/chatbot", label: "Chatbot", icon: Bot },
       { href: "/app/admin/aparencia", label: "Aparência", icon: Palette, tourId: "nav-aparencia" },
       { href: "/app/notificacoes", label: "Notificações", icon: Bell },
       { href: "/app/ajuda", label: "Ajuda", icon: Headphones },
-      { href: "/app/notificacoes", label: "Notificações", icon: Bell },
     ],
   },
   {
@@ -507,16 +531,37 @@ function SidebarBody({
   counts,
   onNavigate,
   isSuperAdmin,
+  enabledModules,
 }: {
   pathname: string;
   counts: NotificationCounts;
   onNavigate: () => void;
   isSuperAdmin: boolean;
+  /**
+   * Módulos (Eixo A) que a org tem. undefined → fail-open (mostra tudo).
+   * Estado atual (enforcement OFF): vem com todos os módulos → nada é escondido.
+   */
+  enabledModules?: string[];
 }) {
-  const visibleCategories = useMemo(
-    () => CATEGORIES.filter((c) => !c.superAdminOnly || isSuperAdmin),
-    [isSuperAdmin],
-  );
+  const visibleCategories = useMemo(() => {
+    // Esconde apenas o que tem `module` setado E não está nos módulos da org.
+    // Sem `module`, ou enabledModules ausente (fail-open) → sempre aparece.
+    const hidden = (m?: string) =>
+      !!m && Array.isArray(enabledModules) && !enabledModules.includes(m);
+
+    return CATEGORIES.filter((c) => !c.hidden)
+      .filter((c) => !c.superAdminOnly || isSuperAdmin)
+      .filter((c) => !hidden(c.module))
+      .map((c) => ({
+        ...c,
+        items: c.items.filter((i) => !hidden(i.module)),
+        subGroups: c.subGroups
+          ?.map((sg) => ({ ...sg, items: sg.items.filter((i) => !hidden(i.module)) }))
+          .filter((sg) => sg.items.length > 0),
+      }))
+      // remove categorias que ficaram totalmente vazias após o filtro de itens
+      .filter((c) => c.items.length > 0 || (c.subGroups?.length ?? 0) > 0);
+  }, [isSuperAdmin, enabledModules]);
   const { collapsed, toggle } = useCollapsedCategories(visibleCategories.map((c) => c.key));
 
   return (
@@ -573,10 +618,15 @@ function SidebarBody({
 export function AppShell({
   ctx,
   initialCounts,
+  logoUrl,
+  logoSize,
   children,
 }: {
   ctx: SessionContext;
   initialCounts?: NotificationCounts;
+  /** Logo custom da org (CMS → Tema do site). Vazio = marca padrão Spotlog. */
+  logoUrl?: string | null;
+  logoSize?: number | null;
   children: React.ReactNode;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -626,19 +676,37 @@ export function AppShell({
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="mm-admin min-h-screen bg-background">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-72 border-r border-border bg-card/80 backdrop-blur-xl transition-transform lg:translate-x-0 flex flex-col",
+          "mm-aside fixed inset-y-0 left-0 z-40 w-72 border-r border-border bg-card transition-transform lg:translate-x-0 flex flex-col",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         <div className="h-16 flex items-center justify-between px-4 border-b border-border shrink-0">
-          <Link href="/app" className="flex items-center gap-2 font-bold">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-navy-900 text-white">
-              <Sparkles className="h-4 w-4" />
-            </div>
-            <span className="text-gradient-spotlog">Spotlog</span>
+          <Link href="/app" className="flex items-center gap-2 font-bold min-w-0">
+            {logoUrl ? (
+              // Logo custom da org — altura configurável no CMS → Tema do site
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={logoUrl}
+                alt={ctx.org.name}
+                style={{
+                  // cabeçalho do app tem 64px de altura → teto de 56px aqui
+                  height: Math.min(logoSize && logoSize > 0 ? logoSize : 32, 56),
+                  width: "auto",
+                  maxWidth: 200,
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
+              <>
+                <div className="grid h-8 w-8 place-items-center rounded-lg bg-navy-900 text-white">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <span className="text-gradient-spotlog">Spotlog</span>
+              </>
+            )}
           </Link>
           <ThemeSwitcher compact />
         </div>
@@ -648,6 +716,7 @@ export function AppShell({
           counts={counts}
           onNavigate={() => setMobileOpen(false)}
           isSuperAdmin={isSuperAdmin}
+          enabledModules={ctx.enabledModules}
         />
 
         <div className="p-3 border-t border-border shrink-0">
@@ -677,7 +746,7 @@ export function AppShell({
       )}
 
       <div className="lg:pl-72">
-        <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 h-16 border-b border-border bg-card/90 backdrop-blur-xl">
           <div className="h-full px-4 md:px-6 flex items-center gap-3">
             <Button
               variant="ghost"
@@ -693,7 +762,7 @@ export function AppShell({
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Buscar contato, empresa, deal..."
-                className="pl-10 bg-card/50 border-border"
+                className="pl-10 rounded-full bg-muted/60 border-transparent"
               />
             </div>
 

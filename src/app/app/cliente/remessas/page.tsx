@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShipmentBadge } from "@/components/operacao/status-badges";
 import { EmptyState } from "@/components/operacao/empty-state";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { getClienteShipments } from "@/lib/queries/cliente";
 import { formatDate } from "@/lib/utils";
 import type { ShipmentStatus } from "@/lib/types/operacao";
@@ -29,7 +29,7 @@ export default async function RemessasListPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string }>;
 }) {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("cliente_remessas"); // Eixo A — neutro enquanto enforcement OFF
   const sp = await searchParams;
   const status = (sp.status ?? "") as ShipmentStatus | "";
   const q = sp.q ?? "";

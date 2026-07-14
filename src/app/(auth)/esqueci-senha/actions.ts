@@ -17,7 +17,7 @@ export async function requestPasswordResetAction(input: { email: string }) {
   const email = parsed.data.email.toLowerCase();
 
   const adminClient = createAdminClient();
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://spotlog-nine.vercel.app";
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.spotlog.com.br";
   // /api/auth/callback troca ?code= por sessão (já usado pelo Google OAuth).
   // Sem ele, o token volta pra /login com ?code= e ninguém faz o exchange.
   const redirectTo = `${appUrl}/api/auth/callback?next=/app`;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { OperacaoNav } from "@/components/operacao/operacao-nav";
+import { requireOrgModule } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
   title: "Operacional | Spotlog",
@@ -7,11 +8,12 @@ export const metadata: Metadata = {
     "Painel operacional Spotlog — remessas, rotas, motoristas, veículos e ocorrências.",
 };
 
-export default function OperacaoLayout({
+export default async function OperacaoLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireOrgModule("operacao"); // Eixo A — neutro enquanto enforcement OFF
   return (
     <div className="space-y-6">
       <header className="space-y-1">

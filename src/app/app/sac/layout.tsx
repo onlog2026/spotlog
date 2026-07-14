@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SacNav } from "@/components/sac/sac-nav";
 import { TicketBadge } from "@/components/sac/ticket-badge";
+import { requireOrgModule } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
   title: "SAC | Spotlog",
@@ -8,11 +9,12 @@ export const metadata: Metadata = {
     "Central de atendimento Spotlog — tickets, prioridades e respostas ao cliente.",
 };
 
-export default function SacLayout({
+export default async function SacLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireOrgModule("tickets_sac"); // Eixo A — neutro enquanto enforcement OFF
   return (
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-3">

@@ -14,7 +14,7 @@ export default function AuthLayout({
       <div className="hidden lg:block relative overflow-hidden bg-navy-950">
         {/* Foto de fundo */}
         <Image
-          src="/images/entregador-login.png"
+          src="/images/entregador-login.webp"
           alt="Entregador Spotlog entregando pedido ao cliente"
           fill
           sizes="50vw"

@@ -152,7 +152,7 @@ export function AjudaClient() {
           </div>
         </button>
         <a
-          href="https://wa.me/5511914791442?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20Spotlog"
+          href="https://wa.me/5511978348288?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20Spotlog"
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-xl p-4 text-left border border-border bg-card hover:shadow-md transition flex items-start gap-3"
@@ -165,7 +165,7 @@ export function AjudaClient() {
           </div>
           <div>
             <div className="font-semibold">Falar com suporte</div>
-            <div className="text-xs text-muted-foreground">WhatsApp (11) 91479-1442</div>
+            <div className="text-xs text-muted-foreground">WhatsApp (11) 97834-8288</div>
           </div>
         </a>
         <a
@@ -212,7 +212,7 @@ export function AjudaClient() {
             Não achou o que procura?
           </p>
           <a
-            href="https://wa.me/5511914791442?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20Spotlog"
+            href="https://wa.me/5511978348288?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20Spotlog"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium"

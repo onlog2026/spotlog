@@ -8,7 +8,7 @@ import {
 } from "@/components/operacao/status-badges";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/operacao/empty-state";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { getClienteTickets } from "@/lib/queries/cliente";
 import { formatDateTime } from "@/lib/utils";
 import type { TicketStatus } from "@/lib/types/operacao";
@@ -48,7 +48,7 @@ export default async function ChamadosPage({
     created?: string;
   }>;
 }) {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("cliente_chamados"); // Eixo A — neutro enquanto enforcement OFF
   const sp = await searchParams;
   const status = (sp.status ?? "todos") as TicketStatus | "todos";
   const department = sp.department ?? "todos";
