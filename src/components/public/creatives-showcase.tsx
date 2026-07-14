@@ -72,7 +72,7 @@ export function CreativesShowcase() {
                 <div className="absolute inset-0 bg-gradient-to-t from-navy-950/85 via-transparent to-transparent" />
 
                 {/* tag canto superior */}
-                <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur px-2.5 py-1 rounded-full shadow-soft">
+                <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur px-2.5 py-1 rounded-full shadow-soft">
                   {it.type === "video" && <Play className="h-3 w-3 text-spotorange-500 fill-spotorange-500" />}
                   <span className="text-[10px] font-bold text-navy-900 uppercase tracking-wider">
                     {it.tag}

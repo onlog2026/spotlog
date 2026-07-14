@@ -189,7 +189,7 @@ export function FormularioComercial({ compact: _compact = false }: { compact?: b
 
         <div className="grid sm:grid-cols-3 gap-3 max-w-2xl mx-auto mb-6">
           <a
-            href="https://wa.me/5511914791442"
+            href="https://wa.me/5511978348288"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 rounded-xl bg-success-500 text-white font-semibold py-3 px-4 hover:bg-success-600 transition-colors"
@@ -198,11 +198,11 @@ export function FormularioComercial({ compact: _compact = false }: { compact?: b
             WhatsApp
           </a>
           <a
-            href="tel:+5511914791442"
+            href="tel:+5511978348288"
             className="flex items-center justify-center gap-2 rounded-xl bg-navy-900 text-white font-semibold py-3 px-4 hover:bg-navy-800 transition-colors"
           >
             <Phone className="h-4 w-4" />
-            (11) 91479-1442
+            (11) 97834-8288
           </a>
           <a
             href="mailto:comercial@spotlogoficial.com.br"

@@ -296,3 +296,62 @@
     box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06) !important;
   }
 }
+
+/* =====================================================================
+ *  SEÇÕES LEGACY SEGUEM O TEMA  (escopo .v3-root = só /nova)
+ *  Sobrescreve as utilitárias de cor FIXA pelos tokens do painel Tema.
+ *  Fora de .v3-root (home "/" antiga) NADA muda — selector não casa.
+ *  Bloco fora de @layer de propósito: vence as utilitárias originais.
+ * ===================================================================== */
+.v3-root .text-gradient-spotlog {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 50%, var(--red) 110%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.v3-root .card-glow,
+.v3-root .card-glow-navy {
+  background: var(--paper);
+  border: 2px solid var(--rule);
+  border-radius: var(--radius-lg);
+}
+.v3-root .card-glow:hover {
+  border-color: var(--red);
+  box-shadow:
+    0 0 0 1px var(--red),
+    0 10px 30px -8px color-mix(in srgb, var(--red) 30%, transparent),
+    0 20px 60px -15px color-mix(in srgb, var(--navy) 18%, transparent);
+}
+.v3-root .card-glow-navy:hover {
+  border-color: var(--navy);
+  box-shadow:
+    0 0 0 1px var(--navy),
+    0 10px 30px -8px color-mix(in srgb, var(--navy) 30%, transparent),
+    0 20px 60px -15px color-mix(in srgb, var(--navy) 18%, transparent);
+}
+.v3-root .card-glow-anim:hover::before {
+  background: linear-gradient(135deg, var(--navy), var(--navy-2) 40%, var(--red) 100%);
+}
+
+/* =====================================================================
+ *  ADMIN (/app) — polish estilo MaterialM  (escopo .mm-admin)
+ *  Mantém as cores das categorias do menu; muda fonte, fundo e cards.
+ *  Bloco fora de @layer de propósito: vence as utilitárias do Tailwind.
+ * ===================================================================== */
+.mm-admin {
+  font-family: var(--font-jakarta), "Inter", system-ui, sans-serif;
+  background: hsl(var(--muted));
+}
+.mm-admin .rounded-xl.bg-card {
+  border-radius: 1.25rem;
+  border-color: transparent;
+  box-shadow: 0 4px 18px -4px rgba(1, 25, 96, 0.1), 0 2px 6px -3px rgba(1, 25, 96, 0.06);
+}
+:root[data-theme="dark"] .mm-admin .rounded-xl.bg-card,
+.dark .mm-admin .rounded-xl.bg-card {
+  border-color: hsl(var(--border));
+  box-shadow: 0 6px 22px -6px rgba(0, 0, 0, 0.55);
+}
+.mm-admin .mm-aside {
+  box-shadow: 0 6px 24px -10px rgba(1, 25, 96, 0.16);
+}

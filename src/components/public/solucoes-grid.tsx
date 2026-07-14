@@ -129,6 +129,7 @@ export async function SolucoesGrid() {
               <Link
                 key={s.slot}
                 href={href}
+                aria-label={`${label} sobre ${s.title}`}
                 className="card-glow group overflow-hidden flex flex-col"
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-navy-100">
@@ -143,7 +144,7 @@ export async function SolucoesGrid() {
                     />
                   ) : null}
                   <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-navy-950/20 to-transparent" />
-                  <div className="absolute top-3 left-3 grid h-10 w-10 place-items-center rounded-xl bg-white/95 backdrop-blur shadow-soft">
+                  <div className="absolute top-3 right-3 grid h-10 w-10 place-items-center rounded-xl bg-white/95 backdrop-blur shadow-soft">
                     <Icon className="h-5 w-5 text-spotorange-600" />
                   </div>
                 </div>

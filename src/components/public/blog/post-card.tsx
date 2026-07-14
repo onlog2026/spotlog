@@ -30,7 +30,7 @@ export function PostCard({ post }: { post: CmsPost }) {
         ) : (
           <div className="w-full h-full grid place-items-center text-ink-400 text-sm">Sem capa</div>
         )}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 right-3">
           <span className="inline-flex items-center bg-spotorange-500 text-white text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wider">
             {categoryLabels[post.category] ?? post.category}
           </span>

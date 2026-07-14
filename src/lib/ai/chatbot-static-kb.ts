@@ -74,7 +74,7 @@ export const STATIC_KB: KBStaticEntry[] = [
     category: "faq",
     question: "Como solicitar uma cotação?",
     answer:
-      "Você pode: 1) Falar com nosso comercial pelo WhatsApp (11) 91479-1442, 2) E-mail comercial@spotlogoficial.com.br, ou 3) Preencher o formulário em /contato. Retornamos em até 1 dia útil.",
+      "Você pode: 1) Falar com nosso comercial pelo WhatsApp (11) 97834-8288, 2) E-mail comercial@spotlogoficial.com.br, ou 3) Preencher o formulário em /contato. Retornamos em até 1 dia útil.",
     keywords: ["cotação", "preço", "orçamento", "valor", "quanto custa", "contratar", "comercial"],
     priority: 95,
   },
@@ -82,7 +82,7 @@ export const STATIC_KB: KBStaticEntry[] = [
     category: "contato",
     question: "Como entro em contato?",
     answer:
-      "Telefone/WhatsApp: (11) 91479-1442. E-mails: contato@spotlogoficial.com.br (geral), comercial@spotlogoficial.com.br (vendas), sac@spotlogoficial.com.br (suporte). Instagram: @spotlogoficial.",
+      "Telefone/WhatsApp: (11) 97834-8288. E-mails: contato@spotlogoficial.com.br (geral), comercial@spotlogoficial.com.br (vendas), sac@spotlogoficial.com.br (suporte). Instagram: @spotlogoficial.",
     keywords: ["contato", "telefone", "whatsapp", "email", "falar", "atendimento", "fone"],
     priority: 95,
   },
@@ -130,7 +130,7 @@ export const STATIC_KB: KBStaticEntry[] = [
     category: "faq",
     question: "Como abrir um chamado de ocorrência?",
     answer:
-      "Pelo SAC: sac@spotlogoficial.com.br ou pelo WhatsApp (11) 91479-1442. Se você é cliente Spotlog, abra direto pelo painel em /app/cliente/chamados.",
+      "Pelo SAC: sac@spotlogoficial.com.br ou pelo WhatsApp (11) 97834-8288. Se você é cliente Spotlog, abra direto pelo painel em /app/cliente/chamados.",
     keywords: ["ocorrência", "reclamação", "problema", "dano", "extravio", "chamado", "ticket", "sac"],
     priority: 85,
   },

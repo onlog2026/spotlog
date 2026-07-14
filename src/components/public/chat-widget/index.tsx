@@ -16,6 +16,10 @@ const TOKEN_KEY = "spotlog.chatbot.token.v1";
 const CONSENT_KEY = "spotlog.chatbot.consent.v1";
 const GREETING_ID = "greeting";
 
+// Portal de rastreio self-service (Octatracking com o logo da Spotlog).
+const RASTREIO_URL =
+  "https://octatracking.com.br/prerastreio?logo=aHR0cHM6Ly9zaXN0ZW1hLnNwb3Rsb2cuY29tLmJyL2ltYWdlcy9zcG90bG9nL2xvZ29zL2xvZ282MDEtNDA2LnBuZw==";
+
 type ChatbotIntent =
   | "cotacao"
   | "rastreio"
@@ -35,21 +39,21 @@ const GREETING: ChatMessage = {
   id: GREETING_ID,
   role: "assistant",
   content:
-    "Oi! Sou o Assistente Spotlog 🤖. Posso te ajudar com cotação, rastreio, dúvidas sobre AFE Anvisa ou conectar com nosso comercial. Como posso ajudar?",
+    "Oi! Aqui é a Bia, da Spotlog 😊 Me conta: é sobre um pedido que já está a caminho, ou você quer conhecer/orçar um serviço com a gente?",
 };
 
 const INITIAL_QUICK_REPLIES: QuickReply[] = [
-  { label: "Como rastrear minha entrega?", value: "rastrear" },
-  { label: "Vocês têm AFE Anvisa?", value: "afe" },
-  { label: "Pedir cotação", value: "cotacao" },
-  { label: "Falar com humano", value: "humano" },
+  { label: "Meu pedido / status da entrega", value: "pedido" },
+  { label: "Deu atraso no meu pedido", value: "atraso" },
+  { label: "Quero contratar / orçar um serviço", value: "comercial" },
+  { label: "Como a Spotlog funciona?", value: "funciona" },
 ];
 
 const QUICK_REPLY_TEXT: Record<string, string> = {
-  rastrear: "Como rastrear minha entrega?",
-  afe: "Vocês têm AFE da Anvisa?",
-  cotacao: "Quero pedir uma cotação",
-  humano: "Quero falar com um humano",
+  pedido: "Quero saber o status do meu pedido",
+  atraso: "Meu pedido está atrasado, o que faço?",
+  comercial: "Quero contratar/orçar um serviço da Spotlog",
+  funciona: "Como a Spotlog funciona?",
 };
 
 function uid() {
@@ -267,9 +271,9 @@ export function ChatWidget() {
   const handleQuickReply = useCallback(
     (reply: QuickReply) => {
       const text = QUICK_REPLY_TEXT[reply.value] ?? reply.label;
-      if (reply.value === "humano") {
-        setDefaultFormMessage("Quero falar com um humano da Spotlog.");
-        setShowForm(true);
+      // "Meu pedido / status da entrega" → oferece o portal de rastreio na hora,
+      // sem depender da IA classificar (resposta instantânea e sempre certa).
+      if (reply.value === "pedido") {
         setMessages((prev) => [
           ...prev,
           { id: uid(), role: "user", content: text },
@@ -277,7 +281,12 @@ export function ChatWidget() {
             id: uid(),
             role: "assistant",
             content:
-              "Claro. Deixe seu contato que a equipe Spotlog te chama em horário comercial.",
+              "Pra ver onde seu pedido está é rapidinho: clique no botão abaixo pra abrir nosso portal de rastreio e informe o código de rastreio. 📦 Se preferir, me conta que eu te ajudo por aqui também!",
+            cta: {
+              label: "Rastrear meu pedido",
+              href: RASTREIO_URL,
+              kind: "external",
+            },
           },
         ]);
         return;
@@ -430,11 +439,11 @@ export function ChatWidget() {
           {/* Header */}
           <div className="flex items-center gap-3 bg-[#011960] px-4 py-3 text-white">
             <div className="flex size-9 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/25">
-              <span className="text-sm font-extrabold tracking-tight">S</span>
+              <span className="text-sm font-extrabold tracking-tight">B</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold leading-tight">
-                Assistente Spotlog 🤖
+                Bia · Atendimento Spotlog
               </p>
               <p className="flex items-center gap-1.5 text-[11px] text-white/80">
                 <span className="size-1.5 rounded-full bg-emerald-400" />

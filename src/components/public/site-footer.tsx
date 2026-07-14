@@ -130,7 +130,7 @@ export function SiteFooter() {
               ))}
 
               <a
-                href="tel:+5511914791442"
+                href="tel:+5511978348288"
                 className="flex items-center gap-3 group hover:bg-white/5 -mx-2 px-2 py-1 rounded-lg transition-colors"
               >
                 <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/10 group-hover:bg-spotorange-500 transition-colors shrink-0">
@@ -138,7 +138,7 @@ export function SiteFooter() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="text-[10px] uppercase tracking-wider font-bold text-ink-300">Telefone / WhatsApp</div>
-                  <div className="text-sm font-semibold text-white group-hover:text-spotorange-300 transition-colors">(11) 91479-1442</div>
+                  <div className="text-sm font-semibold text-white group-hover:text-spotorange-300 transition-colors">(11) 97834-8288</div>
                 </div>
               </a>
 

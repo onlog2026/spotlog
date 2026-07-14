@@ -62,7 +62,7 @@ export function HelpButton() {
               </div>
             </Link>
             <a
-              href="https://wa.me/5511914791442?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20Spotlog"
+              href="https://wa.me/5511978348288?text=Ol%C3%A1%2C%20preciso%20de%20ajuda%20no%20Spotlog"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setOpen(false)}

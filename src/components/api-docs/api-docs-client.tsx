@@ -17,7 +17,7 @@ type Endpoint = {
 const NAVY = "#011960";
 const RED = "#BA0102";
 
-const BASE = "https://spotlog-nine.vercel.app";
+const BASE = "https://www.spotlog.com.br";
 
 const ENDPOINTS: Endpoint[] = [
   {

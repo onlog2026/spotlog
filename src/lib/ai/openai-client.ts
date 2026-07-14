@@ -1,4 +1,5 @@
 import "server-only";
+import { getIntegration } from "@/lib/integrations";
 
 /**
  * Cliente de IA com cascata de providers GRATUITOS + open-source.
@@ -31,6 +32,12 @@ export type ChatCompleteParams = {
   jsonMode?: boolean;
   temperature?: number;
   maxTokens?: number;
+  /**
+   * Quando informado, resolve as chaves de IA (OpenRouter/Anthropic/OpenAI)
+   * a partir das integrações salvas no painel daquela org (com fallback pra env).
+   * Sem orgId, usa só as variáveis de ambiente (comportamento antigo).
+   */
+  orgId?: string;
 };
 
 export type ChatCompleteResult =
@@ -46,7 +53,48 @@ const VALID_PROVIDERS: Provider[] = [
   "pollinations", "openrouter", "groq", "anthropic", "openai",
 ];
 
-function getProviderOrder(): Provider[] {
+type ProviderKeys = {
+  openrouter?: string;
+  groq?: string;
+  anthropic?: string;
+  openai?: string;
+  /** true quando a org conectou OpenRouter no painel (escolha explícita → vira primário) */
+  openrouterPrimary?: boolean;
+};
+
+/**
+ * Resolve as chaves de cada provider. Baseline = variáveis de ambiente.
+ * Se `orgId` for informado, sobrescreve com as chaves salvas no painel
+ * (integrações ativas da org). Falha de DB cai de volta pro env (não quebra).
+ */
+async function resolveKeys(orgId?: string): Promise<ProviderKeys> {
+  const keys: ProviderKeys = {
+    openrouter: process.env.OPENROUTER_API_KEY || undefined,
+    groq: process.env.GROQ_API_KEY || undefined,
+    anthropic: process.env.ANTHROPIC_API_KEY || undefined,
+    openai: process.env.OPENAI_API_KEY || undefined,
+  };
+  if (!orgId) return keys;
+  try {
+    const [or, an, oa] = await Promise.all([
+      getIntegration(orgId, "openrouter"),
+      getIntegration(orgId, "anthropic"),
+      getIntegration(orgId, "openai"),
+    ]);
+    if (or?.credentials?.api_key) {
+      keys.openrouter = or.credentials.api_key;
+      // Veio de uma integração salva no painel (não do env) → prioriza
+      if (or.id !== "env") keys.openrouterPrimary = true;
+    }
+    if (an?.credentials?.api_key) keys.anthropic = an.credentials.api_key;
+    if (oa?.credentials?.api_key) keys.openai = oa.credentials.api_key;
+  } catch (e) {
+    console.warn("[ai-client] resolveKeys: usando env (org falhou):", e);
+  }
+  return keys;
+}
+
+function getProviderOrder(keys: ProviderKeys): Provider[] {
   const override = process.env.AI_PROVIDER_ORDER;
   if (override) {
     const parsed = override
@@ -55,12 +103,15 @@ function getProviderOrder(): Provider[] {
       .filter((p): p is Provider => VALID_PROVIDERS.includes(p as Provider));
     if (parsed.length > 0) return parsed;
   }
-  // Default: Pollinations (sem key, default), depois quaisquer providers com key
-  const order: Provider[] = ["pollinations"];
-  if (process.env.OPENROUTER_API_KEY) order.push("openrouter");
-  if (process.env.GROQ_API_KEY) order.push("groq");
-  if (process.env.ANTHROPIC_API_KEY) order.push("anthropic");
-  if (process.env.OPENAI_API_KEY) order.push("openai");
+  // Org que conectou OpenRouter no painel → ele vira o 1º (escolha explícita).
+  // Senão, Pollinations primeiro (grátis) e OpenRouter (env) como fallback.
+  const order: Provider[] = [];
+  if (keys.openrouter && keys.openrouterPrimary) order.push("openrouter");
+  order.push("pollinations");
+  if (keys.openrouter && !keys.openrouterPrimary) order.push("openrouter");
+  if (keys.groq) order.push("groq");
+  if (keys.anthropic) order.push("anthropic");
+  if (keys.openai) order.push("openai");
   return order;
 }
 
@@ -113,6 +164,7 @@ function mapModel(provider: Provider, model: string): string {
 async function callProvider(
   provider: Provider,
   params: ChatCompleteParams,
+  keys: ProviderKeys,
 ): Promise<ChatCompleteResult> {
   const { model = "gpt-4o-mini", messages, jsonMode, temperature = 0.4, maxTokens } = params;
   const realModel = mapModel(provider, model);
@@ -127,11 +179,11 @@ async function callProvider(
     if (jsonMode) payload.response_format = { type: "json_object" };
     if (maxTokens) payload.max_tokens = maxTokens;
   } else if (provider === "openrouter") {
-    const key = process.env.OPENROUTER_API_KEY;
+    const key = keys.openrouter;
     if (!key) return { ok: false, fallback: DEFAULT_FALLBACK, error: "no_openrouter_key" };
     url = "https://openrouter.ai/api/v1/chat/completions";
     headers.Authorization = `Bearer ${key}`;
-    headers["HTTP-Referer"] = process.env.NEXT_PUBLIC_APP_URL ?? "https://spotlog-nine.vercel.app";
+    headers["HTTP-Referer"] = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.spotlog.com.br";
     headers["X-Title"] = "Spotlog";
     // OpenRouter: usa `models` array com fallback automático entre modelos free.
     // NÃO seta response_format — modelos :free não suportam bem e rate-limit aumenta.
@@ -150,7 +202,7 @@ async function callProvider(
     };
     if (maxTokens) payload.max_tokens = maxTokens;
   } else if (provider === "groq") {
-    const key = process.env.GROQ_API_KEY;
+    const key = keys.groq;
     if (!key) return { ok: false, fallback: DEFAULT_FALLBACK, error: "no_groq_key" };
     url = "https://api.groq.com/openai/v1/chat/completions";
     headers.Authorization = `Bearer ${key}`;
@@ -158,7 +210,7 @@ async function callProvider(
     if (jsonMode) payload.response_format = { type: "json_object" };
     if (maxTokens) payload.max_tokens = maxTokens;
   } else if (provider === "anthropic") {
-    const key = process.env.ANTHROPIC_API_KEY;
+    const key = keys.anthropic;
     if (!key) return { ok: false, fallback: DEFAULT_FALLBACK, error: "no_anthropic_key" };
     url = "https://api.anthropic.com/v1/messages";
     headers["x-api-key"] = key;
@@ -176,7 +228,7 @@ async function callProvider(
       messages: convMessages,
     };
   } else {
-    const key = process.env.OPENAI_API_KEY;
+    const key = keys.openai;
     if (!key) return { ok: false, fallback: DEFAULT_FALLBACK, error: "no_openai_key" };
     url = "https://api.openai.com/v1/chat/completions";
     headers.Authorization = `Bearer ${key}`;
@@ -242,11 +294,12 @@ async function callProvider(
 export async function chatComplete(
   params: ChatCompleteParams,
 ): Promise<ChatCompleteResult> {
-  const order = getProviderOrder();
+  const keys = await resolveKeys(params.orgId);
+  const order = getProviderOrder(keys);
   let lastError: string | undefined;
 
   for (const provider of order) {
-    const result = await callProvider(provider, params);
+    const result = await callProvider(provider, params, keys);
     if (result.ok) return result;
     lastError = result.error;
   }
@@ -265,7 +318,8 @@ export async function chatComplete(
 export async function chatStream(
   params: ChatCompleteParams,
 ): Promise<{ stream: ReadableStream<Uint8Array>; provider: string } | null> {
-  const order = getProviderOrder();
+  const keys = await resolveKeys(params.orgId);
+  const order = getProviderOrder(keys);
   const { model = "gpt-4o-mini", messages, temperature = 0.4 } = params;
 
   for (const provider of order) {
@@ -281,11 +335,11 @@ export async function chatStream(
       url = "https://text.pollinations.ai/openai";
       streamBody = { model: realModel, temperature, stream: true, messages };
     } else if (provider === "openrouter") {
-      const key = process.env.OPENROUTER_API_KEY;
+      const key = keys.openrouter;
       if (!key) continue;
       url = "https://openrouter.ai/api/v1/chat/completions";
       headers.Authorization = `Bearer ${key}`;
-      headers["HTTP-Referer"] = process.env.NEXT_PUBLIC_APP_URL ?? "https://spotlog-nine.vercel.app";
+      headers["HTTP-Referer"] = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.spotlog.com.br";
       headers["X-Title"] = "Spotlog";
       streamBody = {
         models: [
@@ -299,13 +353,13 @@ export async function chatStream(
         route: "fallback",
       };
     } else if (provider === "groq") {
-      const key = process.env.GROQ_API_KEY;
+      const key = keys.groq;
       if (!key) continue;
       url = "https://api.groq.com/openai/v1/chat/completions";
       headers.Authorization = `Bearer ${key}`;
       streamBody = { model: realModel, temperature, stream: true, messages };
     } else {
-      const key = process.env.OPENAI_API_KEY;
+      const key = keys.openai;
       if (!key) continue;
       url = "https://api.openai.com/v1/chat/completions";
       headers.Authorization = `Bearer ${key}`;

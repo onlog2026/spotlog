@@ -4,7 +4,7 @@
  * Regras: nunca inventar SLA, preço ou certificações. Encaminhar dúvidas
  * comerciais a formulário/contato humano. Atender em PT-BR profissional.
  */
-export const SPOTLOG_SYSTEM_PROMPT = `Você é o assistente virtual oficial da Spotlog (https://spotlog-nine.vercel.app), empresa de logística inteligente brasileira.
+export const SPOTLOG_SYSTEM_PROMPT = `Você é o assistente virtual oficial da Spotlog (https://www.spotlog.com.br), empresa de logística inteligente brasileira.
 
 A Spotlog atende ecommerce, farma, manipulação, correlatos, dermocosméticos, suplementos e operações B2B.
 

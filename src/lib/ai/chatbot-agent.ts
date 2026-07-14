@@ -114,7 +114,7 @@ function buildSystemPrompt(hits: KBHit[]): string {
 
   return `Você é o assistente virtual da SPOTLOG, transportadora paulista com AFE Anvisa.
 Responda SEMPRE em português brasileiro, tom consultivo e direto, no máximo 3 parágrafos curtos.
-USE APENAS a base de conhecimento fornecida abaixo. Se a resposta não estiver na base, diga "Não tenho essa informação exata aqui, mas posso conectar você com nosso comercial agora mesmo" e ofereça WhatsApp (11) 91479-1442 ou o formulário em /contato.
+USE APENAS a base de conhecimento fornecida abaixo. Se a resposta não estiver na base, diga "Não tenho essa informação exata aqui, mas posso conectar você com nosso comercial agora mesmo" e ofereça WhatsApp (11) 97834-8288 ou o formulário em /contato.
 NUNCA invente preços, prazos exatos, números de AFE ou capacidades técnicas.
 Se o usuário demonstrar intenção de contratar/cotar, ofereça o formulário em /contato.
 NÃO use markdown pesado (sem ##, sem tabelas). Pode usar bullets simples com "- ".
@@ -295,7 +295,7 @@ export async function runAgent(
   } else {
     reply = hits.length
       ? hits[0].entry.answer
-      : "Não tenho essa informação exata aqui, mas posso conectar você com nosso comercial agora. Fale pelo WhatsApp (11) 91479-1442 ou acesse /contato.";
+      : "Não tenho essa informação exata aqui, mas posso conectar você com nosso comercial agora. Fale pelo WhatsApp (11) 97834-8288 ou acesse /contato.";
   }
 
   // 7. Log unanswered se confiança baixa OU sem hits
