@@ -42,7 +42,7 @@ export async function inviteMemberAction(input: {
     (u) => (u.email ?? "").toLowerCase() === email.toLowerCase(),
   );
 
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://spotlog-nine.vercel.app"}/login?invited=1`;
+  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://www.spotlog.com.br"}/login?invited=1`;
 
   if (existing) {
     // Já existe → verifica se já é membro
@@ -281,7 +281,7 @@ export async function removeMemberAction(input: { user_id: string }) {
 export async function resendInviteAction(input: { email: string }) {
   const ctx = await requireRole(["owner", "admin", "manager"]);
   const supabase = createAdminClient();
-  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://spotlog-nine.vercel.app"}/login?invited=1`;
+  const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://www.spotlog.com.br"}/login?invited=1`;
   const { data: link, error } = await supabase.auth.admin.generateLink({
     type: "magiclink",
     email: input.email,

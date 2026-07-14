@@ -111,3 +111,90 @@ export async function deleteReport(id: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/app/marketing/analisar/relatorios");
 }
+
+export type ReportResultRow = { label: string; value: number; extra?: string };
+
+export async function runReport(
+  orgId: string,
+  reportType: string,
+): Promise<ReportResultRow[]> {
+  const supabase = createAdminClient();
+
+  if (reportType === "leads_by_source") {
+    const { getBySource } = await import("@/lib/queries/marketing-ana");
+    const rows = await getBySource(orgId, 30);
+    return rows.map((r) => ({
+      label: r.source,
+      value: r.count,
+      extra: `${r.converted} convertidos`,
+    }));
+  }
+
+  if (reportType === "revenue") {
+    const { getRevenue } = await import("@/lib/queries/marketing-ana");
+    const rows = await getRevenue(orgId, 6);
+    return rows.map((r) => ({
+      label: r.month,
+      value: r.revenue,
+      extra: `${r.won_deals} negócios`,
+    }));
+  }
+
+  if (reportType === "conversion_funnel") {
+    const { getFunnel } = await import("@/lib/queries/marketing-ana");
+    const f = await getFunnel(orgId, 30);
+    return [
+      { label: "Visitantes", value: f.visitors },
+      { label: "Leads", value: f.leads },
+      { label: "Qualificados", value: f.qualified },
+      { label: "Oportunidades", value: f.opportunities },
+      { label: "Ganhos", value: f.won },
+    ];
+  }
+
+  if (reportType === "deals_by_stage") {
+    // @ts-expect-error tabela sem types gerados
+    const { data: stages } = await supabase
+      .from("pipeline_stages")
+      .select("id, name")
+      .eq("organization_id", orgId);
+    // @ts-expect-error tabela sem types gerados
+    const { data: deals } = await supabase
+      .from("deals")
+      .select("stage_id, amount")
+      .eq("organization_id", orgId)
+      .eq("status", "open");
+    const stageMap = new Map(
+      ((stages ?? []) as { id: string; name: string }[]).map((s) => [s.id, s.name]),
+    );
+    const byStage = new Map<string, { count: number; total: number }>();
+    for (const d of (deals ?? []) as { stage_id: string; amount: number }[]) {
+      const name = stageMap.get(d.stage_id) ?? "Sem estágio";
+      const cur = byStage.get(name) ?? { count: 0, total: 0 };
+      cur.count += 1;
+      cur.total += Number(d.amount ?? 0);
+      byStage.set(name, cur);
+    }
+    return Array.from(byStage, ([label, v]) => ({
+      label,
+      value: v.count,
+      extra: v.total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }),
+    }));
+  }
+
+  if (reportType === "tickets_by_dept") {
+    // @ts-expect-error rpc dinâmico
+    const { data } = await supabase.rpc("op_list_tickets", { p_org: orgId });
+    const rows = (data ?? []) as { category: string | null }[];
+    const byCat = new Map<string, number>();
+    for (const r of rows) {
+      const label = r.category ?? "Sem categoria";
+      byCat.set(label, (byCat.get(label) ?? 0) + 1);
+    }
+    return Array.from(byCat, ([label, value]) => ({ label, value }));
+  }
+
+  // custom_sql: desabilitado por segurança (rodar SQL livre vindo de um campo de texto
+  // é risco de injeção mesmo sendo "admin" — não implementado até ter uma allowlist real)
+  return [];
+}

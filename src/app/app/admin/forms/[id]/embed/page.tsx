@@ -18,7 +18,7 @@ export default async function EmbedPage({
   if (!form) notFound();
 
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://spotlog-nine.vercel.app";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://www.spotlog.com.br";
 
   return (
     <div className="max-w-3xl mx-auto space-y-4">

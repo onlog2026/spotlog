@@ -52,7 +52,7 @@ export function ImageUploadField({
       <input
         ref={ref}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/svg+xml"
+        accept="image/jpeg,image/png,image/webp,image/svg+xml,video/mp4"
         className="hidden"
         onChange={handleChange}
       />
@@ -91,7 +91,7 @@ export function ImageUploadField({
       </div>
       {err ? <p className="text-xs text-red-500">{err}</p> : null}
       <p className="text-[11px] text-muted-foreground">
-        JPG, PNG, WebP ou SVG. Máx 5MB.
+        JPG, PNG, WebP, SVG ou MP4. Imagem até 5MB, vídeo até 50MB.
       </p>
     </div>
   );

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FileText, Plus, ArrowRight, Sparkles } from "lucide-react";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,7 +19,7 @@ const STATUS: Record<string, { label: string; v: string }> = {
 };
 
 export default async function PropostasPage() {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("propostas"); // Eixo A — neutro enquanto enforcement OFF
   const supabase = await createClient();
   const { data: proposals } = await supabase
     .from("proposals")

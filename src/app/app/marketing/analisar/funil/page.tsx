@@ -65,7 +65,7 @@ export default async function FunilPage({
       </div>
 
       {f.visitors === 0 && (
-        <div className="text-xs bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 px-3 py-2 rounded-md">
+        <div className="text-xs bg-yellow-500/10 border border-yellow-500/40 text-neutral-900 px-3 py-2 rounded-md">
           Visitantes ainda não integrados — conecte Google Analytics em Integrações pra ver o topo do funil.
         </div>
       )}

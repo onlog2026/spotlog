@@ -6,8 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Trash2, Sparkles, Loader2, ImageOff } from "lucide-react";
+import { Trash2, Sparkles, Loader2, ImageOff, Type } from "lucide-react";
 import { ImageUploadField } from "./image-upload-field";
+import { MediaPreview } from "./media-preview";
+import {
+  FONT_OPTIONS,
+  WEIGHT_OPTIONS,
+  ALIGN_OPTIONS,
+  type CardStyle,
+} from "@/components/v3/cardStyle";
 
 export type SiteCardInitial = {
   id?: string;
@@ -21,6 +28,8 @@ export type SiteCardInitial = {
   cta_url?: string | null;
   active?: boolean;
   sort?: number;
+  image_url_mobile?: string | null;
+  style?: CardStyle | null;
 };
 
 const STYLES = [
@@ -31,6 +40,27 @@ const STYLES = [
   { value: "minimalista", label: "Minimalista (limpo)" },
   { value: "corporativa", label: "Corporativa (business)" },
 ];
+
+/** Dica de formato/aspecto recomendado por seção (pra imagem não quebrar no front). */
+function formatHint(page: string, section: string): string {
+  const key = `${page}/${section}`;
+  const map: Record<string, string> = {
+    "home/hero": "Retrato suave (~4:3.4) · ideal 1080×1350px. A mesma serve no celular; se quiser, há o campo de imagem mobile abaixo (versão vertical).",
+    "home/focos": "Paisagem 4:3 · ideal 1200×900px. A mesma imagem serve em todos os aparelhos.",
+    "home/solucoes": "Paisagem 4:3 · ideal 1200×900px. A mesma imagem serve em todos os aparelhos.",
+    "home/creatives": "Retrato 9:16 (formato story) · ideal 1080×1920px. A mesma serve em todos.",
+    "home/contato": "Paisagem 4:3 · ideal 1200×900px. A mesma serve em todos.",
+    "home/cobertura": "Paisagem 4:3 · ideal 1200×900px. A mesma serve em todos.",
+    "home/blog": "Paisagem 16:10 · ideal 1200×750px. A mesma serve em todos.",
+    "home/header": "Paisagem 4:3 · ideal 800×600px (imagem do mega-menu). A mesma serve em todos.",
+  };
+  if (map[key]) return map[key];
+  if (section === "hero" && ["ecommerce", "farma", "sobre", "tecnologia"].includes(page))
+    return "Paisagem 5:4 · ideal 1200×960px. A mesma imagem serve em todos os aparelhos.";
+  if (page === "servico")
+    return "Paisagem 4:3 · ideal 1100×825px. A mesma imagem serve em todos os aparelhos.";
+  return "Paisagem, ~1200px de largura. O site recorta/ajusta sozinho; a mesma imagem serve no celular.";
+}
 
 export function SiteCardForm({
   initial,
@@ -49,10 +79,26 @@ export function SiteCardForm({
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.image_url ?? "");
+  const [imageUrlMobile, setImageUrlMobile] = useState(initial?.image_url_mobile ?? "");
   const [ctaLabel, setCtaLabel] = useState(initial?.cta_label ?? "");
   const [ctaUrl, setCtaUrl] = useState(initial?.cta_url ?? "");
   const [active, setActive] = useState(initial?.active ?? true);
   const [sort, setSort] = useState(initial?.sort ?? 0);
+
+  // Tipografia (metadata.style)
+  const st = initial?.style ?? {};
+  const [titleColor, setTitleColor] = useState(st.titleColor ?? "");
+  const [titleSize, setTitleSize] = useState(st.titleSize ? String(st.titleSize) : "");
+  const [titleWeight, setTitleWeight] = useState(st.titleWeight ?? "");
+  const [titleFont, setTitleFont] = useState(st.titleFont ?? "");
+  const [titleItalic, setTitleItalic] = useState(st.titleItalic ?? false);
+  const [titleAlign, setTitleAlign] = useState(st.titleAlign ?? "");
+  const [descColor, setDescColor] = useState(st.descColor ?? "");
+  const [descSize, setDescSize] = useState(st.descSize ? String(st.descSize) : "");
+  const [descWeight, setDescWeight] = useState(st.descWeight ?? "");
+  const [descFont, setDescFont] = useState(st.descFont ?? "");
+  const [descItalic, setDescItalic] = useState(st.descItalic ?? false);
+  const [descAlign, setDescAlign] = useState(st.descAlign ?? "");
 
   // IA image
   const [aiPrompt, setAiPrompt] = useState("");
@@ -192,6 +238,126 @@ export function SiteCardForm({
             </CardContent>
           </Card>
 
+          <Card className="border-white/10 bg-card/50">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Type className="h-4 w-4" /> Tipografia (cor, tamanho, fonte, negrito)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              {[
+                {
+                  label: "Título",
+                  color: titleColor, setColor: setTitleColor,
+                  size: titleSize, setSize: setTitleSize,
+                  weight: titleWeight, setWeight: setTitleWeight,
+                  font: titleFont, setFont: setTitleFont,
+                  italic: titleItalic, setItalic: setTitleItalic,
+                  align: titleAlign, setAlign: setTitleAlign,
+                  prefix: "title",
+                },
+                {
+                  label: "Descrição",
+                  color: descColor, setColor: setDescColor,
+                  size: descSize, setSize: setDescSize,
+                  weight: descWeight, setWeight: setDescWeight,
+                  font: descFont, setFont: setDescFont,
+                  italic: descItalic, setItalic: setDescItalic,
+                  align: descAlign, setAlign: setDescAlign,
+                  prefix: "desc",
+                },
+              ].map((f) => (
+                <div key={f.prefix} className="space-y-2 border-b border-white/5 pb-4 last:border-0 last:pb-0">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{f.label}</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <div className="flex items-center gap-1.5">
+                        <input
+                          type="color"
+                          value={f.color || "#121A33"}
+                          onChange={(e) => f.setColor(e.target.value)}
+                          className="h-9 w-9 rounded border border-white/10 bg-transparent p-0.5 cursor-pointer"
+                        />
+                        <Input
+                          name={`style_${f.prefix}Color`}
+                          value={f.color}
+                          onChange={(e) => f.setColor(e.target.value)}
+                          placeholder="auto"
+                          className="h-9"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tamanho (px)</Label>
+                      <Input
+                        name={`style_${f.prefix}Size`}
+                        type="number"
+                        value={f.size}
+                        onChange={(e) => f.setSize(e.target.value)}
+                        placeholder="auto"
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Negrito / peso</Label>
+                      <select
+                        name={`style_${f.prefix}Weight`}
+                        value={f.weight}
+                        onChange={(e) => f.setWeight(e.target.value)}
+                        className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                      >
+                        {WEIGHT_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Fonte</Label>
+                      <select
+                        name={`style_${f.prefix}Font`}
+                        value={f.font}
+                        onChange={(e) => f.setFont(e.target.value)}
+                        className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                      >
+                        {FONT_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Alinhamento</Label>
+                      <select
+                        name={`style_${f.prefix}Align`}
+                        value={f.align}
+                        onChange={(e) => f.setAlign(e.target.value)}
+                        className="w-full h-9 rounded-md border border-input bg-background px-2 text-sm"
+                      >
+                        {ALIGN_OPTIONS.map((o) => (
+                          <option key={o.value} value={o.value}>{o.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <label className="flex items-end gap-2 text-sm pb-1.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name={`style_${f.prefix}Italic`}
+                        checked={f.italic}
+                        onChange={(e) => f.setItalic(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                      Itálico
+                    </label>
+                  </div>
+                </div>
+              ))}
+              <p className="text-xs text-muted-foreground">
+                Deixe vazio para manter o estilo padrão do design. Cor aceita nome
+                (<code>red</code>) ou hex (<code>#011960</code>).
+              </p>
+            </CardContent>
+          </Card>
+
           <Card
             className="border-0 text-white shadow-xl"
             style={{
@@ -272,9 +438,11 @@ export function SiteCardForm({
               <CardTitle className="text-base">Imagem atual</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
+              <p className="text-xs rounded-md bg-blue-500/10 border border-blue-500/30 text-foreground px-2.5 py-2 leading-relaxed">
+                📐 <strong>Formato ideal:</strong> {formatHint(page, section)}
+              </p>
               {imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <MediaPreview
                   src={imageUrl}
                   alt="preview"
                   className="w-full h-44 object-cover rounded-md border border-white/10"
@@ -295,6 +463,42 @@ export function SiteCardForm({
                 currentUrl={imageUrl ?? undefined}
                 onUploaded={(url) => setImageUrl(url)}
                 onClear={() => setImageUrl("")}
+                folder="cards"
+              />
+            </CardContent>
+          </Card>
+
+          <Card className="border-white/10 bg-card/50">
+            <CardHeader>
+              <CardTitle className="text-base">Imagem mobile (opcional)</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-xs text-muted-foreground">
+                Use quando a imagem desktop não fica boa no celular (ex: versão vertical).
+                Se vazio, o site usa a imagem desktop no mobile também.
+              </p>
+              {imageUrlMobile ? (
+                <MediaPreview
+                  src={imageUrlMobile}
+                  alt="preview mobile"
+                  className="w-full h-44 object-cover rounded-md border border-white/10"
+                />
+              ) : (
+                <div className="w-full h-44 grid place-items-center rounded-md border border-dashed border-white/10 text-muted-foreground">
+                  <ImageOff className="h-8 w-8" />
+                </div>
+              )}
+              <Input
+                id="image_url_mobile"
+                name="image_url_mobile"
+                value={imageUrlMobile ?? ""}
+                onChange={(e) => setImageUrlMobile(e.target.value)}
+                placeholder="https://... (versão mobile)"
+              />
+              <ImageUploadField
+                currentUrl={imageUrlMobile ?? undefined}
+                onUploaded={(url) => setImageUrlMobile(url)}
+                onClear={() => setImageUrlMobile("")}
                 folder="cards"
               />
             </CardContent>
@@ -333,16 +537,20 @@ export function SiteCardForm({
       <div className="flex items-center justify-between gap-3 pt-2">
         <div>
           {excluirAction ? (
-            <form action={excluirAction}>
-              <Button
-                type="submit"
-                variant="outline"
-                className="text-red-500 hover:text-red-600"
-              >
-                <Trash2 className="h-4 w-4 mr-1.5" />
-                Excluir card
-              </Button>
-            </form>
+            <Button
+              type="submit"
+              formAction={excluirAction}
+              variant="outline"
+              className="text-red-500 hover:text-red-600"
+              onClick={(e) => {
+                if (!confirm("Excluir este card definitivamente? Esta ação não pode ser desfeita.")) {
+                  e.preventDefault();
+                }
+              }}
+            >
+              <Trash2 className="h-4 w-4 mr-1.5" />
+              Excluir card
+            </Button>
           ) : null}
         </div>
         <div className="flex gap-2">

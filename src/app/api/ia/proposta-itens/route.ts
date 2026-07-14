@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await chatComplete({
+      orgId: ctx.org.id,
       messages: [
         { role: "system", content: proposalItemsSuggestSystem },
         { role: "user", content: `BRIEFING:\n${parsed.data.briefing}` },

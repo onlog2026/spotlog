@@ -215,13 +215,19 @@ export async function listInvoices(
       (i) => i.due_date && i.due_date <= (filters.ate as string),
     );
   }
-  return filtered
-    .sort((a, b) => {
-      const av = a.due_date ? new Date(a.due_date).getTime() : 0;
-      const bv = b.due_date ? new Date(b.due_date).getTime() : 0;
-      return bv - av;
-    })
-    .map((i) => ({ ...i, companies: null })) as InvoiceWithCompany[];
+  const sorted = filtered.sort((a, b) => {
+    const av = a.due_date ? new Date(a.due_date).getTime() : 0;
+    const bv = b.due_date ? new Date(b.due_date).getTime() : 0;
+    return bv - av;
+  });
+  const companiesById = await getCompaniesById(
+    supabase,
+    sorted.map((i) => i.company_id),
+  );
+  return sorted.map((i) => ({
+    ...i,
+    companies: companiesById.get(i.company_id) ?? null,
+  })) as InvoiceWithCompany[];
 }
 
 export async function getInvoice(
@@ -234,7 +240,28 @@ export async function getInvoice(
   });
   const found = rows.find((i) => i.id === id);
   if (!found) return null;
-  return { ...found, companies: null } as InvoiceWithCompany;
+  const companiesById = await getCompaniesById(supabase, [found.company_id]);
+  return {
+    ...found,
+    companies: companiesById.get(found.company_id) ?? null,
+  } as InvoiceWithCompany;
+}
+
+async function getCompaniesById(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  companyIds: string[],
+): Promise<Map<string, { id: string; name: string }>> {
+  const uniqueIds = Array.from(new Set(companyIds.filter(Boolean)));
+  if (uniqueIds.length === 0) return new Map();
+  const { data } = await supabase
+    .from("companies")
+    .select("id, name")
+    .in("id", uniqueIds);
+  const map = new Map<string, { id: string; name: string }>();
+  for (const c of (data ?? []) as { id: string; name: string }[]) {
+    map.set(c.id, c);
+  }
+  return map;
 }
 
 export async function getInvoiceItems(

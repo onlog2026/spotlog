@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
       .join("\n\n");
 
     const result = await chatComplete({
+      orgId: ctx.org.id,
       messages: [
         { role: "system", content: proposalDraftSystem },
         { role: "user", content: userContent },

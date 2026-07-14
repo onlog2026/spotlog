@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FileSpreadsheet, ArrowRight } from "lucide-react";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { formatDateTime } from "@/lib/utils";
 export const dynamic = "force-dynamic";
 
 export default async function TabelasPage() {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("propostas"); // Eixo A — neutro enquanto enforcement OFF
   const supabase = await createClient();
 
   const { data: tables } = await supabase

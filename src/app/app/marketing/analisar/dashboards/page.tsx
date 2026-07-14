@@ -59,7 +59,12 @@ export default async function DashboardsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 className="font-semibold text-sm">{d.name}</h3>
+                    <Link
+                      href={`/app/marketing/analisar/dashboards/${d.id}`}
+                      className="font-semibold text-sm hover:underline"
+                    >
+                      {d.name}
+                    </Link>
                     {d.is_default && (
                       <Badge className="bg-[#BA0102] text-white text-[10px]">padrão</Badge>
                     )}

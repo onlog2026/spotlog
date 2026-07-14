@@ -15,13 +15,20 @@ export default async function EditarCardPage({
   const { data } = await supabase
     .from("site_cards")
     .select(
-      "id, page, section, slot, title, description, image_url, cta_label, cta_url, active, sort",
+      "id, page, section, slot, title, description, image_url, cta_label, cta_url, active, sort, metadata",
     )
     .eq("id", id)
     .maybeSingle();
   if (!data) notFound();
 
-  const row = data as SiteCardInitial;
+  const raw = data as SiteCardInitial & {
+    metadata?: { image_url_mobile?: string | null; style?: SiteCardInitial["style"] };
+  };
+  const row: SiteCardInitial = {
+    ...raw,
+    image_url_mobile: raw.metadata?.image_url_mobile ?? null,
+    style: raw.metadata?.style ?? null,
+  };
 
   async function update(fd: FormData) {
     "use server";

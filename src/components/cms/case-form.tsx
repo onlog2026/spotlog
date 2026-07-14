@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Sparkles } from "lucide-react";
 import { AiGeneratorPanel, type GeneratedPayload } from "./ai-generator-panel";
 import { ImageUploadField } from "./image-upload-field";
+import { MediaPreview } from "./media-preview";
 
 export type CaseFormInitial = {
   id?: string;
@@ -291,8 +292,7 @@ export function CaseForm({
                   label="Enviar logo"
                 />
                 {logoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <MediaPreview
                     src={logoUrl}
                     alt="logo"
                     className="w-full h-24 object-contain rounded-md border border-white/10 bg-white p-2"
@@ -325,8 +325,7 @@ export function CaseForm({
                   label="Enviar hero"
                 />
                 {heroUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <MediaPreview
                     src={heroUrl}
                     alt="hero"
                     className="w-full h-32 object-cover rounded-md border border-white/10"

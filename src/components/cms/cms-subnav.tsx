@@ -1,14 +1,16 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, FileText, Trophy, LayoutGrid } from "lucide-react";
+import { LayoutDashboard, FileText, Trophy, LayoutGrid, Palette, Map } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
   { href: "/app/cms", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/app/cms/posts", label: "Posts", icon: FileText },
   { href: "/app/cms/cases", label: "Cases", icon: Trophy },
-  { href: "/app/cms/site/cards", label: "Cards do site", icon: LayoutGrid },
+  { href: "/app/cms/site/mapa", label: "Mapa do site", icon: Map },
+  { href: "/app/cms/site/cards", label: "Cards (avançado)", icon: LayoutGrid },
+  { href: "/app/cms/site/tema", label: "Tema do site", icon: Palette },
 ];
 
 export function CmsSubnav() {

@@ -82,7 +82,7 @@ export default async function PublicBioPage({
           {d.links.map((l) => (
             <Link
               key={l.id}
-              href={l.url}
+              href={`/bio/go/${l.id}`}
               target="_blank"
               className={
                 isBrand || isDark

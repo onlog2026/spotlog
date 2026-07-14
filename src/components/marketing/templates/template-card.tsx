@@ -48,7 +48,7 @@ export function TemplateCard({ slug, title, description, category, coverUrl, typ
           className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
           loading="lazy"
         />
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 right-3">
           <Badge className={`${CATEGORY_COLOR[category] ?? "bg-slate-600"} text-white border-0 capitalize`}>
             {category.replace("-", " ")}
           </Badge>

@@ -177,5 +177,3 @@ export async function listAllCampaigns(orgId: string): Promise<CampaignRow[]> {
   rows.sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
   return rows;
 }
-
-import type { SmsCampaign } from "./marketing-rel";

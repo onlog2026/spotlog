@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { MarketingTabs } from "@/components/marketing/marketing-tabs";
+import { requireOrgModule } from "@/lib/entitlements";
 
-export default function MarketingLayout({ children }: { children: React.ReactNode }) {
+export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
+  await requireOrgModule("marketing"); // Eixo A — neutro enquanto enforcement OFF
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">

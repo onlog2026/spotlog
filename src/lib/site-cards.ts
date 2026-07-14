@@ -1,5 +1,5 @@
 import "server-only";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/admin";
 
 export type SiteCard = {
   id: string;
@@ -21,7 +21,7 @@ export type SiteCard = {
  */
 export async function getSiteCards(page: string, section: string): Promise<SiteCard[]> {
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     const { data, error } = await supabase
       .from("site_cards")
       .select(

@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
     const { text, mode } = parsed.data;
 
     const result = await chatComplete({
+      orgId: ctx.org.id,
       messages: [
         { role: "system", content: rewriteSystem(mode) },
         { role: "user", content: text },

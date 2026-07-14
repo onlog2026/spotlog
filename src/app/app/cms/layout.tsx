@@ -1,5 +1,6 @@
 import { CmsSubnav } from "@/components/cms/cms-subnav";
 import { createClient } from "@/lib/supabase/server";
+import { requireOrgModule } from "@/lib/entitlements";
 
 async function cmsHealthCheck(): Promise<boolean> {
   try {
@@ -16,6 +17,7 @@ async function cmsHealthCheck(): Promise<boolean> {
 }
 
 export default async function CmsLayout({ children }: { children: React.ReactNode }) {
+  await requireOrgModule("cms"); // Eixo A — neutro enquanto enforcement OFF
   const healthy = await cmsHealthCheck();
   return (
     <div className="space-y-6">

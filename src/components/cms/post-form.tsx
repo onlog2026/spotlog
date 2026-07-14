@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2, Sparkles } from "lucide-react";
 import { AiGeneratorPanel, type GeneratedPayload } from "./ai-generator-panel";
 import { ImageUploadField } from "./image-upload-field";
+import { MediaPreview } from "./media-preview";
 
 export type PostFormInitial = {
   id?: string;
@@ -235,8 +236,7 @@ export function PostForm({
                   folder="posts"
                 />
                 {coverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <MediaPreview
                     src={coverUrl}
                     alt="preview"
                     className="w-full h-32 object-cover rounded-md border border-white/10"

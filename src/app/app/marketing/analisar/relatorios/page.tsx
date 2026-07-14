@@ -138,8 +138,10 @@ export default async function RelatoriosPage() {
                   </p>
                 </div>
                 <div className="flex gap-1">
-                  <Button size="sm" variant="outline" className="border-white/20" disabled>
-                    <Play className="h-3 w-3 mr-1" /> Executar
+                  <Button size="sm" variant="outline" className="border-white/20" asChild>
+                    <a href={`/app/marketing/analisar/relatorios/${r.id}`}>
+                      <Play className="h-3 w-3 mr-1" /> Executar
+                    </a>
                   </Button>
                   <form action={remove}>
                     <input type="hidden" name="id" value={r.id} />
