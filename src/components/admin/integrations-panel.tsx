@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -203,12 +203,9 @@ const DEFS: IntegrationDef[] = [
     category: "Agenda",
     icon: Calendar,
     color: "from-blue-500 to-indigo-500",
-    desc: "Sync de appointments com Google Calendar (OAuth — em breve).",
-    fields: [
-      { key: "oauth_token", label: "OAuth Token (cole manualmente por enquanto)" },
-      { key: "calendar_id", label: "Calendar ID", placeholder: "primary" },
-    ],
-    docs: "https://developers.google.com/calendar/api/quickstart/js",
+    desc: "Cria eventos no seu Google Agenda quando um agendamento é criado/confirmado.",
+    fields: [],
+    docs: "https://calendar.google.com",
   },
   {
     provider: "webhook",
@@ -231,6 +228,21 @@ const DEFS: IntegrationDef[] = [
     desc: "Acessa Claude, Gemini, Llama e dezenas de modelos via uma única API.",
     fields: [{ key: "api_key", label: "API Key", placeholder: "sk-or-..." }],
     docs: "https://openrouter.ai/keys",
+  },
+  {
+    provider: "digisac",
+    name: "DIGISAC",
+    category: "WhatsApp",
+    icon: MessageCircle,
+    color: "from-green-700 to-emerald-600",
+    desc: "WhatsApp multicanal via DIGISAC (envia e recebe). Só dispara com opt-in do contato.",
+    fields: [
+      { key: "base_url", label: "URL da conta", placeholder: "https://spotlog2.digisac.io" },
+      { key: "token", label: "Token de acesso pessoal", type: "password" },
+      { key: "service_id", label: "Conexão (serviceId)", placeholder: "uuid da conexão WhatsApp" },
+      { key: "webhook_secret", label: "Segredo do webhook (você inventa)", type: "password" },
+    ],
+    docs: "https://spotlog2.digisac.io",
   },
 ];
 
@@ -265,6 +277,24 @@ export function IntegrationsPanel({
 }) {
   const [query, setQuery] = useState("");
   const [activeCat, setActiveCat] = useState<string>("Todas");
+
+  // Feedback do retorno do OAuth do Google Calendar (?gcal=...)
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search).get("gcal");
+    if (!p) return;
+    const msg: Record<string, string> = {
+      connected: "Google Calendar conectado! ✅",
+      denied: "Conexão cancelada no Google.",
+      no_refresh: "O Google não devolveu o token. Tente reconectar.",
+      missing_config: "Falta configurar GOOGLE_OAUTH_CLIENT_ID/SECRET na Vercel.",
+      bad_state: "Sessão inválida — tente de novo.",
+      save_error: "Conectou, mas falhou ao salvar. Tente de novo.",
+      error: "Erro ao conectar o Google Calendar.",
+    };
+    if (p === "connected") toast.success(msg[p]);
+    else toast.error(msg[p] ?? "Erro ao conectar.");
+    window.history.replaceState({}, "", window.location.pathname);
+  }, []);
   const groups = ["Todas", ...Array.from(new Set(DEFS.map((d) => d.category)))];
   const filtered = DEFS.filter((d) => {
     if (activeCat !== "Todas" && d.category !== activeCat) return false;
@@ -351,6 +381,7 @@ function IntegrationCard({
   const [saving, setSaving] = useState(false);
   const [values, setValues] = useState<Record<string, string>>({});
   const supportsEvents = EVENT_PROVIDERS.has(def.provider);
+  const isOAuth = def.provider === "google_calendar";
   const initialEvents = Array.isArray(row?.settings?.events)
     ? (row!.settings!.events as string[])
     : [];
@@ -474,10 +505,21 @@ function IntegrationCard({
             <Button
               variant={row ? "outline" : "gradient"}
               size="sm"
-              onClick={() => setOpen(true)}
+              onClick={() =>
+                isOAuth
+                  ? (window.location.href =
+                      "/api/integrations/google-calendar/connect")
+                  : setOpen(true)
+              }
             >
               <Plug className="h-3 w-3" />
-              {row ? "Editar" : "Conectar"}
+              {isOAuth
+                ? row
+                  ? "Reconectar"
+                  : "Conectar Google"
+                : row
+                  ? "Editar"
+                  : "Conectar"}
             </Button>
           </div>
         </CardContent>

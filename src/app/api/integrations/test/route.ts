@@ -149,6 +149,15 @@ export async function POST(req: NextRequest) {
       await markOk(ctx.org.id, provider, ok, ok ? undefined : "OAuth token ausente");
       return NextResponse.json({ ok });
     }
+    if (provider === "digisac") {
+      const base = String(i.credentials.base_url || "").replace(/\/+$/, "");
+      const res = await fetch(`${base}/api/v1/services?perPage=1`, {
+        headers: { Authorization: `Bearer ${i.credentials.token}` },
+      });
+      const ok = res.ok;
+      await markOk(ctx.org.id, provider, ok);
+      return NextResponse.json({ ok, error: ok ? undefined : `status ${res.status}` });
+    }
     if (provider === "zapi") {
       const res = await fetch(
         `https://api.z-api.io/instances/${i.credentials.instance_id}/token/${i.credentials.token}/status`,

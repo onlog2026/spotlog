@@ -5,6 +5,17 @@ export type WhatsappSendOptions = {
   organization_id: string;
   to: string; // E.164 ou só dígitos
   text: string;
+  /**
+   * Serviço/número do Digisac a usar (SDR usa o "Comercial"; atendimento usa o
+   * "Sac"). Se vazio, cai no service_id padrão salvo na integração.
+   */
+  serviceId?: string;
+  /**
+   * Força um provider específico (ignora a cascata). O Robô/Flow Builder usa
+   * "digisac" pra responder pelo mesmo canal que recebeu — senão a cascata
+   * poderia mandar por Evolution/Z-API e quebrar o eco do webhook.
+   */
+  provider?: "evolution" | "zapi" | "digisac";
 };
 
 export type WhatsappResult = {
@@ -21,16 +32,33 @@ export type WhatsappResult = {
 export async function sendWhatsapp(
   opts: WhatsappSendOptions,
 ): Promise<WhatsappResult> {
+  // Provider forçado (Robô força "digisac"): usa só ele, sem cascata.
+  if (opts.provider) {
+    const cfg = await getIntegration(opts.organization_id, opts.provider);
+    if (!cfg)
+      return {
+        ok: false,
+        provider: opts.provider,
+        error: `WhatsApp: provider "${opts.provider}" não está configurado.`,
+      };
+    if (opts.provider === "evolution") return sendViaEvolution(opts, cfg);
+    if (opts.provider === "zapi") return sendViaZapi(opts, cfg);
+    return sendViaDigisac(opts, cfg);
+  }
+
   const evo = await getIntegration(opts.organization_id, "evolution");
   if (evo) return sendViaEvolution(opts, evo);
 
   const zapi = await getIntegration(opts.organization_id, "zapi");
   if (zapi) return sendViaZapi(opts, zapi);
 
+  const digisac = await getIntegration(opts.organization_id, "digisac");
+  if (digisac) return sendViaDigisac(opts, digisac);
+
   return {
     ok: false,
     error:
-      "WhatsApp não está configurado. Conecte Evolution API ou Z-API em /app/admin/integracoes.",
+      "WhatsApp não está configurado. Conecte Evolution API, Z-API ou DIGISAC em /app/admin/integracoes.",
   };
 }
 
@@ -113,6 +141,52 @@ async function sendViaZapi(
     return {
       ok: false,
       provider: "zapi",
+      error: e instanceof Error ? e.message : "Falha de rede",
+    };
+  }
+}
+
+async function sendViaDigisac(
+  opts: WhatsappSendOptions,
+  cfg: { credentials: Record<string, string> },
+): Promise<WhatsappResult> {
+  const base = String(cfg.credentials.base_url || "").replace(/\/+$/, "");
+  const token = cfg.credentials.token;
+  // SDR passa o serviceId do "Comercial"; senão usa o padrão salvo.
+  const serviceId = opts.serviceId || cfg.credentials.service_id;
+  if (!base || !token || !serviceId)
+    return {
+      ok: false,
+      provider: "digisac",
+      error: "DIGISAC: base_url, token ou service_id ausentes.",
+    };
+  try {
+    const res = await fetch(`${base}/api/v1/messages`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: opts.text,
+        type: "chat",
+        number: formatNumber(opts.to),
+        serviceId,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok)
+      return {
+        ok: false,
+        provider: "digisac",
+        error: data?.message ?? `Erro ${res.status}`,
+      };
+    return {
+      ok: true,
+      provider: "digisac",
+      provider_message_id: data?.id ?? data?.messageId,
+    };
+  } catch (e) {
+    return {
+      ok: false,
+      provider: "digisac",
       error: e instanceof Error ? e.message : "Falha de rede",
     };
   }

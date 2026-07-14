@@ -90,8 +90,8 @@ function renderEmail(input: {
         ${input.footer_note ? `<tr><td style="padding:16px 32px;border-top:1px solid #eef3fa;font-size:12px;color:#8aa0bf;text-align:center;">${escapeHtml(input.footer_note)}</td></tr>` : ""}
         <tr>
           <td style="padding:16px 32px;background:#f8faff;text-align:center;font-size:11px;color:#8aa0bf;">
-            Spotlog · São Paulo, SP · <a href="https://spotlog-nine.vercel.app" style="color:#011960;text-decoration:none;">spotlogoficial.com.br</a><br/>
-            Dúvidas? <a href="mailto:sac@spotlogoficial.com.br" style="color:#011960;text-decoration:none;">sac@spotlogoficial.com.br</a> · WhatsApp (11) 91479-1442
+            Spotlog · São Paulo, SP · <a href="https://www.spotlog.com.br" style="color:#011960;text-decoration:none;">spotlogoficial.com.br</a><br/>
+            Dúvidas? <a href="mailto:sac@spotlogoficial.com.br" style="color:#011960;text-decoration:none;">sac@spotlogoficial.com.br</a> · WhatsApp (11) 97834-8288
           </td>
         </tr>
       </table>

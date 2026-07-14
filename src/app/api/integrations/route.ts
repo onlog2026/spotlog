@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { requireRole } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { invalidateIntegrationCache, type IntegrationProvider } from "@/lib/integrations";
 
 const upsertSchema = z.object({
   provider: z.string(),
@@ -39,6 +40,7 @@ export async function POST(req: NextRequest) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  invalidateIntegrationCache(ctx.org.id, body.provider as IntegrationProvider);
   return NextResponse.json({ ok: true });
 }
 
@@ -56,5 +58,6 @@ export async function PATCH(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  invalidateIntegrationCache(ctx.org.id, body.provider as IntegrationProvider);
   return NextResponse.json({ ok: true });
 }

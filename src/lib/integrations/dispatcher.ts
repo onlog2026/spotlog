@@ -3,6 +3,7 @@ import { sendSlackNotification } from "./clients/slack";
 import { sendDiscordNotification } from "./clients/discord";
 import { sendTelegramMessage } from "./clients/telegram";
 import { dispatchWebhook } from "./clients/webhook-generic";
+import { createCalendarEventForAppointment } from "./google-calendar";
 
 export type DispatchEvent =
   | "lead.created"
@@ -62,6 +63,11 @@ async function runDispatch(
 
   const tasks = rows
     .filter((row) => {
+      // Google Calendar: cria evento só na criação (sem depender de settings.events;
+      // só "created" pra não duplicar quando o agendamento é confirmado depois)
+      if (row.provider === "google_calendar") {
+        return event === "appointment.created";
+      }
       const subs = (row.settings?.events as string[] | undefined) ?? [];
       // se "settings.events" não existir, NÃO dispara (opt-in)
       return Array.isArray(subs) && subs.includes(event);
@@ -102,6 +108,15 @@ async function sendOne(
           cred.secret || undefined,
         );
         break;
+      case "google_calendar": {
+        const orgId = payload.organization_id as string | undefined;
+        const apptId = (payload.data as { id?: string } | undefined)?.id;
+        result =
+          orgId && apptId
+            ? await createCalendarEventForAppointment(orgId, apptId, cred)
+            : { ok: false, error: "missing_org_or_appt" };
+        break;
+      }
       default:
         // outros providers (resend/twilio/etc) não são notificadores de evento
         return;
