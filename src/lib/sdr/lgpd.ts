@@ -193,7 +193,7 @@ export function getUnsubscribeUrl(
     baseUrl ||
     process.env.NEXT_PUBLIC_APP_URL ||
     process.env.NEXT_PUBLIC_SITE_URL ||
-    "https://spotlog-nine.vercel.app";
+    "https://www.spotlog.com.br";
   const params = new URLSearchParams({ c: contactId, t: token });
   if (email) params.set("e", email);
   return `${base.replace(/\/$/, "")}/unsubscribe?${params.toString()}`;

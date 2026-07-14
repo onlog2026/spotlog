@@ -3,25 +3,40 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/integrations/email";
 import { sendWhatsapp } from "@/lib/integrations/whatsapp";
 import { aiGenerate } from "@/lib/integrations/ai";
+import { isSafeToContact } from "@/lib/sdr/lgpd";
+import { recordOutcome } from "@/lib/sdr/brain";
+
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 /**
- * "Tick" do worker de cadência. Processa enrollments que estão com
- * next_action_at <= now() e dispara o próximo passo. Idempotente por step.
- *
- * Pra rodar em produção: configurar Vercel Cron pra POST /api/cadence/tick
- * a cada 5–15 min. Header `x-internal: <WEBHOOK_SECRET>` obrigatório.
+ * Autoriza: (1) Vercel Cron — manda `Authorization: Bearer <CRON_SECRET>` (GET);
+ * (2) chamada interna/manual — header `x-internal: <WEBHOOK_SECRET>` (POST).
+ * Se nenhum secret estiver configurado, libera (dev).
  */
-export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-internal");
-  if (
-    process.env.WEBHOOK_SECRET &&
-    secret !== process.env.WEBHOOK_SECRET
-  ) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+function isAuthorized(req: NextRequest): boolean {
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && req.headers.get("authorization") === `Bearer ${cronSecret}`)
+    return true;
+  const webhook = process.env.WEBHOOK_SECRET;
+  if (webhook && req.headers.get("x-internal") === webhook) return true;
+  // Vercel Cron manda user-agent "vercel-cron/1.0" — autoriza o disparo agendado.
+  if ((req.headers.get("user-agent") || "").includes("vercel-cron")) return true;
+  return !cronSecret && !webhook;
+}
 
+// Anti-ban WhatsApp (Evolution é API não-oficial): poucos envios por tick,
+// com intervalo humano entre eles. Enrollments que sobrarem ficam pro
+// próximo tick do cron — o ritmo total fica naturalmente espaçado.
+const MAX_WHATSAPP_PER_TICK = 6;
+const waJitter = () =>
+  new Promise((r) => setTimeout(r, 3000 + Math.random() * 4000));
+
+/** Processa enrollments com next_action_at <= now() e dispara o próximo passo. */
+async function runTick(): Promise<number> {
   const admin = createAdminClient();
   const now = new Date().toISOString();
+  let whatsappSent = 0;
 
   const { data: enrollments } = await admin
     .from("sequence_enrollments")
@@ -51,13 +66,9 @@ export async function POST(req: NextRequest) {
         .maybeSingle();
 
       if (!stepRow) {
-        // sem mais passos: finalizar
         await admin
           .from("sequence_enrollments")
-          .update({
-            status: "finished",
-            finished_at: now,
-          })
+          .update({ status: "finished", finished_at: now })
           .eq("id", en.id);
         continue;
       }
@@ -97,16 +108,34 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
+      // LGPD: suppression list / opt-out bloqueia QUALQUER envio da cadência.
+      try {
+        const safe = await isSafeToContact(
+          en.organization_id,
+          contact.email,
+          contact.whatsapp ?? contact.phone,
+        );
+        if (!safe) {
+          await admin
+            .from("sequence_enrollments")
+            .update({ status: "opted_out" })
+            .eq("id", en.id);
+          continue;
+        }
+      } catch (err) {
+        console.warn("isSafeToContact falhou — pulando envio por segurança", err);
+        continue;
+      }
+
       const firstName =
         contact.first_name ?? contact.full_name.split(" ")[0] ?? "Olá";
       const company = contact.companies?.name ?? "sua empresa";
 
-      // Renderização básica + IA opcional
       let body = (step.body ?? "")
         .replaceAll("{{first_name}}", firstName)
         .replaceAll("{{full_name}}", contact.full_name)
         .replaceAll("{{company}}", company);
-      let subject = (step.subject ?? "")
+      const subject = (step.subject ?? "")
         .replaceAll("{{first_name}}", firstName)
         .replaceAll("{{company}}", company);
 
@@ -142,7 +171,6 @@ export async function POST(req: NextRequest) {
           if (out) body = out;
         } catch (err) {
           console.warn("ai_personalize failed", err);
-          // segue com texto-base
         }
       }
 
@@ -164,6 +192,9 @@ export async function POST(req: NextRequest) {
         providerMessageId = r.provider_message_id;
         providerName = "resend";
       } else if (step.kind === "whatsapp") {
+        // Teto por tick atingido → deixa este enrollment pro próximo tick
+        // (não avança o passo; o cron pega de novo). Ritmo seguro anti-ban.
+        if (whatsappSent >= MAX_WHATSAPP_PER_TICK) continue;
         const to = contact.whatsapp ?? contact.phone;
         if (to) {
           const r = await sendWhatsapp({
@@ -175,13 +206,17 @@ export async function POST(req: NextRequest) {
           sendError = r.error;
           providerMessageId = r.provider_message_id;
           providerName = r.provider;
+          if (r.ok) {
+            whatsappSent++;
+            await waJitter(); // intervalo humano entre envios
+          }
         } else {
           sendError = "Contato sem WhatsApp/telefone";
         }
       } else if (step.kind === "wait") {
-        sendOk = true; // só avança
+        sendOk = true;
       } else if (step.kind === "manual_task") {
-        sendOk = true; // cria activity
+        sendOk = true;
         await admin.from("activities").insert({
           organization_id: en.organization_id,
           type: "task",
@@ -193,6 +228,15 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      if ((step.kind === "email" || step.kind === "whatsapp") && sendOk) {
+        // Cérebro Comercial: registra o ENVIO (aprendizado por canal/hora).
+        await recordOutcome(admin, {
+          orgId: en.organization_id,
+          stage: "sent",
+          channel: step.kind === "email" ? "email" : "whatsapp",
+        });
+      }
+
       if (step.kind === "email" || step.kind === "whatsapp") {
         await admin.from("messages").insert({
           organization_id: en.organization_id,
@@ -200,9 +244,7 @@ export async function POST(req: NextRequest) {
           direction: "outbound",
           status: sendOk ? "sent" : "failed",
           to_address:
-            step.kind === "email"
-              ? contact.email
-              : contact.whatsapp ?? contact.phone,
+            step.kind === "email" ? contact.email : contact.whatsapp ?? contact.phone,
           subject,
           body_text: body,
           body_html: step.kind === "email" ? body.replace(/\n/g, "<br/>") : null,
@@ -216,7 +258,6 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      // Avança próximo passo
       const { data: nextStep } = await admin
         .from("sequence_steps")
         .select("wait_days, wait_hours")
@@ -227,8 +268,7 @@ export async function POST(req: NextRequest) {
       if (nextStep) {
         const wait = nextStep as { wait_days: number; wait_hours: number };
         const ms =
-          (wait.wait_days * 24 + wait.wait_hours) * 60 * 60 * 1000 +
-          5 * 60 * 1000;
+          (wait.wait_days * 24 + wait.wait_hours) * 60 * 60 * 1000 + 5 * 60 * 1000;
         await admin
           .from("sequence_enrollments")
           .update({
@@ -249,5 +289,21 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  return processed;
+}
+
+/** Vercel Cron (GET) — roda o tick da cadência. */
+export async function GET(req: NextRequest) {
+  if (!isAuthorized(req))
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const processed = await runTick();
+  return NextResponse.json({ ok: true, processed });
+}
+
+/** Disparo manual/interno (POST com x-internal). */
+export async function POST(req: NextRequest) {
+  if (!isAuthorized(req))
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const processed = await runTick();
   return NextResponse.json({ ok: true, processed });
 }

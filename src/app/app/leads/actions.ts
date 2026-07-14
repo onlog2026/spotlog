@@ -5,7 +5,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireSession } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sendConvertedEmail } from "@/lib/email/lead-converted-notification";
+import { isSafeToContact } from "@/lib/sdr/lgpd";
+import { normalizePhoneBR, isValidEmail } from "@/lib/sdr/validate";
 
 const LEAD_STATUS = [
   "new",
@@ -56,6 +59,98 @@ function parseForm(formData: FormData) {
     score: scoreRaw ? Number(scoreRaw) : null,
     message: v("message"),
   };
+}
+
+/**
+ * COLOCAR NA CADÊNCIA (em massa) — inscreve leads novos com WhatsApp/e-mail
+ * na sequência escolhida. O cron /api/cadence/tick dispara os envios sozinho.
+ * Guardas: LGPD (opt-out), dedupe de contato, unique(sequence, contact).
+ */
+export async function colocarLeadsNaCadencia(sequenceId: string) {
+  const ctx = await requireSession();
+  if (!sequenceId) throw new Error("Escolha uma cadência.");
+  const admin = createAdminClient();
+
+  const { data: leadsRaw } = await admin
+    .from("leads")
+    .select("id, full_name, email, phone, company_name, job_title")
+    .eq("organization_id", ctx.org.id)
+    .in("status", ["new", "contacted"])
+    .limit(300);
+
+  let enrolled = 0;
+  let skipped = 0;
+  for (const l of (leadsRaw ?? []) as Array<{
+    id: string;
+    full_name: string | null;
+    email: string | null;
+    phone: string | null;
+    company_name: string | null;
+    job_title: string | null;
+  }>) {
+    try {
+      const phone = normalizePhoneBR(l.phone ?? undefined) || null;
+      const email = l.email && isValidEmail(l.email) ? l.email : null;
+      if (!phone && !email) {
+        skipped++;
+        continue;
+      }
+      const safe = await isSafeToContact(ctx.org.id, email, phone);
+      if (!safe) {
+        skipped++;
+        continue;
+      }
+
+      // find-or-create do contato (a cadência trabalha com `contacts`)
+      const orParts: string[] = [];
+      if (email) orParts.push(`email.eq.${email}`);
+      if (phone) orParts.push(`whatsapp.eq.${phone}`, `phone.eq.${phone}`);
+      let contactId: string | null = null;
+      const { data: existingCt } = await admin
+        .from("contacts")
+        .select("id")
+        .eq("organization_id", ctx.org.id)
+        .or(orParts.join(","))
+        .limit(1)
+        .maybeSingle();
+      if (existingCt) {
+        contactId = (existingCt as { id: string }).id;
+      } else {
+        const { data: newCt } = await admin
+          .from("contacts")
+          .insert({
+            organization_id: ctx.org.id,
+            full_name: l.full_name ?? l.company_name ?? "Contato",
+            email,
+            whatsapp: phone,
+            phone,
+            job_title: l.job_title ?? null,
+            source: "leads-cadencia",
+          })
+          .select("id")
+          .single();
+        contactId = (newCt as { id: string } | null)?.id ?? null;
+      }
+      if (!contactId) {
+        skipped++;
+        continue;
+      }
+
+      // unique(sequence_id, contact_id) → duplicata vira erro silencioso
+      const { error: enrErr } = await admin.from("sequence_enrollments").insert({
+        organization_id: ctx.org.id,
+        sequence_id: sequenceId,
+        contact_id: contactId,
+      });
+      if (enrErr) skipped++;
+      else enrolled++;
+    } catch {
+      skipped++;
+    }
+  }
+
+  revalidatePath("/app/leads");
+  return { enrolled, skipped };
 }
 
 export async function createLead(formData: FormData) {

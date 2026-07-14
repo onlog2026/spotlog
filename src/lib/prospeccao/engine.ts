@@ -15,8 +15,9 @@ import {
   normalizeCnpj,
   type EnrichedCompany,
 } from "@/lib/sdr/enrich";
+import { searchProspects } from "@/lib/integrations/prospecting";
 
-export type CampaignType = "cnpj_list" | "segmento" | "domain_list";
+export type CampaignType = "cnpj_list" | "segmento" | "domain_list" | "internet";
 
 export type CampaignICP = {
   type: CampaignType;
@@ -25,7 +26,9 @@ export type CampaignICP = {
   industries?: string[];
   states?: string[];
   cities?: string[];
+  neighborhood?: string;
   keywords?: string[];
+  limit?: number;
 };
 
 type Result = {
@@ -92,6 +95,8 @@ export async function runCampaign(campaignId: string): Promise<void> {
       results = await runSegmento(ca.organization_id, ca.icp);
     } else if (type === "domain_list") {
       results = await runDomainList(ca.icp?.domains ?? []);
+    } else if (type === "internet") {
+      results = await runInternet(ca.organization_id, ca.icp);
     }
 
     if (results.length > 0) {
@@ -147,6 +152,43 @@ export async function runCampaign(campaignId: string): Promise<void> {
   }
 }
 
+/**
+ * Busca GRÁTIS na internet (OpenStreetMap). Nicho + cidade → empresas reais
+ * com nome/endereço/telefone/site/e-mail/WhatsApp. Sem chave, sem custo.
+ */
+async function runInternet(
+  orgId: string,
+  icp: CampaignICP,
+): Promise<Result[]> {
+  // Google Places (melhor cobertura + celular/WhatsApp) como PRIMÁRIO;
+  // OpenStreetMap como reserva grátis. searchProspects faz o failover: se o
+  // Google falhar/estourar cota, o OSM continua (o erro fica no diagnóstico).
+  const { hits } = await searchProspects(
+    orgId,
+    {
+      industries: icp.industries,
+      keywords: icp.keywords,
+      cities: icp.cities,
+      states: icp.states,
+      neighborhood: icp.neighborhood,
+      limit: icp.limit,
+    },
+    ["google_places", "openstreetmap"],
+  );
+  return hits.map((h) => {
+    let score = 45;
+    if (h.company.phone) score += 20;
+    if (h.company.website) score += 20;
+    if (h.contact?.email) score += 15;
+    return {
+      external_id: h.external_id,
+      match_score: Math.min(score, 100),
+      company_data: h.company as Record<string, unknown>,
+      contact_data: (h.contact ?? null) as Record<string, unknown> | null,
+    };
+  });
+}
+
 async function runCnpjList(
   orgId: string,
   cnpjsRaw: string[],
@@ -187,6 +229,8 @@ function toResult(cnpj: string, ec: EnrichedCompany): Result {
       description: `${ec.cnae_descricao ?? ""}${
         ec.capital_social ? ` · Capital R$${ec.capital_social}` : ""
       }`,
+      // Decisores prováveis (QSA da Receita via BrasilAPI — grátis, real)
+      socios: ec.socios && ec.socios.length > 0 ? ec.socios : undefined,
     },
     contact_data: ec.email
       ? {

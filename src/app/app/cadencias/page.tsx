@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Send, Plus, Mail, MessageCircle, ArrowRight } from "lucide-react";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 export const dynamic = "force-dynamic";
 
 export default async function CadenciasPage() {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("cadencias"); // Eixo A — neutro enquanto enforcement OFF
   const supabase = await createClient();
 
   const { data: sequences } = await supabase

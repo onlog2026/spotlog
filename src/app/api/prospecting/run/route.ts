@@ -1,51 +1,56 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { searchProspects, type ICP } from "@/lib/integrations/prospecting";
+import { analyzeLeadSite } from "@/lib/sdr/enrich-web";
+import {
+  normalizePhoneBR,
+  isValidPhoneBR,
+  isValidEmail,
+} from "@/lib/sdr/validate";
+
+export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 /**
- * Roda um job de prospecção para uma campanha. Pode ser chamado:
- * - direto após criação (POST com campaign_id);
- * - por cron schedule (Vercel Cron) — itera campanhas em status 'running'.
- *
- * Header `x-internal` deve bater com WEBHOOK_SECRET pra impedir abuso.
+ * AGENTE DE PROSPECÇÃO — roda a descoberta + o enriquecimento.
+ * Chamado por:
+ *  - GET  → Vercel Cron (diário, autônomo): descobre em TODAS as campanhas
+ *           'running' + enriquece os leads novos (site → WhatsApp/e-mail).
+ *  - POST → manual/interno (header x-internal=WEBHOOK_SECRET), opcional {campaign_id}.
  */
-export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-internal");
-  if (
-    process.env.WEBHOOK_SECRET &&
-    secret !== process.env.WEBHOOK_SECRET
-  ) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+function authorized(req: NextRequest): boolean {
+  const cron = process.env.CRON_SECRET;
+  if (cron && req.headers.get("authorization") === `Bearer ${cron}`) return true;
+  const wh = process.env.WEBHOOK_SECRET;
+  if (wh && req.headers.get("x-internal") === wh) return true;
+  if ((req.headers.get("user-agent") || "").includes("vercel-cron")) return true;
+  if (!cron && !wh) return true; // sem secret configurado → libera (dev)
+  return false;
+}
 
-  const admin = createAdminClient();
-  const body = (await req.json().catch(() => ({}))) as {
-    campaign_id?: string;
-  };
+type Camp = {
+  id: string;
+  organization_id: string;
+  icp: ICP;
+  sources: string[];
+  daily_limit: number;
+  total_target: number;
+  found_count: number;
+};
 
-  const { data: campaigns } = body.campaign_id
-    ? await admin
-        .from("prospecting_campaigns")
-        .select("*")
-        .eq("id", body.campaign_id)
-    : await admin
-        .from("prospecting_campaigns")
-        .select("*")
-        .eq("status", "running");
-
-  if (!campaigns?.length) return NextResponse.json({ ok: true, processed: 0 });
+/** Descoberta: roda as campanhas (uma específica ou todas 'running'). */
+async function discover(
+  admin: ReturnType<typeof createAdminClient>,
+  campaignId?: string,
+): Promise<number> {
+  const { data: campaigns } = campaignId
+    ? await admin.from("prospecting_campaigns").select("*").eq("id", campaignId)
+    : await admin.from("prospecting_campaigns").select("*").eq("status", "running");
+  if (!campaigns?.length) return 0;
 
   let processed = 0;
   for (const c of campaigns) {
-    const ca = c as unknown as {
-      id: string;
-      organization_id: string;
-      icp: ICP;
-      sources: string[];
-      daily_limit: number;
-      total_target: number;
-      found_count: number;
-    };
+    const ca = c as unknown as Camp;
     if (ca.found_count >= ca.total_target) {
       await admin
         .from("prospecting_campaigns")
@@ -53,11 +58,7 @@ export async function POST(req: NextRequest) {
         .eq("id", ca.id);
       continue;
     }
-
-    const remaining = Math.min(
-      ca.daily_limit,
-      ca.total_target - ca.found_count,
-    );
+    const remaining = Math.min(ca.daily_limit, ca.total_target - ca.found_count);
     const icp: ICP = { ...ca.icp, limit: remaining };
 
     const { data: job } = await admin
@@ -75,11 +76,15 @@ export async function POST(req: NextRequest) {
     const jobId = (job as { id: string }).id;
 
     try {
-      const hits = await searchProspects(
+      const { hits, diagnostics } = await searchProspects(
         ca.organization_id,
         icp,
         ca.sources,
       );
+      const failures = diagnostics.filter((d) => !d.ok);
+      const note = failures.length
+        ? "Avisos: " + failures.map((d) => `${d.source}: ${d.error}`).join(" | ")
+        : null;
 
       if (hits.length) {
         await admin.from("prospecting_results").insert(
@@ -107,6 +112,7 @@ export async function POST(req: NextRequest) {
         .update({
           status: "completed",
           total_found: hits.length,
+          error: note,
           finished_at: new Date().toISOString(),
         })
         .eq("id", jobId);
@@ -122,8 +128,85 @@ export async function POST(req: NextRequest) {
         .eq("id", jobId);
     }
   }
+  return processed;
+}
 
-  return NextResponse.json({ ok: true, processed });
+/**
+ * Auto-enriquecimento: pega leads NOVOS com site e ainda não analisados
+ * (sem `dores`), entra no site e preenche WhatsApp/e-mail + score + dores.
+ * É o "agente trabalhando sozinho" nos leads. Capado pra caber no tempo.
+ */
+async function autoEnrich(
+  admin: ReturnType<typeof createAdminClient>,
+  cap = 15,
+): Promise<number> {
+  const { data } = await admin
+    .from("prospecting_results")
+    .select("id,organization_id,company_data,contact_data")
+    .eq("status", "new")
+    .limit(cap * 4);
+  const rows = ((data ?? []) as Array<Record<string, unknown>>)
+    .filter((r) => {
+      const cd = (r.company_data ?? {}) as { website?: string; dores?: unknown };
+      return cd.website && cd.dores === undefined; // tem site e ainda não analisado
+    })
+    .slice(0, cap);
+
+  let enriched = 0;
+  for (const r of rows) {
+    try {
+      const cd = { ...((r.company_data ?? {}) as Record<string, string | undefined>) };
+      const pd = { ...((r.contact_data ?? {}) as Record<string, string | undefined>) };
+      const web = await analyzeLeadSite(cd.website!);
+      const cand = [...web.whatsapps, ...web.phones];
+      const wphone = cand.find((p) => isValidPhoneBR(p)) ?? "";
+      const waValid = web.whatsapps.find((p) => isValidPhoneBR(p)) ?? "";
+      if (!cd.phone && wphone) cd.phone = wphone;
+      if (!pd.email && web.emails[0]) pd.email = web.emails[0];
+      if (waValid) pd.phone = pd.phone || waValid;
+      const np = normalizePhoneBR(cd.phone);
+      if (cd.phone && np) cd.phone = np;
+      if (pd.email && !isValidEmail(pd.email)) delete pd.email;
+      const score = Math.min(
+        40 +
+          (isValidPhoneBR(cd.phone) ? 25 : 0) +
+          (pd.email && isValidEmail(pd.email) ? 20 : 0) +
+          (cd.website ? 10 : 0),
+        100,
+      );
+      await admin
+        .from("prospecting_results")
+        .update({
+          company_data: { ...cd, dores: web.dores },
+          contact_data: Object.keys(pd).length ? pd : null,
+          match_score: score,
+        })
+        .eq("id", r.id as string);
+      enriched++;
+    } catch {
+      // um lead falho não derruba o lote
+    }
+  }
+  return enriched;
+}
+
+export async function GET(req: NextRequest) {
+  if (!authorized(req))
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const admin = createAdminClient();
+  const processed = await discover(admin); // todas 'running'
+  const enriched = await autoEnrich(admin); // leads novos com site
+  return NextResponse.json({ ok: true, processed, enriched });
+}
+
+export async function POST(req: NextRequest) {
+  if (!authorized(req))
+    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const admin = createAdminClient();
+  const body = (await req.json().catch(() => ({}))) as { campaign_id?: string };
+  const processed = await discover(admin, body.campaign_id);
+  const enriched = await autoEnrich(admin);
+  return NextResponse.json({ ok: true, processed, enriched });
 }
 
 function scoreMatch(h: {

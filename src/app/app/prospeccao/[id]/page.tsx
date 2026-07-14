@@ -8,17 +8,26 @@ import { Progress } from "@/components/ui/progress";
 import { notFound } from "next/navigation";
 import { formatDateTime } from "@/lib/utils";
 import { getCampaign, listResults } from "@/lib/queries/prospeccao";
+import { createAdminClient } from "@/lib/supabase/admin";
 import {
   DeleteCampaignButton,
   RerunCampaignButton,
+  EnrichCampaignButton,
+  RunAllButton,
+  DeepSearchButton,
+  AutoCollect,
 } from "@/components/prospeccao/campaign-actions";
 import {
   ConvertOneButton,
   ConvertAllButton,
   DiscardOneButton,
+  InformarCnpjButton,
 } from "@/components/prospeccao/result-row-actions";
+import { SendApproachPanel } from "@/components/prospeccao/send-approach-panel";
 
 export const dynamic = "force-dynamic";
+// Dá tempo pro enriquecimento (crawl dos sites) rodar sem cortar.
+export const maxDuration = 60;
 
 export default async function CampaignDetailPage({
   params,
@@ -30,6 +39,17 @@ export default async function CampaignDetailPage({
   const campaign = await getCampaign(ctx.org.id, id);
   if (!campaign) notFound();
   const results = await listResults(ctx.org.id, id);
+
+  // Raspagem (Apify) em andamento? → AutoCollect coleta e enriquece sozinho.
+  const { data: runningJob } = await createAdminClient()
+    .from("prospecting_jobs")
+    .select("id")
+    .eq("organization_id", ctx.org.id)
+    .eq("campaign_id", id)
+    .eq("source", "apify")
+    .eq("status", "running")
+    .limit(1)
+    .maybeSingle();
 
   const icp = (campaign.icp as Record<string, unknown> | null) ?? {};
   const tipo =
@@ -55,8 +75,35 @@ export default async function CampaignDetailPage({
 
   const newCount = results.filter((r) => r.status === "new").length;
 
+  // Funil de prospecção
+  const totalRes = results.length;
+  const comContato = results.filter((r) => {
+    const cd = (r.company_data ?? {}) as Record<string, string>;
+    const pd = (r.contact_data ?? {}) as Record<string, string>;
+    return Boolean(cd.phone || pd.email);
+  }).length;
+  const qualificados = results.filter(
+    (r) => Number(r.match_score ?? 0) >= 50,
+  ).length;
+  const convertidos = results.filter((r) => r.status === "converted").length;
+
+  // Leads prontos pra contatar: têm WhatsApp/telefone + mensagem da IA + não contatados.
+  const contactable = results
+    .filter((r) => r.status !== "contacted")
+    .map((r) => {
+      const cd = (r.company_data ?? {}) as Record<string, string>;
+      const pd = (r.contact_data ?? {}) as Record<string, string>;
+      const phone = pd?.phone || cd?.phone;
+      const pitch = (r.company_data as { pitch?: string } | null)?.pitch;
+      return phone && pitch
+        ? { id: r.id, name: cd?.name ?? "Lead", phone, message: pitch }
+        : null;
+    })
+    .filter(Boolean) as { id: string; name: string; phone: string; message: string }[];
+
   return (
     <div className="space-y-6">
+      {runningJob && <AutoCollect id={campaign.id} />}
       <div>
         <Link
           href="/app/prospeccao"
@@ -81,6 +128,9 @@ export default async function CampaignDetailPage({
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <StatusBadge status={campaign.status} />
+            <RunAllButton id={campaign.id} />
+            {tipo === "internet" && <DeepSearchButton id={campaign.id} />}
+            <EnrichCampaignButton id={campaign.id} />
             <RerunCampaignButton id={campaign.id} />
             <DeleteCampaignButton id={campaign.id} />
           </div>
@@ -140,6 +190,23 @@ export default async function CampaignDetailPage({
         </Card>
       </div>
 
+      {/* Funil de prospecção */}
+      <Card className="border-white/10 bg-card/50">
+        <CardHeader>
+          <CardTitle className="text-sm">Funil</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <FunnelStep label="Encontrados" value={totalRes} tone="slate" />
+            <FunnelStep label="Com contato" value={comContato} tone="sky" />
+            <FunnelStep label="Qualificados (≥50)" value={qualificados} tone="amber" />
+            <FunnelStep label="Convertidos" value={convertidos} tone="emerald" />
+          </div>
+        </CardContent>
+      </Card>
+
+      <SendApproachPanel campaignId={id} leads={contactable} />
+
       <Card className="border-white/10 bg-card/50">
         <CardHeader>
           <div className="flex items-center justify-between flex-wrap gap-2">
@@ -179,6 +246,24 @@ export default async function CampaignDetailPage({
                       string,
                       string
                     > | null;
+                    const dores =
+                      ((r.company_data as { dores?: string[] } | null)?.dores) ?? [];
+                    const pitch =
+                      (r.company_data as { pitch?: string } | null)?.pitch ?? "";
+                    const socios =
+                      ((r.company_data as {
+                        socios?: Array<{ nome?: string; qualificacao?: string }>;
+                      } | null)?.socios) ?? [];
+                    const decisor =
+                      pd?.full_name ||
+                      (socios[0]?.nome
+                        ? `${socios[0].nome}${socios[0].qualificacao ? ` (${socios[0].qualificacao})` : ""}`
+                        : null);
+                    const site = cd?.website
+                      ? cd.website.startsWith("http")
+                        ? cd.website
+                        : `https://${cd.website}`
+                      : null;
                     return (
                       <tr
                         key={r.id}
@@ -193,9 +278,64 @@ export default async function CampaignDetailPage({
                           <div className="font-medium">
                             {cd?.name ?? "—"}
                           </div>
-                          <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                          <div className="text-xs text-muted-foreground truncate max-w-[220px]">
                             {cd?.industry ?? ""}
                           </div>
+                          {(cd?.phone || pd?.email || site) && (
+                            <div className="text-[11px] text-muted-foreground mt-0.5 flex gap-2 flex-wrap">
+                              {cd?.phone && <span>📞 {cd.phone}</span>}
+                              {pd?.email && <span>✉️ {pd.email}</span>}
+                              {site && (
+                                <a
+                                  href={site}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline"
+                                >
+                                  site
+                                </a>
+                              )}
+                              {(((r.company_data as { socials?: string[] } | null)
+                                ?.socials) ?? []).map((s) => (
+                                <a
+                                  key={s}
+                                  href={s}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="underline text-sky-300/90"
+                                >
+                                  {s.includes("instagram")
+                                    ? "instagram"
+                                    : s.includes("facebook")
+                                      ? "facebook"
+                                      : "linkedin"}
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                          {decisor && (
+                            <div className="text-[11px] mt-0.5 text-emerald-300">
+                              👤 Decisor: {decisor}
+                            </div>
+                          )}
+                          {dores.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1 max-w-[260px]">
+                              {dores.slice(0, 4).map((d, i) => (
+                                <span
+                                  key={i}
+                                  className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300"
+                                  title="Oportunidade encontrada no site do lead"
+                                >
+                                  {d}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {pitch && (
+                            <div className="mt-1.5 text-[11px] italic text-sky-300/90 bg-sky-500/10 rounded p-1.5 max-w-[280px]">
+                              💬 {pitch}
+                            </div>
+                          )}
                         </td>
                         <td className="p-3 hidden md:table-cell text-xs text-muted-foreground">
                           {cd?.cnpj ?? "—"}
@@ -214,6 +354,9 @@ export default async function CampaignDetailPage({
                           <div className="flex items-center justify-end gap-1">
                             {r.status === "new" && (
                               <>
+                                {!cd?.cnpj && (
+                                  <InformarCnpjButton resultId={r.id} />
+                                )}
                                 <ConvertOneButton resultId={r.id} />
                                 <DiscardOneButton resultId={r.id} />
                               </>
@@ -229,6 +372,31 @@ export default async function CampaignDetailPage({
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function FunnelStep({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone: "slate" | "sky" | "amber" | "emerald";
+}) {
+  const color: Record<string, string> = {
+    slate: "text-slate-300",
+    sky: "text-sky-300",
+    amber: "text-amber-300",
+    emerald: "text-emerald-300",
+  };
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 text-center">
+      <div className={`text-2xl font-bold ${color[tone]}`}>{value}</div>
+      <div className="text-[10px] uppercase tracking-wide text-muted-foreground mt-1">
+        {label}
+      </div>
     </div>
   );
 }

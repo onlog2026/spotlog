@@ -1,13 +1,57 @@
 "use client";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { Loader2, UserPlus, X, Users } from "lucide-react";
+import { Loader2, UserPlus, X, Users, IdCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   converterResultadoEmLead,
   converterTodosResultados,
   descartarResultado,
+  informarCnpj,
 } from "@/lib/prospeccao/actions";
+
+/**
+ * "Informar CNPJ" — resultado da busca de internet não tem CNPJ; o dono cola
+ * o CNPJ e o sistema puxa razão social + SÓCIOS (decisores) da Receita, grátis.
+ */
+export function InformarCnpjButton({ resultId }: { resultId: string }) {
+  const [pending, start] = useTransition();
+  function onClick() {
+    const cnpj = window.prompt(
+      "CNPJ da empresa (só números ou com pontuação):",
+    );
+    if (!cnpj) return;
+    start(async () => {
+      try {
+        const res = await informarCnpj(resultId, cnpj);
+        toast.success(
+          res.socios > 0
+            ? `CNPJ ok — ${res.socios} sócio(s) encontrados (decisores prováveis).`
+            : "CNPJ ok — dados oficiais preenchidos (sem QSA público).",
+        );
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Falha");
+      }
+    });
+  }
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      disabled={pending}
+      className="h-7 px-2 text-xs"
+      title="Informar CNPJ pra descobrir os sócios (decisores)"
+    >
+      {pending ? (
+        <Loader2 className="h-3 w-3 animate-spin" />
+      ) : (
+        <IdCard className="h-3 w-3" />
+      )}
+      CNPJ
+    </Button>
+  );
+}
 
 export function ConvertOneButton({
   resultId,

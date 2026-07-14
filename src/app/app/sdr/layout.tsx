@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SdrNav } from "@/components/sdr/sdr-nav";
+import { requireOrgModule } from "@/lib/entitlements";
 
 export const metadata: Metadata = {
   title: "SDR Digital | Spotlog",
@@ -7,7 +8,8 @@ export const metadata: Metadata = {
     "Prospecção LGPD-safe com IA, enriquecimento de leads e gestão de consentimento.",
 };
 
-export default function SdrLayout({ children }: { children: React.ReactNode }) {
+export default async function SdrLayout({ children }: { children: React.ReactNode }) {
+  await requireOrgModule("sdr"); // Eixo A — neutro enquanto enforcement OFF
   return (
     <div className="space-y-6">
       <header className="space-y-1">

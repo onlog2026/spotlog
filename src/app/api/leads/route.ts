@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { dispatchEvent } from "@/lib/integrations/dispatcher";
+import { sendNewLeadNotification } from "@/lib/email/new-lead-notification";
 
 const schema = z.object({
   full_name: z.string().min(2),
@@ -142,6 +143,18 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       console.warn("[/api/leads] notify failed", e);
     }
+
+    // E-mail de notificação para o time comercial (best-effort)
+    await sendNewLeadNotification({
+      id: (lead as { id: string }).id,
+      full_name: data.full_name,
+      email: data.email,
+      whatsapp: data.whatsapp,
+      company_name: data.company_name,
+      message: data.message,
+      source_detail: data.source_detail,
+      custom_fields: data.custom_fields as Record<string, string> | undefined,
+    });
 
     // Dispara para integrações nativas (Slack, Discord, Telegram, webhook genérico)
     dispatchEvent(orgId, "lead.created", {

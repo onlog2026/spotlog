@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, Plus, Target, Search, Lock, UserX } from "lucide-react";
-import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,8 @@ import { formatDateTime, initials } from "@/lib/utils";
 import { MarkSeenOnMount } from "@/components/notifications/mark-seen-on-mount";
 import { FlashBanner } from "@/components/crm/flash-banner";
 import { listLeads, getActiveLeadLocks } from "@/lib/queries/leads";
+import { EnrollCadencePanel } from "@/components/leads/enroll-cadence-panel";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +37,7 @@ export default async function LeadsPage({
     assignment?: "mine" | "unassigned" | "all";
   }>;
 }) {
-  const ctx = await requireSession();
+  const ctx = await requireOrgModule("crm"); // Eixo A — neutro enquanto enforcement OFF
   const { status, q, created, deleted, error, assignment } = await searchParams;
   const leads = await listLeads(ctx.org.id, {
     status,
@@ -83,6 +85,15 @@ export default async function LeadsPage({
     leads.map((l) => l.id),
   );
 
+  // Cadências ativas — alimentam o painel "Colocar na cadência".
+  const { data: seqRows } = await createAdminClient()
+    .from("sequences")
+    .select("id, name")
+    .eq("organization_id", ctx.org.id)
+    .eq("is_active", true)
+    .order("name");
+  const sequences = (seqRows ?? []) as { id: string; name: string }[];
+
   const qs = (extra: Record<string, string | undefined>) => {
     const params = new URLSearchParams();
     if (q) params.set("q", q);
@@ -106,12 +117,15 @@ export default async function LeadsPage({
             Lista de leads que entraram no funil. Triagem e atribuição.
           </p>
         </div>
-        <Button variant="orange" asChild>
-          <Link href="/app/leads/novo">
-            <Plus className="h-4 w-4" />
-            Novo lead
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <EnrollCadencePanel sequences={sequences} />
+          <Button variant="orange" asChild>
+            <Link href="/app/leads/novo">
+              <Plus className="h-4 w-4" />
+              Novo lead
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {created ? <FlashBanner message="Lead criado com sucesso." /> : null}
