@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { dispatchEvent } from "@/lib/integrations/dispatcher";
 
 /**
  * POST /api/agenda/book
@@ -71,6 +72,13 @@ export async function POST(req: Request) {
   } catch (e) {
     console.warn("[agenda/book] notification insert failed", e);
   }
+
+  // Dispara integrações: Google Calendar cria o evento; Slack/Discord/Telegram/webhook notificam
+  dispatchEvent(org, "appointment.created", {
+    id: apptId as string,
+    title: payload.title,
+    scheduled_at: scheduledAt,
+  });
 
   return NextResponse.json({ ok: true, appointment_id: apptId });
 }
