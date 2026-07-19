@@ -870,7 +870,7 @@ async function convertSingleResult(
       status: "new",
       full_name: pd?.full_name ?? cd?.name ?? "Lead",
       email: pd?.email ?? null,
-      phone: pd?.phone ?? cd?.phone ?? null,
+      phone: normalizePhoneBR(pd?.phone ?? cd?.phone) || null,
       company_name: cd?.name ?? null,
       job_title: pd?.job_title ?? null,
       score: Number(result.match_score ?? 50),

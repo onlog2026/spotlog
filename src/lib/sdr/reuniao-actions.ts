@@ -53,6 +53,31 @@ export async function marcarReuniao(enrollmentId: string) {
   } | null;
   if (!contact) throw new Error("Contato não encontrado");
 
+  // Evita reunião duplicada: a IA do SDR pode já ter marcado um compromisso
+  // futuro pra esse mesmo contato (ver conversation.ts) antes do dono clicar aqui.
+  const { data: existing } = await admin
+    .from("appointments")
+    .select("id")
+    .eq("organization_id", ctx.org.id)
+    .eq("contact_id", contact.id)
+    .eq("status", "agendado")
+    .gte("scheduled_at", new Date().toISOString())
+    .maybeSingle();
+  if (existing) {
+    await admin
+      .from("sequence_enrollments")
+      .update({ status: "finished", finished_at: new Date().toISOString() })
+      .eq("id", enrollmentId)
+      .eq("organization_id", ctx.org.id);
+    revalidatePath("/app/sdr");
+    revalidatePath("/app/agenda");
+    return {
+      ok: true,
+      appointmentId: (existing as { id: string }).id,
+      alreadyExisted: true,
+    };
+  }
+
   const empresa = contact.companies?.name;
   const { data: appt, error } = await admin
     .from("appointments")
