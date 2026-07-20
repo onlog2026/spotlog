@@ -323,7 +323,7 @@ export default async function CampaignDetailPage({
                               {dores.slice(0, 4).map((d, i) => (
                                 <span
                                   key={i}
-                                  className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300"
+                                  className="text-[9px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300"
                                   title="Oportunidade encontrada no site do lead"
                                 >
                                   {d}

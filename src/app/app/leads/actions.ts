@@ -66,17 +66,25 @@ function parseForm(formData: FormData) {
  * na sequência escolhida. O cron /api/cadence/tick dispara os envios sozinho.
  * Guardas: LGPD (opt-out), dedupe de contato, unique(sequence, contact).
  */
-export async function colocarLeadsNaCadencia(sequenceId: string) {
+/**
+ * @param minScore Nota de corte opcional (add-on Prospecção Avançada) —
+ * quando informado, só inscreve leads com `score >= minScore`. Sem informar,
+ * comportamento igual a sempre (todos os leads contatáveis entram).
+ */
+export async function colocarLeadsNaCadencia(sequenceId: string, minScore?: number) {
   const ctx = await requireSession();
   if (!sequenceId) throw new Error("Escolha uma cadência.");
   const admin = createAdminClient();
 
-  const { data: leadsRaw } = await admin
+  let query = admin
     .from("leads")
-    .select("id, full_name, email, phone, company_name, job_title")
+    .select("id, full_name, email, phone, company_name, job_title, score")
     .eq("organization_id", ctx.org.id)
-    .in("status", ["new", "contacted"])
-    .limit(300);
+    .in("status", ["new", "contacted"]);
+  if (typeof minScore === "number" && minScore > 0) {
+    query = query.gte("score", minScore);
+  }
+  const { data: leadsRaw } = await query.limit(300);
 
   let enrolled = 0;
   let skipped = 0;
@@ -87,6 +95,7 @@ export async function colocarLeadsNaCadencia(sequenceId: string) {
     phone: string | null;
     company_name: string | null;
     job_title: string | null;
+    score: number | null;
   }>) {
     try {
       const phone = normalizePhoneBR(l.phone ?? undefined) || null;

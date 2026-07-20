@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
+import { requireOrgModule } from "@/lib/entitlements";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { runCampaign, type CampaignType } from "@/lib/prospeccao/engine";
 import { analyzeLeadSite } from "@/lib/sdr/enrich-web";
@@ -176,6 +177,11 @@ export async function criarMaquina(formData: FormData) {
   const cidade = String(formData.get("cidade") ?? "").trim();
   const bairro = String(formData.get("bairro") ?? "").trim();
   const limit = Math.min(Math.max(Number(formData.get("limit")) || 30, 10), 200);
+  // Fonte extra (add-on "Prospecção Avançada"): links de post do Instagram,
+  // um por linha — vazio = não usa essa fonte, comportamento igual a antes.
+  const instagramPosts = splitLines(String(formData.get("instagram_posts") ?? ""));
+  const minScore = Number(formData.get("min_score_to_enroll"));
+  const minScoreToEnroll = Number.isFinite(minScore) && minScore > 0 ? Math.min(100, minScore) : null;
 
   if (termos.length === 0) throw new Error("Diga o que buscar (ex: farmácia de manipulação).");
   if (!estado && !cidade) throw new Error("Informe pelo menos o estado ou a cidade.");
@@ -205,6 +211,7 @@ export async function criarMaquina(formData: FormData) {
       total_target: limit,
       status: "running",
       created_by: ctx.user.id,
+      min_score_to_enroll: minScoreToEnroll,
     })
     .select("id")
     .single();
@@ -227,8 +234,49 @@ export async function criarMaquina(formData: FormData) {
     console.warn("[criarMaquina] startApifyDeep", e);
   }
 
+  // 3) Fonte Instagram (opcional, exige o módulo add-on "prospeccao_avancada").
+  //    Falha silenciosa se o cliente não tem o módulo — não quebra a Máquina base.
+  if (instagramPosts.length > 0) {
+    try {
+      const ok = await requireOrgModule("prospeccao_avancada").then(() => true).catch(() => false);
+      if (ok) {
+        const { startApifyInstagram } = await import("@/lib/prospeccao/apify-instagram");
+        await startApifyInstagram(ctx.org.id, id, instagramPosts);
+      }
+    } catch (e) {
+      console.warn("[criarMaquina] startApifyInstagram", e);
+    }
+  }
+
   revalidatePath("/app/prospeccao");
   redirect(`/app/prospeccao/${id}?maquina=1`);
+}
+
+/** Fonte Instagram avulsa (add-on). Dispara o run — coleta é feita por polling/botão. */
+export async function iniciarBuscaInstagram(campaignId: string, postUrls: string[]) {
+  const ctx = await requireOrgModule("prospeccao_avancada");
+  if (!campaignId) throw new Error("id obrigatório");
+  const { startApifyInstagram } = await import("@/lib/prospeccao/apify-instagram");
+  const r = await startApifyInstagram(ctx.org.id, campaignId, postUrls);
+  if (!r.ok) throw new Error(r.error || "Falha ao iniciar busca no Instagram.");
+  revalidatePath(`/app/prospeccao/${campaignId}`);
+  return r;
+}
+
+export async function coletarBuscaInstagram(campaignId: string) {
+  const ctx = await requireOrgModule("prospeccao_avancada");
+  if (!campaignId) throw new Error("id obrigatório");
+  const { collectApifyInstagram } = await import("@/lib/prospeccao/apify-instagram");
+  const r = await collectApifyInstagram(ctx.org.id, campaignId);
+  if (r.status === "done" && (r.added ?? 0) > 0) {
+    try {
+      await enriquecerCampanha(campaignId);
+    } catch (e) {
+      console.warn("[coletarBuscaInstagram] auto-enrich", e);
+    }
+  }
+  revalidatePath(`/app/prospeccao/${campaignId}`);
+  return r;
 }
 
 export async function excluirCampanha(formData: FormData) {
@@ -297,7 +345,7 @@ export async function enriquecerCampanha(campaignId: string) {
         const website = cd.website;
         if (website && fetched < MAX_FETCH) {
           fetched++;
-          const web = await analyzeLeadSite(website);
+          const web = await analyzeLeadSite(website, ctx.org.id);
           dores = web.dores;
           // telefone: prioriza WhatsApp; só aceita número que PASSA na validação
           const cand = [...web.whatsapps, ...web.phones];
@@ -903,15 +951,21 @@ async function convertSingleResult(
     if (!campaignId) return;
     const { data: campRow } = await admin
       .from("prospecting_campaigns")
-      .select("auto_enroll, sequence_id")
+      .select("auto_enroll, sequence_id, min_score_to_enroll")
       .eq("id", campaignId)
       .eq("organization_id", orgId)
       .maybeSingle();
     const camp = campRow as {
       auto_enroll?: boolean;
       sequence_id?: string | null;
+      min_score_to_enroll?: number | null;
     } | null;
     if (!camp?.auto_enroll || !camp.sequence_id) return;
+
+    // Nota de corte (add-on Prospecção Avançada): campanha sem corte definido
+    // (null) preserva o comportamento de sempre — só filtra quando configurado.
+    const cutoff = camp.min_score_to_enroll;
+    if (cutoff != null && Number(result.match_score ?? 0) < cutoff) return;
 
     const phone = normalizePhoneBR(pd?.phone ?? cd?.phone) || null;
     const email = pd?.email && isValidEmail(pd.email) ? pd.email : null;

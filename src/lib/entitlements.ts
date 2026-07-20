@@ -36,6 +36,7 @@ export const MANAGED_MODULE_KEYS = [
   "propostas",
   "cadencias",
   "prospeccao",
+  "prospeccao_avancada",
   "sdr",
   "inbox",
   "flow_builder",

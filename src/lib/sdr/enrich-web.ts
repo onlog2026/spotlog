@@ -146,6 +146,40 @@ async function robotsAllows(url: string): Promise<boolean> {
 }
 
 /**
+ * Velocidade REAL (add-on Prospecção Avançada) — Google PageSpeed Insights.
+ * Funciona sem chave (cota baixa) ou com GOOGLE_PAGESPEED_API_KEY (cota alta).
+ * Nunca trava o fluxo: qualquer falha/timeout retorna null (sem essa "dor" —
+ * a checagem antiga por tamanho de conteúdo em detectDores continua valendo
+ * como sinal, esta é um sinal REAL adicional, não uma substituição).
+ */
+async function checkPageSpeed(url: string): Promise<string | null> {
+  try {
+    const params = new URLSearchParams({ url, strategy: "mobile", category: "performance" });
+    const key = process.env.GOOGLE_PAGESPEED_API_KEY;
+    if (key) params.set("key", key);
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(
+      `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?${params.toString()}`,
+      { signal: ctrl.signal },
+    );
+    clearTimeout(t);
+    if (!res.ok) return null;
+    const json = (await res.json()) as {
+      lighthouseResult?: { categories?: { performance?: { score?: number } } };
+    };
+    const score = json.lighthouseResult?.categories?.performance?.score;
+    if (typeof score !== "number") return null;
+    if (score < 0.5) {
+      return `Site lento no celular (nota real de performance: ${Math.round(score * 100)}/100).`;
+    }
+    return null;
+  } catch {
+    return null; // best-effort — nunca quebra o enriquecimento por isso
+  }
+}
+
+/**
  * Agente Identificador de Dores — regras objetivas sobre o site (grátis, sem IA):
  * cada "dor" é uma oportunidade de venda/argumento pro SDR. Nunca inventa —
  * só reporta o que dá pra checar no HTML.
@@ -244,8 +278,13 @@ export type SiteAnalysis = WebContacts & { dores: string[]; reached: boolean };
 /**
  * Analisa o site do lead: contatos + dores, num único crawl.
  * (Usado pelo botão "Enriquecer & validar".)
+ *
+ * @param orgId Opcional — quando informado E a org tem o add-on
+ * "prospeccao_avancada", soma a checagem REAL de velocidade (PageSpeed
+ * Insights) às dores. Sem orgId (compatibilidade com chamadas antigas) ou
+ * sem o módulo, comportamento idêntico a antes.
  */
-export async function analyzeLeadSite(rawUrl: string): Promise<SiteAnalysis> {
+export async function analyzeLeadSite(rawUrl: string, orgId?: string): Promise<SiteAnalysis> {
   let url = rawUrl.trim();
   if (!url) return { emails: [], phones: [], whatsapps: [], socials: [], dores: [], reached: false };
   if (!/^https?:\/\//i.test(url)) url = "https://" + url;
@@ -253,6 +292,19 @@ export async function analyzeLeadSite(rawUrl: string): Promise<SiteAnalysis> {
   const { contacts, home, blocked } = await crawlSite(url);
   const dores = detectDores(home, url, contacts);
   if (blocked) dores.push("Site bloqueia robôs de leitura (robots.txt) — respeitamos e não raspamos.");
+
+  if (home && orgId) {
+    try {
+      const { orgHasModule } = await import("@/lib/entitlements");
+      if (await orgHasModule(orgId, "prospeccao_avancada")) {
+        const speedDor = await checkPageSpeed(url);
+        if (speedDor) dores.push(speedDor);
+      }
+    } catch {
+      /* best-effort — checagem extra nunca derruba o enriquecimento base */
+    }
+  }
+
   return { ...contacts, dores, reached: home !== null };
 }
 

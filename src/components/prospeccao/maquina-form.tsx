@@ -131,6 +131,38 @@ export function MaquinaForm() {
             <p>4. Dá nota pra cada lead e descarta duplicados</p>
           </div>
 
+          <details className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-foreground">
+              Prospecção Avançada <span className="text-[10px] font-normal text-muted-foreground">(add-on — opcional)</span>
+            </summary>
+            <div className="mt-3 space-y-4">
+              <Field
+                label="Buscar também no Instagram"
+                hint="Cole links de posts (1 por linha) — a máquina extrai quem comentou. Vazio = não usa essa fonte. Precisa do add-on liberado pra sua conta."
+              >
+                <textarea
+                  name="instagram_posts"
+                  rows={2}
+                  placeholder="https://www.instagram.com/p/..."
+                  className={inputClass}
+                />
+              </Field>
+              <Field
+                label="Nota mínima pra entrar na prospecção automática"
+                hint="Só leads com nota igual ou maior entram na cadência sozinhos. Vazio = sem corte (todos entram, como hoje)."
+              >
+                <input
+                  name="min_score_to_enroll"
+                  type="number"
+                  min={0}
+                  max={100}
+                  placeholder="Ex: 60"
+                  className={inputClass}
+                />
+              </Field>
+            </div>
+          </details>
+
           <Button type="submit" variant="orange" size="lg" disabled={pending} className="w-full">
             {pending ? (
               <>

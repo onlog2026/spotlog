@@ -32,6 +32,82 @@ const MAX_WHATSAPP_PER_TICK = 6;
 const waJitter = () =>
   new Promise((r) => setTimeout(r, 3000 + Math.random() * 4000));
 
+/**
+ * Curva de aquecimento (add-on Prospecção Avançada) — soma-se ao teto de
+ * 6/tick acima, não o substitui. Org que começou a mandar WhatsApp
+ * automático há pouco tempo tem um teto DIÁRIO mais baixo, subindo aos
+ * poucos. Depois de ~7 dias, só o limite por tick vale (sem teto extra).
+ * Granularidade por org (não por número real) — suficiente pro objetivo:
+ * não deixar uma org nova disparar em volume desde o dia 1.
+ */
+const WARMUP_PROVIDER = "cadence";
+const WARMUP_IDENTIFIER = "org";
+
+function warmupDailyLimit(startedAt: string): number {
+  const ageMs = Date.now() - new Date(startedAt).getTime();
+  const days = ageMs / (24 * 60 * 60 * 1000);
+  if (days < 3) return 10;
+  if (days < 7) return 25;
+  return Infinity;
+}
+
+/**
+ * Confere se a org ainda tem "cota de aquecimento" hoje. Se sim, incrementa
+ * o contador e retorna true. Se não (bateu o teto do dia), retorna false —
+ * o chamador pula o envio (fica pro próximo tick/dia, igual ao MAX_WHATSAPP_PER_TICK).
+ * Best-effort: qualquer falha de leitura/escrita LIBERA o envio (fail-open,
+ * mesma filosofia do resto do projeto — nunca travar produção por uma
+ * tabela nova).
+ */
+async function warmupAllowsAndIncrement(
+  admin: ReturnType<typeof createAdminClient>,
+  orgId: string,
+): Promise<boolean> {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: rowRaw } = await admin
+      .from("whatsapp_number_warmup")
+      .select("started_at, send_date, sent_today")
+      .eq("organization_id", orgId)
+      .eq("provider", WARMUP_PROVIDER)
+      .eq("identifier", WARMUP_IDENTIFIER)
+      .maybeSingle();
+    const row = rowRaw as { started_at: string; send_date: string; sent_today: number } | null;
+
+    if (!row) {
+      // Primeiro envio automático desta org — nasce a curva agora.
+      await admin.from("whatsapp_number_warmup").insert({
+        organization_id: orgId,
+        provider: WARMUP_PROVIDER,
+        identifier: WARMUP_IDENTIFIER,
+        started_at: new Date().toISOString(),
+        send_date: today,
+        sent_today: 1,
+      });
+      return true;
+    }
+
+    const sentToday = row.send_date === today ? row.sent_today : 0; // novo dia → reseta
+    const limit = warmupDailyLimit(row.started_at);
+    if (sentToday >= limit) return false;
+
+    await admin
+      .from("whatsapp_number_warmup")
+      .update({
+        send_date: today,
+        sent_today: sentToday + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("organization_id", orgId)
+      .eq("provider", WARMUP_PROVIDER)
+      .eq("identifier", WARMUP_IDENTIFIER);
+    return true;
+  } catch (e) {
+    console.warn("[cadence/tick] warmup check falhou — liberando envio (fail-open)", e);
+    return true;
+  }
+}
+
 /** Processa enrollments com next_action_at <= now() e dispara o próximo passo. */
 async function runTick(): Promise<number> {
   const admin = createAdminClient();
@@ -195,6 +271,8 @@ async function runTick(): Promise<number> {
         // Teto por tick atingido → deixa este enrollment pro próximo tick
         // (não avança o passo; o cron pega de novo). Ritmo seguro anti-ban.
         if (whatsappSent >= MAX_WHATSAPP_PER_TICK) continue;
+        // Curva de aquecimento (org nova manda menos por dia) — soma ao teto acima.
+        if (!(await warmupAllowsAndIncrement(admin, en.organization_id))) continue;
         const to = contact.whatsapp ?? contact.phone;
         if (to) {
           const r = await sendWhatsapp({
