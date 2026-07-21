@@ -19,7 +19,9 @@ function isAuthorized(req: NextRequest): boolean {
     return true;
   const webhook = process.env.WEBHOOK_SECRET;
   if (webhook && req.headers.get("x-internal") === webhook) return true;
-  if ((req.headers.get("user-agent") || "").includes("vercel-cron")) return true;
+  // NÃO confiar em user-agent — qualquer curl finge ser "vercel-cron". Com
+  // CRON_SECRET configurado, a Vercel manda o Bearer automaticamente (checado
+  // acima); essa linha era um bypass total do segredo.
   return !cronSecret && !webhook;
 }
 

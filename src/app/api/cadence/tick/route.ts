@@ -21,8 +21,10 @@ function isAuthorized(req: NextRequest): boolean {
     return true;
   const webhook = process.env.WEBHOOK_SECRET;
   if (webhook && req.headers.get("x-internal") === webhook) return true;
-  // Vercel Cron manda user-agent "vercel-cron/1.0" — autoriza o disparo agendado.
-  if ((req.headers.get("user-agent") || "").includes("vercel-cron")) return true;
+  // NÃO confiar em user-agent — é só um header, qualquer curl finge ser
+  // "vercel-cron". Com CRON_SECRET configurado, a Vercel já manda o Bearer
+  // automaticamente na chamada agendada (checado acima); sem isso, esta
+  // linha era um bypass total do segredo.
   return !cronSecret && !webhook;
 }
 
