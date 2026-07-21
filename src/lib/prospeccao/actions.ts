@@ -1,6 +1,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { requireOrgModule } from "@/lib/entitlements";
@@ -155,8 +156,13 @@ export async function criarCampanha(formData: FormData) {
     }
   } else {
     // Tipos que podem demorar (enriquecer muitos CNPJs) seguem em background.
-    void runCampaign(id).catch((e) =>
-      console.warn("[criarCampanha] runCampaign falhou", e),
+    // `after()` (Next 15) garante que a função roda até o fim mesmo depois da
+    // resposta/redirect — um `void` puro era morto pelo serverless no meio,
+    // igual ao bug que já tinha sido corrigido pro tipo "internet" acima.
+    after(() =>
+      runCampaign(id).catch((e) =>
+        console.warn("[criarCampanha] runCampaign falhou", e),
+      ),
     );
   }
 

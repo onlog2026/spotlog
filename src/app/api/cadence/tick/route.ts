@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/integrations/email";
 import { sendWhatsapp } from "@/lib/integrations/whatsapp";
+import { getIntegration } from "@/lib/integrations";
 import { aiGenerate } from "@/lib/integrations/ai";
 import { isSafeToContact } from "@/lib/sdr/lgpd";
 import { recordOutcome } from "@/lib/sdr/brain";
@@ -31,6 +32,22 @@ function isAuthorized(req: NextRequest): boolean {
 const MAX_WHATSAPP_PER_TICK = 6;
 const waJitter = () =>
   new Promise((r) => setTimeout(r, 3000 + Math.random() * 4000));
+
+/**
+ * Chave do NÚMERO/CANAL de WhatsApp que essa org realmente vai usar (mesma
+ * cascata de `sendWhatsapp` sem provider forçado: Evolution → Z-API → Digisac).
+ * Orgs com integração própria (linha no banco) têm `id` único → cota
+ * independente. Orgs que caem no fallback de env (`id === "env"`) COMPARTILHAM
+ * o mesmo número — por isso usam a mesma chave fixa entre si, preservando o
+ * anti-ban original pra esse número compartilhado.
+ */
+async function whatsappChannelKey(orgId: string): Promise<string> {
+  for (const provider of ["evolution", "zapi", "digisac"] as const) {
+    const row = await getIntegration(orgId, provider);
+    if (row) return row.id === "env" ? `env:${provider}` : row.id;
+  }
+  return `no-channel:${orgId}`;
+}
 
 /**
  * Curva de aquecimento (add-on Prospecção Avançada) — soma-se ao teto de
@@ -112,7 +129,11 @@ async function warmupAllowsAndIncrement(
 async function runTick(): Promise<number> {
   const admin = createAdminClient();
   const now = new Date().toISOString();
-  let whatsappSent = 0;
+  // Por NÚMERO real de WhatsApp (não por org, não global — ver whatsappChannelKey
+  // abaixo). Orgs com integração própria em /app/admin/integracoes têm cota
+  // independente; orgs no fallback de env (número compartilhado) dividem a
+  // mesma cota entre si, preservando o anti-ban original desse número.
+  const whatsappSentByOrg = new Map<string, number>();
 
   const { data: enrollments } = await admin
     .from("sequence_enrollments")
@@ -268,9 +289,11 @@ async function runTick(): Promise<number> {
         providerMessageId = r.provider_message_id;
         providerName = "resend";
       } else if (step.kind === "whatsapp") {
-        // Teto por tick atingido → deixa este enrollment pro próximo tick
-        // (não avança o passo; o cron pega de novo). Ritmo seguro anti-ban.
-        if (whatsappSent >= MAX_WHATSAPP_PER_TICK) continue;
+        // Teto por tick atingido (por NÚMERO/canal real, não por org) → deixa
+        // este enrollment pro próximo tick (não avança o passo).
+        const channelKey = await whatsappChannelKey(en.organization_id);
+        const sentForOrg = whatsappSentByOrg.get(channelKey) ?? 0;
+        if (sentForOrg >= MAX_WHATSAPP_PER_TICK) continue;
         // Curva de aquecimento (org nova manda menos por dia) — soma ao teto acima.
         if (!(await warmupAllowsAndIncrement(admin, en.organization_id))) continue;
         const to = contact.whatsapp ?? contact.phone;
@@ -285,7 +308,7 @@ async function runTick(): Promise<number> {
           providerMessageId = r.provider_message_id;
           providerName = r.provider;
           if (r.ok) {
-            whatsappSent++;
+            whatsappSentByOrg.set(channelKey, sentForOrg + 1);
             await waJitter(); // intervalo humano entre envios
           }
         } else {
