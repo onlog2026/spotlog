@@ -13,11 +13,12 @@ const RED = "#BA0102";
  */
 export async function GET(req: NextRequest) {
   const { searchParams, origin } = new URL(req.url);
-  const nome = searchParams.get("nome") || "Seu Nome";
-  const cargo = searchParams.get("cargo") || "";
-  const telefone = searchParams.get("telefone") || "";
-  const whatsapp = searchParams.get("whatsapp") || "";
-  const email = searchParams.get("email") || "";
+  const clip = (s: string, max: number) => s.slice(0, max);
+  const nome = clip(searchParams.get("nome") || "Seu Nome", 60);
+  const cargo = clip(searchParams.get("cargo") || "", 60);
+  const telefone = clip(searchParams.get("telefone") || "", 30);
+  const whatsapp = clip(searchParams.get("whatsapp") || "", 30);
+  const email = clip(searchParams.get("email") || "", 60);
   const logo = searchParams.get("logo") || `${origin}/logo-spotlog-signature.png`;
 
   // Controles do usuário (botões -/+ no admin). 1 = tamanho padrão.
@@ -40,6 +41,18 @@ export async function GET(req: NextRequest) {
   const cargoSize = Math.round(32 * fontScale);
   const iconSize = Math.round(36 * fontScale);
   const rowSize = Math.round(32 * fontScale);
+
+  // Largura do canvas cresce com o conteúdo (nome/cargo/contatos + escala) pra
+  // nunca cortar texto — Arial larga ~0.58x o tamanho da fonte por caractere.
+  const charW = (fontSize: number) => fontSize * 0.58;
+  const textWidths = [
+    nome.length * charW(nameSize),
+    cargo.length * charW(cargoSize),
+    ...rows.map((r) => iconSize + 16 + r.label.length * charW(rowSize)),
+  ];
+  const maxTextWidth = Math.max(0, ...textWidths);
+  const leftFixed = 68 + logoSize + 52 + 6 + 52; // padding esq. + logo + margem + borda + padding interno
+  const canvasWidth = Math.min(2400, Math.max(1280, Math.round(leftFixed + maxTextWidth + 68)));
 
   return new ImageResponse(
     (
@@ -88,6 +101,6 @@ export async function GET(req: NextRequest) {
         </div>
       </div>
     ),
-    { width: 1280, height: 560 },
+    { width: canvasWidth, height: 560 },
   );
 }
