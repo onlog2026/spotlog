@@ -35,6 +35,8 @@ export async function GET(req: NextRequest) {
       <div
         style={{
           display: "flex",
+          width: "100%",
+          height: "100%",
           alignItems: "center",
           background: "#ffffff",
           padding: "28px 34px",
