@@ -1,12 +1,59 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { Copy, Download, MousePointerClick, Check } from "lucide-react";
+import { Copy, Download, MousePointerClick, Check, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageUploadField } from "@/components/cms/image-upload-field";
 import { renderSignatureHtml } from "@/lib/email/signature";
+
+const SCALE_STEP = 0.1;
+const SCALE_MIN = 0.6;
+const SCALE_MAX = 1.5;
+
+function ScaleControl({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  const dec = () => onChange(Math.max(SCALE_MIN, Math.round((value - SCALE_STEP) * 10) / 10));
+  const inc = () => onChange(Math.min(SCALE_MAX, Math.round((value + SCALE_STEP) * 10) / 10));
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <Label className="mb-0">{label}</Label>
+      <div className="flex items-center gap-1">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={dec}
+          disabled={value <= SCALE_MIN}
+        >
+          <Minus className="h-3.5 w-3.5" />
+        </Button>
+        <span className="w-11 text-center text-xs tabular-nums text-muted-foreground">
+          {Math.round(value * 100)}%
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-7 w-7"
+          onClick={inc}
+          disabled={value >= SCALE_MAX}
+        >
+          <Plus className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </div>
+  );
+}
 
 export function AssinaturaForm() {
   const [nome, setNome] = useState("");
@@ -15,12 +62,19 @@ export function AssinaturaForm() {
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
   const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
+  const [logoScale, setLogoScale] = useState(1);
+  const [fontScale, setFontScale] = useState(1);
   const [copied, setCopied] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const signatureHtml = useMemo(
-    () => renderSignatureHtml({ nome: nome || "Seu Nome", cargo, telefone, whatsapp, email, logoUrl }),
-    [nome, cargo, telefone, whatsapp, email, logoUrl],
+    () =>
+      renderSignatureHtml(
+        { nome: nome || "Seu Nome", cargo, telefone, whatsapp, email, logoUrl },
+        undefined,
+        { logoScale, fontScale },
+      ),
+    [nome, cargo, telefone, whatsapp, email, logoUrl, logoScale, fontScale],
   );
 
   const previewDoc = `<html><body style="margin:0;padding:16px;background:#ffffff;">${signatureHtml}</body></html>`;
@@ -49,6 +103,8 @@ export function AssinaturaForm() {
       telefone,
       whatsapp,
       email,
+      logoScale: String(logoScale),
+      fontScale: String(fontScale),
     });
     if (logoUrl) params.set("logo", logoUrl);
     window.open(`/api/admin/assinatura/imagem?${params.toString()}`, "_blank");
@@ -71,6 +127,10 @@ export function AssinaturaForm() {
               Sem upload, usa a logo padrão da Spotlog.
             </p>
           )}
+        </div>
+        <div className="space-y-2 rounded-lg border border-white/10 p-3">
+          <ScaleControl label="Tamanho da logo" value={logoScale} onChange={setLogoScale} />
+          <ScaleControl label="Tamanho da fonte" value={fontScale} onChange={setFontScale} />
         </div>
         <div className="space-y-2">
           <Label htmlFor="sig-nome">Nome completo</Label>
