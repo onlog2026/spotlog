@@ -130,7 +130,8 @@ export function AssinaturaForm() {
           </p>
           <p>
             <strong className="text-foreground">Imagem (PNG):</strong> use quando o campo não aceitar
-            HTML — ex: perfil do WhatsApp Business ou apps que só aceitam foto.
+            HTML — ex: perfil do WhatsApp Business ou apps que só aceitam foto. Sai em alta
+            resolução (nítida); se precisar menor, redimensione ao inserir.
           </p>
         </div>
       </div>
