@@ -1,4 +1,4 @@
--- Marketing — RD Station style (Atrair + Converter)
+-- Marketing (Atrair + Converter)
 -- Aplicado via MCP Supabase em 2026-05-26.
 -- Tabelas + RLS + RPCs `mkt_*` pra contornar PostgREST schema cache stale.
 -- Ver `src/lib/queries/marketing.ts` para os tipos do lado cliente.

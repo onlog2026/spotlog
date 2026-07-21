@@ -10,7 +10,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
         <div>
           <h1 className="text-2xl md:text-3xl font-bold">Marketing</h1>
           <p className="text-sm text-muted-foreground">
-            Atraia, converta e relacione — tudo num lugar só. Estilo RD Station, do jeito Spotlog.
+            Atraia, converta e relacione — tudo num lugar só.
           </p>
         </div>
         <Link

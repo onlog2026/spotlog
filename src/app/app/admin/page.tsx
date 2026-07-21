@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plug, Users2, Building2, Webhook, Sparkles, KeyRound, Bot, FileText } from "lucide-react";
+import { Plug, Users2, Building2, Webhook, Sparkles, KeyRound, Bot, FileText, PenLine } from "lucide-react";
 import { requireSession } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -33,6 +33,12 @@ const items = [
     icon: KeyRound,
     title: "API Keys",
     desc: "Tokens pra integração com plataformas externas (tickets + pedidos).",
+  },
+  {
+    href: "/app/admin/assinatura",
+    icon: PenLine,
+    title: "Assinatura de e-mail",
+    desc: "Gere a assinatura da equipe com logo, cargo, telefone e WhatsApp — em HTML ou imagem.",
   },
 ];
 
