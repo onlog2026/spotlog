@@ -42,6 +42,7 @@ import {
   Tags,
   ListChecks,
   Mail,
+  PenLine,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -379,6 +380,7 @@ const CATEGORIES: Category[] = [
       { href: "/app/admin/email", label: "Layout de e-mail", icon: Mail },
       { href: "/app/admin/forms", label: "Formulários", icon: ClipboardList },
       { href: "/app/admin/api-keys", label: "API Keys", icon: KeyRound },
+      { href: "/app/admin/assinatura", label: "Assinatura de e-mail", icon: PenLine },
       { href: "/app/admin/chatbot", label: "Chatbot", icon: Bot },
       { href: "/app/admin/aparencia", label: "Aparência", icon: Palette, tourId: "nav-aparencia" },
       { href: "/app/notificacoes", label: "Notificações", icon: Bell },
