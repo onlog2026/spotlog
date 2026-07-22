@@ -42,6 +42,9 @@ export default async function PropostasPage() {
             <Link href="/app/propostas/tabelas">Tabelas de preço</Link>
           </Button>
           <Button variant="outline" asChild>
+            <Link href="/app/propostas/modelos">Modelos</Link>
+          </Button>
+          <Button variant="outline" asChild>
             <Link href="/app/propostas/nova-ia">
               <Sparkles className="h-4 w-4" />
               Nova com IA

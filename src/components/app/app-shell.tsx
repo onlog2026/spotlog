@@ -43,6 +43,7 @@ import {
   ListChecks,
   Mail,
   PenLine,
+  FileSpreadsheet,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -159,6 +160,7 @@ const CATEGORIES: Category[] = [
       { href: "/app/contatos", label: "Contatos", icon: Users2 },
       { href: "/app/propostas", label: "Propostas", icon: FileText, module: "propostas" },
       { href: "/app/propostas/tabelas", label: "Tabelas de Preço", icon: Tags, module: "propostas" },
+      { href: "/app/propostas/modelos", label: "Modelos", icon: FileSpreadsheet, module: "propostas" },
     ],
   },
   {

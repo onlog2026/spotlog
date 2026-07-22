@@ -12,6 +12,8 @@ const patchSchema = z.object({
   payment_terms: z.string().max(2000).optional(),
   delivery_terms: z.string().max(2000).optional(),
   title: z.string().min(2).max(240).optional(),
+  template_id: z.string().uuid().nullable().optional(),
+  reajuste_pct: z.number().min(0).max(1).optional(),
 });
 
 /**

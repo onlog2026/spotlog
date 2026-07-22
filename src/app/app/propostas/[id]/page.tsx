@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShareProposalActions } from "@/components/proposals/share-proposal-actions";
 import { ProposalItemsEditor } from "@/components/proposals/proposal-items-editor";
+import { TemplateSelector } from "@/components/proposals/template-selector";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -46,6 +47,8 @@ export default async function ProposalDetailPage({
     signed_by_name: string | null;
     contact: { full_name: string; email: string; whatsapp: string; phone: string } | null;
     company: { name: string } | null;
+    template_id: string | null;
+    reajuste_pct: number | null;
   };
 
   const { data: itemRows } = await supabase
@@ -53,6 +56,12 @@ export default async function ProposalDetailPage({
     .select("product_id, name, description, quantity, unit_price, discount_pct")
     .eq("proposal_id", id)
     .order("position");
+
+  const { data: templates } = await supabase
+    .from("proposal_templates")
+    .select("id, name")
+    .eq("organization_id", ctx.org.id)
+    .order("name");
 
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/proposta/${p.public_token}`;
 
@@ -127,6 +136,20 @@ export default async function ProposalDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      <Card className="border-white/10 bg-card/50">
+        <CardHeader>
+          <CardTitle className="text-base">Modelo de tabela</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <TemplateSelector
+            proposalId={p.id}
+            templates={templates ?? []}
+            currentTemplateId={p.template_id}
+            currentReajustePct={p.reajuste_pct ?? 0}
+          />
+        </CardContent>
+      </Card>
 
       <ProposalItemsEditor
         proposalId={p.id}
