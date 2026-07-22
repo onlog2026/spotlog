@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireSession } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { listMarketing, type LinkInBio } from "@/lib/queries/marketing";
 import { createBio, addBioLink, deleteMarketingItem } from "../../actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +15,24 @@ export const dynamic = "force-dynamic";
 export default async function LinkBioPage() {
   const ctx = await requireSession();
   const bios = await listMarketing<LinkInBio>(ctx.org.id, "bio");
+
+  // O clique real é gravado em link_in_bio_links (por link, pelo redirect
+  // /bio/go/[linkId]) -- a coluna link_in_bio.clicks nunca é tocada e
+  // sempre mostrava 0. Busca os links + soma por bio.
+  const supabase = await createClient();
+  const bioIds = bios.map((b) => b.id);
+  const { data: linkRows } = bioIds.length
+    ? await supabase
+        .from("link_in_bio_links")
+        .select("id, bio_id, label, url, clicks")
+        .in("bio_id", bioIds)
+        .order("sort")
+    : { data: [] };
+  const linksByBio = new Map<string, { id: string; label: string; url: string; clicks: number }[]>();
+  for (const l of (linkRows ?? []) as Array<{ id: string; bio_id: string; label: string; url: string; clicks: number }>) {
+    if (!linksByBio.has(l.bio_id)) linksByBio.set(l.bio_id, []);
+    linksByBio.get(l.bio_id)!.push(l);
+  }
 
   async function submit(formData: FormData) {
     "use server";
@@ -51,7 +70,10 @@ export default async function LinkBioPage() {
           </Card>
         ) : (
           <div className="grid gap-3">
-            {bios.map((b) => (
+            {bios.map((b) => {
+              const links = linksByBio.get(b.id) ?? [];
+              const totalClicks = links.reduce((acc, l) => acc + (l.clicks ?? 0), 0);
+              return (
               <Card key={b.id} className="border-white/10 bg-card/50">
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center justify-between gap-2">
@@ -69,7 +91,7 @@ export default async function LinkBioPage() {
                       <Badge variant={b.active ? "default" : "secondary"}>
                         {b.active ? "Ativo" : "Inativo"}
                       </Badge>
-                      <span className="text-xs text-muted-foreground">{b.clicks} cliques</span>
+                      <span className="text-xs text-muted-foreground">{totalClicks} cliques</span>
                       <form action={remove}>
                         <input type="hidden" name="id" value={b.id} />
                         <Button type="submit" size="icon" variant="ghost">
@@ -78,6 +100,16 @@ export default async function LinkBioPage() {
                       </form>
                     </div>
                   </div>
+                  {links.length > 0 && (
+                    <div className="space-y-1 border-t border-white/5 pt-2">
+                      {links.map((l) => (
+                        <div key={l.id} className="flex items-center justify-between text-xs">
+                          <span className="truncate">{l.label}</span>
+                          <span className="text-muted-foreground shrink-0 ml-2">{l.clicks} cliques</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <form action={addLink} className="flex flex-col sm:flex-row gap-2 border-t border-white/5 pt-3">
                     <input type="hidden" name="bio_id" value={b.id} />
                     <Input name="label" placeholder="Rótulo" required className="flex-1" />
@@ -88,7 +120,8 @@ export default async function LinkBioPage() {
                   </form>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

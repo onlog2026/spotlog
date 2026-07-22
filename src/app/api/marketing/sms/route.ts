@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
+import { after } from "next/server";
 import { requireSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendSms } from "@/lib/integrations/clients/twilio";
 
 export const dynamic = "force-dynamic";
 
 /**
- * STUB: dispara campanha SMS.
- * Hoje só simula — quando o user conectar um provedor real (Twilio, Zenvia, etc),
- * trocar o loop de "send" pela chamada real do provedor.
+ * Dispara campanha SMS de verdade via Twilio (cliente já existia em
+ * lib/integrations/clients/twilio.ts, só nunca tinha sido chamado daqui —
+ * a campanha ficava travada em "enviando" pra sempre). Zenvia continua
+ * sem adapter — falha explicitamente se for o provedor conectado.
  */
 export async function POST(req: Request) {
   let ctx;
@@ -71,7 +74,7 @@ export async function POST(req: Request) {
   // Verifica provedor SMS conectado
   const { data: integ } = await supabase
     .from("integrations")
-    .select("id, provider, status")
+    .select("id, provider, status, credentials")
     .eq("organization_id", ctx.org.id)
     .in("provider", ["twilio", "zenvia", "sms"])
     .eq("status", "active")
@@ -91,17 +94,72 @@ export async function POST(req: Request) {
     );
   }
 
-  // Provider conectado: marca como enviando — disparo real deve ser implementado
-  // por integração específica (ainda não construída — Twilio/Zenvia adapter).
+  if (integ.provider !== "twilio") {
+    await supabase
+      .from("sms_campaigns")
+      .update({ status: "falhou", total_count: valid.length })
+      .eq("id", campaign.id);
+    return NextResponse.json(
+      { error: `Provedor "${integ.provider}" ainda não tem envio real implementado (só Twilio).` },
+      { status: 400 },
+    );
+  }
+
+  const cred = (integ.credentials ?? {}) as { account_sid?: string; auth_token?: string; from?: string };
+  if (!cred.account_sid || !cred.auth_token || !cred.from) {
+    await supabase
+      .from("sms_campaigns")
+      .update({ status: "falhou", total_count: valid.length })
+      .eq("id", campaign.id);
+    return NextResponse.json(
+      { error: "Credenciais Twilio incompletas em /app/admin/integracoes." },
+      { status: 400 },
+    );
+  }
+
   await supabase
     .from("sms_campaigns")
     .update({ status: "enviando", total_count: valid.length })
     .eq("id", campaign.id);
 
+  // Envio real roda em background (after) -- um loop de N chamadas HTTP pro
+  // Twilio não cabe no tempo de resposta da rota.
+  after(async () => {
+    const admin = createAdminClient();
+    let sentCount = 0;
+    let failedCount = 0;
+    for (const r of valid) {
+      const result = await sendSms(
+        cred.account_sid!,
+        cred.auth_token!,
+        cred.from!,
+        r.phone!,
+        campaign.message,
+      );
+      await admin.from("sms_logs").insert({
+        campaign_id: campaign.id,
+        phone: r.phone,
+        status: result.ok ? "sent" : "failed",
+        error: result.ok ? null : result.error ?? null,
+      });
+      if (result.ok) sentCount++;
+      else failedCount++;
+    }
+    await admin
+      .from("sms_campaigns")
+      .update({
+        status: failedCount > 0 && sentCount === 0 ? "falhou" : "enviada",
+        sent_count: sentCount,
+        failed_count: failedCount,
+        sent_at: new Date().toISOString(),
+      })
+      .eq("id", campaign.id);
+  });
+
   return NextResponse.json({
     ok: true,
     total_recipients: valid.length,
     provider: integ.provider,
-    note: "Campanha em fila. O adapter do provedor processará o disparo.",
+    note: "Campanha em fila — envio real via Twilio rodando em background.",
   });
 }

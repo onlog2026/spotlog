@@ -144,6 +144,26 @@ export async function POST(
       console.warn("[/api/forms/submit] notify failed", e);
     }
 
+    // "Conversões" da landing page ligada a esse form_slug -- nunca era
+    // incrementado, então o dashboard sempre mostrava 0 mesmo com leads
+    // reais entrando pela página.
+    try {
+      const { data: lp } = await supabase
+        .from("landing_pages")
+        .select("id, conversions")
+        .eq("organization_id", orgId)
+        .eq("form_slug", slug)
+        .maybeSingle();
+      if (lp) {
+        await supabase
+          .from("landing_pages")
+          .update({ conversions: (lp.conversions ?? 0) + 1 })
+          .eq("id", lp.id);
+      }
+    } catch (e) {
+      console.warn("[/api/forms/submit] lp conversion increment failed", e);
+    }
+
     return NextResponse.json({
       ok: true,
       submission_id: submission?.id ?? null,

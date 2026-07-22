@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { after } from "next/server";
 import Link from "next/link";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { LandingPage } from "@/lib/queries/marketing";
@@ -42,6 +43,16 @@ export default async function PublicLandingPage({
   const { slug } = await params;
   const lp = await getLanding(slug);
   if (!lp) notFound();
+
+  // "Views" ficava travado em 0 pra sempre -- nunca era incrementado.
+  // after() roda depois da resposta, não atrasa o carregamento da página.
+  after(async () => {
+    const admin = createAdminClient();
+    await admin
+      .from("landing_pages")
+      .update({ views: (lp.views ?? 0) + 1 })
+      .eq("id", lp.id);
+  });
 
   const body = (lp.body_json as BodyJson | null) ?? {};
   const blocks = body.blocks ?? [];
