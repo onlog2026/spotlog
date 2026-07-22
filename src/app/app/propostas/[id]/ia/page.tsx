@@ -34,6 +34,12 @@ export default async function ProposalIaEditorPage({
     status: string;
   };
 
+  const { data: itemRows } = await supabase
+    .from("proposal_items")
+    .select("product_id, name, description, quantity, unit_price, discount_pct")
+    .eq("proposal_id", id)
+    .order("position");
+
   return (
     <div className="space-y-6">
       <Link
@@ -61,6 +67,14 @@ export default async function ProposalIaEditorPage({
         initialIntro={p.intro_text ?? ""}
         initialScope={p.scope ?? ""}
         proposalTitle={p.title}
+        initialItems={(itemRows ?? []) as unknown as Array<{
+          product_id: string | null;
+          name: string;
+          description: string | null;
+          quantity: number;
+          unit_price: number;
+          discount_pct: number;
+        }>}
       />
     </div>
   );

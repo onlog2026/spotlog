@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Copy, Loader2, Mail, Sparkles } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,11 +14,21 @@ import {
   type SuggestedItem,
 } from "@/components/propostas/ia/suggested-items-modal";
 
+type ExistingItem = {
+  product_id: string | null;
+  name: string;
+  description: string | null;
+  quantity: number;
+  unit_price: number;
+  discount_pct: number;
+};
+
 export type AssistantPanelProps = {
   proposalId: string;
   initialIntro: string;
   initialScope: string;
   proposalTitle: string;
+  initialItems: ExistingItem[];
 };
 
 export function AssistantPanel({
@@ -25,10 +36,13 @@ export function AssistantPanel({
   initialIntro,
   initialScope,
   proposalTitle,
+  initialItems,
 }: AssistantPanelProps) {
+  const router = useRouter();
   const [intro, setIntro] = useState(initialIntro);
   const [scope, setScope] = useState(initialScope);
   const [saving, setSaving] = useState(false);
+  const [applyingItems, setApplyingItems] = useState(false);
 
   const [followupOpen, setFollowupOpen] = useState(false);
   const [followupLoading, setFollowupLoading] = useState(false);
@@ -108,12 +122,45 @@ export function AssistantPanel({
     }
   }
 
-  function applyItems(items: SuggestedItem[]) {
-    setAppliedItems((prev) => [...prev, ...items]);
-    setAddedItemsCount((c) => c + items.length);
-    toast.success(
-      `${items.length} ${items.length === 1 ? "item sugerido" : "itens sugeridos"} prontos pra revisão.`,
-    );
+  async function applyItems(items: SuggestedItem[]) {
+    setApplyingItems(true);
+    // Junta com os itens que já existem na proposta (não substitui) — a
+    // rota PATCH sempre recebe a lista completa.
+    const merged = [
+      ...initialItems.map((it) => ({
+        product_id: it.product_id ?? undefined,
+        name: it.name,
+        description: it.description ?? undefined,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        discount_pct: it.discount_pct,
+      })),
+      ...items.map((it) => ({
+        name: it.description,
+        quantity: it.quantity,
+        unit_price: it.unit_price,
+        discount_pct: 0,
+      })),
+    ];
+    try {
+      const res = await fetch(`/api/proposals/${proposalId}/items`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: merged, discount_pct: 0 }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Falha ao aplicar itens.");
+      setAppliedItems((prev) => [...prev, ...items]);
+      setAddedItemsCount((c) => c + items.length);
+      toast.success(
+        `${items.length} ${items.length === 1 ? "item adicionado" : "itens adicionados"} de verdade na proposta.`,
+      );
+      router.refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Falha ao aplicar itens.");
+    } finally {
+      setApplyingItems(false);
+    }
   }
 
   async function copyItems() {
@@ -220,8 +267,8 @@ export function AssistantPanel({
                 </div>
               ))}
               <p className="text-xs text-muted-foreground">
-                Esses itens são sugestões. Para adicioná-los oficialmente à
-                proposta, copie e cole na tela de edição de itens.
+                Itens já adicionados de verdade à proposta — confira e ajuste
+                preço/quantidade na tela da proposta.
               </p>
             </CardContent>
           </Card>

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShareProposalActions } from "@/components/proposals/share-proposal-actions";
+import { ProposalItemsEditor } from "@/components/proposals/proposal-items-editor";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +39,7 @@ export default async function ProposalDetailPage({
     total: number;
     currency: string;
     public_token: string;
+    discount_pct: number | null;
     sent_at: string | null;
     viewed_at: string | null;
     signed_at: string | null;
@@ -45,6 +47,12 @@ export default async function ProposalDetailPage({
     contact: { full_name: string; email: string; whatsapp: string; phone: string } | null;
     company: { name: string } | null;
   };
+
+  const { data: itemRows } = await supabase
+    .from("proposal_items")
+    .select("product_id, name, description, quantity, unit_price, discount_pct")
+    .eq("proposal_id", id)
+    .order("position");
 
   const publicUrl = `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/proposta/${p.public_token}`;
 
@@ -119,6 +127,20 @@ export default async function ProposalDetailPage({
           </CardContent>
         </Card>
       </div>
+
+      <ProposalItemsEditor
+        proposalId={p.id}
+        initialItems={(itemRows ?? []) as unknown as Array<{
+          product_id: string | null;
+          name: string;
+          description: string | null;
+          quantity: number;
+          unit_price: number;
+          discount_pct: number;
+        }>}
+        initialDiscountPct={p.discount_pct ?? 0}
+        readOnly={p.status === "accepted"}
+      />
     </div>
   );
 }
