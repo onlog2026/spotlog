@@ -20,7 +20,7 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "leads:read");
   if ("error" in guard) return guard.error;
   const { limit, offset, url } = parseListParams(req);
   const status = url.searchParams.get("status");
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "leads:write");
   if ("error" in guard) return guard.error;
   let body: unknown;
   try {

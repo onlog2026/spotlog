@@ -19,7 +19,7 @@ const patchSchema = z.object({
 });
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "companies:read");
   if ("error" in guard) return guard.error;
   const { id } = await ctx.params;
   const admin = createAdminClient();
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 }
 
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "companies:write");
   if ("error" in guard) return guard.error;
   const { id } = await ctx.params;
   const parsed = patchSchema.safeParse(await req.json().catch(() => null));

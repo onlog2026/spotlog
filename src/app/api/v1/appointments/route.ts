@@ -23,7 +23,7 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "appointments:read");
   if ("error" in guard) return guard.error;
   const { limit, offset, url } = parseListParams(req);
   const from = url.searchParams.get("from");
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "appointments:write");
   if ("error" in guard) return guard.error;
   const parsed = createSchema.safeParse(await req.json().catch(() => null));
   if (!parsed.success) return v1Error("Dados inválidos.", 400);

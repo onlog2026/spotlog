@@ -18,7 +18,7 @@ const createSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "contacts:read");
   if ("error" in guard) return guard.error;
   const { limit, offset, url } = parseListParams(req);
   const search = url.searchParams.get("search");
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "contacts:write");
   if ("error" in guard) return guard.error;
   const body = await req.json().catch(() => null);
   const parsed = createSchema.safeParse(body);

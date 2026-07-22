@@ -21,6 +21,16 @@ const SCOPES = [
   { value: "tickets:read", label: "Ler tickets" },
   { value: "tickets:write", label: "Criar/editar tickets" },
   { value: "orders:webhook", label: "Receber webhook de pedidos" },
+  { value: "leads:read", label: "Ler leads" },
+  { value: "leads:write", label: "Criar/editar leads" },
+  { value: "contacts:read", label: "Ler contatos" },
+  { value: "contacts:write", label: "Criar/editar contatos" },
+  { value: "companies:read", label: "Ler empresas" },
+  { value: "companies:write", label: "Criar/editar empresas" },
+  { value: "deals:read", label: "Ler negócios (pipeline)" },
+  { value: "deals:write", label: "Criar/editar negócios" },
+  { value: "appointments:read", label: "Ler agendamentos" },
+  { value: "appointments:write", label: "Criar/editar agendamentos" },
 ];
 
 function formatDate(iso: string | null): string {

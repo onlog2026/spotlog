@@ -16,7 +16,7 @@ const updateSchema = z.object({
 });
 
 export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "leads:read");
   if ("error" in guard) return guard.error;
   const { id } = await ctx.params;
   const admin = createAdminClient();
@@ -32,7 +32,7 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
 }
 
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "leads:write");
   if ("error" in guard) return guard.error;
   const { id } = await ctx.params;
   let body: unknown;
@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
 }
 
 export async function DELETE(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const guard = await guardV1(req);
+  const guard = await guardV1(req, "leads:write");
   if ("error" in guard) return guard.error;
   const { id } = await ctx.params;
   const admin = createAdminClient();

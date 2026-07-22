@@ -144,9 +144,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok, error: ok ? undefined : `status ${r.status}` });
     }
     if (provider === "google_calendar") {
-      // OAuth verdadeiro virá depois; por ora, marca como OK se tem token
-      const ok = !!i.credentials.oauth_token;
-      await markOk(ctx.org.id, provider, ok, ok ? undefined : "OAuth token ausente");
+      // O callback OAuth grava `refresh_token` (nunca `oauth_token`) — essa
+      // checagem usava o nome errado e reportava falha mesmo conectado.
+      const ok = !!i.credentials.refresh_token;
+      await markOk(ctx.org.id, provider, ok, ok ? undefined : "Refresh token ausente — reconecte o Google Calendar.");
       return NextResponse.json({ ok });
     }
     if (provider === "digisac") {
