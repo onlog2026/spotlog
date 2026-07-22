@@ -38,6 +38,29 @@ export type TicketWithCompany = SupportTicket & {
   companies: { id: string; name: string } | null;
 };
 
+/**
+ * op_list_tickets (RPC) não faz join com companies -- a coluna "Empresa"
+ * da lista/dashboard sempre mostrava "—" mesmo com ticket vinculado. Busca
+ * os nomes em lote e junta em memória (sem precisar mexer na RPC/migration).
+ */
+async function attachCompanies<T extends { company_id: string | null }>(
+  supabase: SupaClient,
+  rows: T[],
+): Promise<(T & { companies: { id: string; name: string } | null })[]> {
+  const ids = Array.from(
+    new Set(rows.map((r) => r.company_id).filter((v): v is string => !!v)),
+  );
+  if (ids.length === 0) {
+    return rows.map((r) => ({ ...r, companies: null }));
+  }
+  const { data } = await supabase.from("companies").select("id, name").in("id", ids);
+  const map = new Map((data ?? []).map((c: { id: string; name: string }) => [c.id, c]));
+  return rows.map((r) => ({
+    ...r,
+    companies: r.company_id ? map.get(r.company_id) ?? null : null,
+  }));
+}
+
 export type TicketDetail = SupportTicket & {
   companies: { id: string; name: string } | null;
   shipments: { id: string; code: string; status: string } | null;
@@ -71,16 +94,35 @@ export async function getSacKpis(organizationId: string): Promise<SacKpis> {
       t.status !== "fechado",
   ).length;
 
-  const respondidos = list.filter((t) => t.last_response_at && t.opened_at);
+  // last_response_at é tocado por QUALQUER ação (mudar status/prioridade,
+  // auto-atribuir, mensagem de sistema) -- não só resposta real ao
+  // cliente. Calcula direto de ticket_messages (author_kind='operador'),
+  // que é o único sinal confiável de "respondeu de verdade".
   let tempoMedioRespostaHoras: number | null = null;
-  if (respondidos.length > 0) {
-    const somaMs = respondidos.reduce((acc, t) => {
-      const a = new Date(t.opened_at).getTime();
-      const b = new Date(t.last_response_at as string).getTime();
-      return acc + Math.max(0, b - a);
-    }, 0);
-    tempoMedioRespostaHoras =
-      Math.round((somaMs / respondidos.length / 1000 / 60 / 60) * 10) / 10;
+  const ticketIds = list.map((t) => t.id);
+  if (ticketIds.length > 0) {
+    const { data: msgs } = await supabase
+      .from("ticket_messages")
+      .select("ticket_id, created_at")
+      .in("ticket_id", ticketIds)
+      .eq("author_kind", "operador")
+      .order("created_at", { ascending: true });
+    const firstReplyByTicket = new Map<string, string>();
+    for (const m of (msgs ?? []) as { ticket_id: string; created_at: string }[]) {
+      if (!firstReplyByTicket.has(m.ticket_id)) {
+        firstReplyByTicket.set(m.ticket_id, m.created_at);
+      }
+    }
+    const respondidos = list.filter((t) => firstReplyByTicket.has(t.id) && t.opened_at);
+    if (respondidos.length > 0) {
+      const somaMs = respondidos.reduce((acc, t) => {
+        const a = new Date(t.opened_at).getTime();
+        const b = new Date(firstReplyByTicket.get(t.id) as string).getTime();
+        return acc + Math.max(0, b - a);
+      }, 0);
+      tempoMedioRespostaHoras =
+        Math.round((somaMs / respondidos.length / 1000 / 60 / 60) * 10) / 10;
+    }
   }
 
   return {
@@ -101,7 +143,7 @@ export async function getTicketsUrgentes(
   const list = await rpcList<SupportTicket>(supabase, "op_list_tickets", {
     p_org: organizationId,
   });
-  return list
+  const filtered = list
     .filter(
       (t) =>
         ["urgente", "alta"].includes(t.priority) &&
@@ -111,8 +153,8 @@ export async function getTicketsUrgentes(
       (a, b) =>
         new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime(),
     )
-    .slice(0, limit)
-    .map((t) => ({ ...t, companies: null })) as TicketWithCompany[];
+    .slice(0, limit);
+  return attachCompanies(supabase, filtered);
 }
 
 export type TicketDepartment =
@@ -153,7 +195,7 @@ export async function listTickets(
         (t.subject ?? "").toLowerCase().includes(term),
     );
   }
-  return filtered.map((t) => ({ ...t, companies: null })) as TicketWithCompany[];
+  return attachCompanies(supabase, filtered);
 }
 
 export async function getTicket(

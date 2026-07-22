@@ -14,7 +14,7 @@ import { getFullTicket } from "@/lib/queries/sac";
 import {
   TicketPriorityBadge,
   TicketStatusBadge,
-} from "@/components/operacao/status-badges";
+} from "@/components/sac/status-badges";
 import { ReplyForm } from "@/components/sac/reply-form";
 import { TicketChat } from "@/components/sac/ticket-chat";
 import { TicketSideControls } from "@/components/sac/ticket-side-controls";
