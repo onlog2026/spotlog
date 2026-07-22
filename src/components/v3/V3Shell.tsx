@@ -5,6 +5,7 @@ import { Header } from "@/components/v3/Header";
 import { Footer } from "@/components/v3/Footer";
 import { SiteScroll } from "@/components/v3/site-scroll";
 import { v3FontsClassName } from "@/lib/v3-fonts";
+import { PopupRenderer } from "@/components/public/popup-renderer";
 
 /**
  * Casca padrão das páginas públicas no visual v3 (mesma identidade da home):
@@ -39,6 +40,7 @@ export async function V3Shell({ children }: { children: React.ReactNode }) {
         <main>{children}</main>
         <Footer />
         <SiteScroll />
+        <PopupRenderer />
       </div>
     </>
   );
