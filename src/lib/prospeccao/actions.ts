@@ -746,8 +746,8 @@ export async function reexecutarCampanha(formData: FormData) {
     .update({ status: "running" })
     .eq("organization_id", ctx.org.id)
     .eq("id", id);
-  void runCampaign(id).catch((e) =>
-    console.warn("[reexecutarCampanha]", e),
+  after(() =>
+    runCampaign(id).catch((e) => console.warn("[reexecutarCampanha]", e)),
   );
   revalidatePath(`/app/prospeccao/${id}`);
 }

@@ -27,6 +27,7 @@ import { formatDateTime } from "@/lib/utils";
 import { FlashBanner } from "@/components/crm/flash-banner";
 import { DeleteButton } from "@/components/crm/delete-button";
 import { LeadSourceBadge } from "@/components/crm/lead-source-badge";
+import { SubmitButton } from "@/components/crm/submit-button";
 import { getLead, getLeadActivities } from "@/lib/queries/leads";
 import {
   deleteLead,
@@ -132,18 +133,18 @@ export default async function LeadDetalhePage({
           {lead.status !== "converted" ? (
             <>
               <form action={convertAction}>
-                <Button type="submit" variant="orange" size="sm">
+                <SubmitButton variant="orange" size="sm" pendingLabel="Convertendo…">
                   <ArrowRightCircle className="h-4 w-4" /> Converter em deal
-                </Button>
+                </SubmitButton>
               </form>
               <form action={markConvertedAction}>
-                <Button
-                  type="submit"
+                <SubmitButton
                   size="sm"
                   style={{ background: "#BA0102", color: "white" }}
+                  pendingLabel="Marcando…"
                 >
                   <PartyPopper className="h-4 w-4" /> Marcar como convertido
-                </Button>
+                </SubmitButton>
               </form>
             </>
           ) : null}
@@ -268,7 +269,7 @@ export default async function LeadDetalhePage({
                   <>
                     {" · "}
                     <Link
-                      href={`/app/pipeline`}
+                      href={`/app/pipeline/${lead.converted_deal_id}`}
                       className="text-spotorange-500 hover:underline"
                     >
                       Ver deal

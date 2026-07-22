@@ -46,11 +46,16 @@ function parseForm(formData: FormData) {
     return s === "" ? null : s;
   };
   const scoreRaw = v("score");
+  const rawPhone = v("phone");
+  const rawWhatsapp = v("whatsapp");
   return {
     full_name: String(formData.get("full_name") ?? "").trim(),
     email: v("email"),
-    phone: v("phone"),
-    whatsapp: v("whatsapp"),
+    // Normalizado igual contacts.phone/whatsapp já fazem — sem isso o SDR não
+    // encontra o lead pelo telefone recebido no webhook (mesmo bug já
+    // corrigido em prospeccao/actions.ts, mas este caminho ficou de fora).
+    phone: rawPhone ? normalizePhoneBR(rawPhone) || rawPhone : null,
+    whatsapp: rawWhatsapp ? normalizePhoneBR(rawWhatsapp) || rawWhatsapp : null,
     company_name: v("company_name"),
     job_title: v("job_title"),
     source: String(formData.get("source") ?? "manual").trim() || "manual",
@@ -285,13 +290,22 @@ export async function convertLeadToDeal(leadId: string) {
 
   const { data: lead } = await supabase
     .from("leads")
-    .select("id, full_name, company_name, email, phone, score")
+    .select("id, full_name, company_name, email, phone, score, status, assigned_to")
     .eq("organization_id", ctx.org.id)
     .eq("id", leadId)
     .maybeSingle();
   if (!lead) {
     redirect(`/app/leads?error=${encodeURIComponent("Lead não encontrado")}`);
   }
+  if (lead.status === "converted") {
+    redirect(
+      `/app/leads/${leadId}?error=${encodeURIComponent("Lead já convertido — evita duplicar contato/negócio.")}`,
+    );
+  }
+  // Preserva quem já era responsável pelo lead (atribuição/lock) — sem isso,
+  // converter um lead atribuído a outro vendedor rouba o negócio pra quem
+  // clicou em Converter.
+  const ownerId = lead.assigned_to ?? ctx.user.id;
 
   const { data: pipeline } = await supabase
     .from("pipelines")
@@ -335,7 +349,7 @@ export async function convertLeadToDeal(leadId: string) {
         .from("companies")
         .insert({
           organization_id: ctx.org.id,
-          owner_id: ctx.user.id,
+          owner_id: ownerId,
           name: lead.company_name,
           source: "lead_conversion",
         })
@@ -345,23 +359,45 @@ export async function convertLeadToDeal(leadId: string) {
     }
   }
 
-  // contato a partir do lead
+  // contato a partir do lead — normaliza telefone (senão o SDR não casa a
+  // conversa de WhatsApp com esse contato) e reaproveita um já existente com
+  // o mesmo e-mail/telefone em vez de duplicar.
+  const normalizedPhone = lead.phone ? normalizePhoneBR(lead.phone) || lead.phone : null;
   let contact_id: string | null = null;
   if (lead.full_name) {
-    const { data: newContact } = await supabase
-      .from("contacts")
-      .insert({
-        organization_id: ctx.org.id,
-        owner_id: ctx.user.id,
-        full_name: lead.full_name,
-        email: lead.email,
-        phone: lead.phone,
-        company_id,
-        source: "lead_conversion",
-      })
-      .select("id")
-      .single();
-    contact_id = newContact?.id ?? null;
+    const orFilters = [
+      lead.email ? `email.eq.${lead.email}` : null,
+      normalizedPhone ? `phone.eq.${normalizedPhone}` : null,
+      normalizedPhone ? `whatsapp.eq.${normalizedPhone}` : null,
+    ].filter(Boolean);
+    const { data: existingContact } = orFilters.length
+      ? await supabase
+          .from("contacts")
+          .select("id")
+          .eq("organization_id", ctx.org.id)
+          .or(orFilters.join(","))
+          .maybeSingle()
+      : { data: null };
+
+    if (existingContact) {
+      contact_id = existingContact.id;
+    } else {
+      const { data: newContact } = await supabase
+        .from("contacts")
+        .insert({
+          organization_id: ctx.org.id,
+          owner_id: ownerId,
+          full_name: lead.full_name,
+          email: lead.email,
+          phone: normalizedPhone,
+          whatsapp: normalizedPhone,
+          company_id,
+          source: "lead_conversion",
+        })
+        .select("id")
+        .single();
+      contact_id = newContact?.id ?? null;
+    }
   }
 
   const { data: deal } = await supabase
@@ -374,7 +410,7 @@ export async function convertLeadToDeal(leadId: string) {
       status: "open",
       contact_id,
       company_id,
-      owner_id: ctx.user.id,
+      owner_id: ownerId,
       source: "lead_conversion",
     })
     .select("id")
