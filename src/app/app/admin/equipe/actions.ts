@@ -31,6 +31,9 @@ export async function inviteMemberAction(input: {
     return { ok: false as const, error: parsed.error.issues[0].message };
   }
   const { email, full_name, role } = parsed.data;
+  if (role === "owner" && ctx.org.role !== "owner") {
+    return { ok: false as const, error: "Só um owner pode convidar outro owner." };
+  }
   const supabase = createAdminClient();
 
   // 1. Busca user existente em auth.users
@@ -252,6 +255,30 @@ export async function changeRoleAction(input: { user_id: string; role: Role }) {
     return { ok: false as const, error: "Role inválido" };
   }
   const supabase = createAdminClient();
+
+  // Só outro owner mexe no role de um owner (rebaixar ou promover) —
+  // um admin comum não pode tocar em owner, mesmo que role=owner esteja
+  // na lista de opções do <select>.
+  const { data: target } = await supabase
+    .from("organization_members")
+    .select("role")
+    .eq("user_id", input.user_id)
+    .eq("organization_id", ctx.org.id)
+    .maybeSingle();
+  if ((target?.role === "owner" || input.role === "owner") && ctx.org.role !== "owner") {
+    return { ok: false as const, error: "Só um owner pode promover/rebaixar outro owner." };
+  }
+  if (target?.role === "owner" && input.role !== "owner") {
+    const { count } = await supabase
+      .from("organization_members")
+      .select("user_id", { count: "exact", head: true })
+      .eq("organization_id", ctx.org.id)
+      .eq("role", "owner");
+    if ((count ?? 0) <= 1) {
+      return { ok: false as const, error: "A organização precisa de pelo menos 1 owner." };
+    }
+  }
+
   const { error } = await supabase
     .from("organization_members")
     .update({ role: input.role })
@@ -268,6 +295,28 @@ export async function removeMemberAction(input: { user_id: string }) {
     return { ok: false as const, error: "Você não pode remover a si mesmo." };
   }
   const supabase = createAdminClient();
+
+  // Só outro owner remove um owner — e nunca o último owner da org.
+  const { data: target } = await supabase
+    .from("organization_members")
+    .select("role")
+    .eq("user_id", input.user_id)
+    .eq("organization_id", ctx.org.id)
+    .maybeSingle();
+  if (target?.role === "owner") {
+    if (ctx.org.role !== "owner") {
+      return { ok: false as const, error: "Só um owner pode remover outro owner." };
+    }
+    const { count } = await supabase
+      .from("organization_members")
+      .select("user_id", { count: "exact", head: true })
+      .eq("organization_id", ctx.org.id)
+      .eq("role", "owner");
+    if ((count ?? 0) <= 1) {
+      return { ok: false as const, error: "A organização precisa de pelo menos 1 owner." };
+    }
+  }
+
   const { error } = await supabase
     .from("organization_members")
     .delete()

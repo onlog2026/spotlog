@@ -128,7 +128,7 @@ export default async function EquipePage() {
       </div>
 
       {/* Form de convite */}
-      <InviteForm />
+      <InviteForm currentUserRole={ctx.org.role} />
 
       {/* Lista de membros */}
       <Card className="border-navy-100 bg-white shadow-soft">

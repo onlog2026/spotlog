@@ -15,8 +15,12 @@ const ROLE_OPTIONS = [
   { value: "viewer", label: "Viewer — somente leitura" },
 ];
 
-export function InviteForm() {
+export function InviteForm({ currentUserRole }: { currentUserRole?: string }) {
   const router = useRouter();
+  const roleOptions =
+    currentUserRole === "owner"
+      ? ROLE_OPTIONS
+      : ROLE_OPTIONS.filter((r) => r.value !== "owner");
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [role, setRole] = useState<string>("viewer");
@@ -106,7 +110,7 @@ export function InviteForm() {
           onChange={(e) => setRole(e.target.value)}
           className="w-full rounded-lg border border-navy-200 bg-white px-3 py-2 text-sm text-navy-900 focus:border-spotorange-500 focus:outline-none focus:ring-2 focus:ring-spotorange-500/20"
         >
-          {ROLE_OPTIONS.map((r) => (
+          {roleOptions.map((r) => (
             <option key={r.value} value={r.value}>
               {r.label}
             </option>
