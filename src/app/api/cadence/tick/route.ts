@@ -137,12 +137,15 @@ async function runTick(): Promise<number> {
   // mesma cota entre si, preservando o anti-ban original desse número.
   const whatsappSentByOrg = new Map<string, number>();
 
+  // sequences!inner + is_active=true: cadência pausada não deve ser
+  // processada (o toggle Ativa/Pausada era só decorativo antes disso).
   const { data: enrollments } = await admin
     .from("sequence_enrollments")
     .select(
-      "id, organization_id, sequence_id, contact_id, current_step, status, next_action_at",
+      "id, organization_id, sequence_id, contact_id, current_step, status, next_action_at, sequences!inner(is_active)",
     )
     .eq("status", "active")
+    .eq("sequences.is_active", true)
     .lte("next_action_at", now)
     .limit(100);
 

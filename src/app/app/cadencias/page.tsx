@@ -4,7 +4,7 @@ import { requireOrgModule } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { SequenceActiveToggle } from "@/components/sequences/sequence-active-toggle";
 
 export const dynamic = "force-dynamic";
 
@@ -80,9 +80,7 @@ export default async function CadenciasPage() {
                         {sq.name}
                       </Link>
                     </div>
-                    <Badge variant={sq.is_active ? "success" : "secondary"}>
-                      {sq.is_active ? "Ativa" : "Pausada"}
-                    </Badge>
+                    <SequenceActiveToggle sequenceId={sq.id} isActive={sq.is_active} />
                   </div>
                   {sq.description && (
                     <p className="text-xs text-muted-foreground line-clamp-2">
