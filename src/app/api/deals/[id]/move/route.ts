@@ -3,6 +3,7 @@ import { z } from "zod";
 import { requireSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendConvertedEmail } from "@/lib/email/lead-converted-notification";
+import { dispatchEvent } from "@/lib/integrations/dispatcher";
 
 const schema = z.object({
   stage_id: z.string().uuid(),
@@ -41,13 +42,16 @@ export async function POST(
     update.closed_at = null;
   }
 
-  const { error } = await admin
+  const { data: updated, error } = await admin
     .from("deals")
     .update(update)
     .eq("id", id)
-    .eq("organization_id", ctx.org.id);
+    .eq("organization_id", ctx.org.id)
+    .select("id, title, amount")
+    .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  const deal = updated as { id: string; title: string; amount: number };
 
   // Se virou WON, dispara conversion side effects (email + notif + lead status)
   if ((stage as { is_won: boolean }).is_won) {
@@ -66,6 +70,14 @@ export async function POST(
     } catch {
       // best-effort
     }
+  }
+
+  // Notifica Slack/Discord/Telegram/webhook configurados — sem isso, a org
+  // nunca ficava sabendo de negócio ganho/perdido fora da própria tela do CRM.
+  if ((stage as { is_won: boolean }).is_won) {
+    dispatchEvent(ctx.org.id, "deal.won", { title: deal.title, amount: deal.amount });
+  } else if ((stage as { is_lost: boolean }).is_lost) {
+    dispatchEvent(ctx.org.id, "deal.lost", { title: deal.title, amount: deal.amount });
   }
 
   return NextResponse.json({ ok: true, won: (stage as { is_won: boolean }).is_won });
