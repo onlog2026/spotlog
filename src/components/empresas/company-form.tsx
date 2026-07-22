@@ -15,6 +15,14 @@ import {
 } from "@/components/ui/card";
 import { AddressForm, EMPTY_ADDRESS } from "@/components/crm/address-form";
 
+function titleCase(s: string): string {
+  return s
+    .toLowerCase()
+    .split(" ")
+    .map((w) => (w ? w[0].toUpperCase() + w.slice(1) : w))
+    .join(" ");
+}
+
 const INDUSTRIES = [
   { value: "ecommerce", label: "E-commerce" },
   { value: "farma", label: "Farma" },
@@ -139,7 +147,10 @@ export function CompanyForm({
         number: j.number ?? cur.number,
         complement: j.complement ?? cur.complement,
         neighborhood: j.neighborhood ?? cur.neighborhood,
-        city: j.city ?? cur.city,
+        // Receita Federal devolve cidade em CAIXA ALTA — normaliza pra
+        // Title Case (o filtro de cidade já foi trocado pra ilike, mas o
+        // nome legível evita confundir o operador na lista/edição).
+        city: j.city ? titleCase(j.city) : cur.city,
         state: (j.state ?? cur.state).toUpperCase(),
       }));
       setCnpjMsg(j.situacao ? `Situação: ${j.situacao}` : "Dados carregados.");

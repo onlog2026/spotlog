@@ -63,7 +63,11 @@ export async function listCompanies(
     q = q.eq("state", opts.state.trim().toUpperCase());
   }
   if (opts.city && opts.city.trim()) {
-    q = q.eq("city", opts.city.trim());
+    // ilike (case-insensitive) — empresas importadas por CNPJ chegam com a
+    // cidade em CAIXA ALTA (Receita Federal), enquanto o dropdown usa o
+    // nome oficial do IBGE (Title Case). Exact match escondia essas
+    // empresas de qualquer filtro por cidade.
+    q = q.ilike("city", opts.city.trim());
   }
   const { data } = await q;
   return (data ?? []) as CompanyRow[];

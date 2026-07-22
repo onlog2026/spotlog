@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -60,6 +61,7 @@ export function ContactForm({
   /** desliga lookup quando editando o próprio contato (passa excludeId) */
   showLookup?: boolean;
 }) {
+  const router = useRouter();
   const d = defaults ?? {};
   const [email, setEmail] = useState<string>(d.email ?? "");
   const [fullName, setFullName] = useState<string>(d.full_name ?? "");
@@ -83,24 +85,10 @@ export function ContactForm({
   });
 
   function applyExisting(c: ExistingContact) {
-    if (c.full_name) setFullName(c.full_name);
-    if (c.phone) setPhone(c.phone);
-    if (c.whatsapp) setWhatsapp(c.whatsapp);
-    if (c.job_title) setJobTitle(c.job_title);
-    if (c.department) setDepartment(c.department);
-    if (c.seniority) setSeniority(c.seniority);
-    if (c.linkedin_url) setLinkedin(c.linkedin_url);
-    if (c.company_id) setCompanyId(c.company_id);
-    setAddress({
-      cep: c.cep ?? "",
-      street: c.street ?? "",
-      number: c.number ?? "",
-      complement: c.complement ?? "",
-      neighborhood: c.neighborhood ?? "",
-      city: c.city ?? "",
-      state: c.state ?? "",
-      country: c.country ?? "BR",
-    });
+    // Antes só preenchia os campos e o submit continuava criando um
+    // contato NOVO (duplicado) — agora vai direto editar o que já existe,
+    // já que e-mail igual é a mesma pessoa.
+    router.push(`/app/contatos/${c.id}/editar`);
   }
 
   return (
