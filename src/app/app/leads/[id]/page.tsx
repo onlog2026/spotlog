@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/utils";
 import { FlashBanner } from "@/components/crm/flash-banner";
 import { DeleteButton } from "@/components/crm/delete-button";
+import { LeadSourceBadge } from "@/components/crm/lead-source-badge";
 import { getLead, getLeadActivities } from "@/lib/queries/leads";
 import {
   deleteLead,
@@ -205,7 +206,7 @@ export default async function LeadDetalhePage({
                 >
                   {status.label}
                 </Badge>
-                <Badge variant="outline">{lead.source}</Badge>
+                <LeadSourceBadge source={lead.source} />
                 {typeof lead.score === "number" ? (
                   <Badge variant="secondary">Score {lead.score}</Badge>
                 ) : null}

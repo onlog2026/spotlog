@@ -12,6 +12,7 @@ import { MarkSeenOnMount } from "@/components/notifications/mark-seen-on-mount";
 import { FlashBanner } from "@/components/crm/flash-banner";
 import { listLeads, getActiveLeadLocks } from "@/lib/queries/leads";
 import { EnrollCadencePanel } from "@/components/leads/enroll-cadence-panel";
+import { LeadSourceBadge } from "@/components/crm/lead-source-badge";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
@@ -295,8 +296,8 @@ export default async function LeadsPage({
                             </span>
                           )}
                         </td>
-                        <td className="p-4 hidden md:table-cell text-muted-foreground text-xs">
-                          {lead.source}
+                        <td className="p-4 hidden md:table-cell text-xs">
+                          <LeadSourceBadge source={lead.source} />
                         </td>
                         <td className="p-4 hidden lg:table-cell text-muted-foreground text-xs">
                           {lead.created_at
