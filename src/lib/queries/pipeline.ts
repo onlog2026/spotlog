@@ -26,6 +26,7 @@ export type PipelineDeal = {
   source: string | null;
   tags: string[] | null;
   created_at: string;
+  probability: number | null;
   company_name?: string | null;
   contact_name?: string | null;
   owner_name?: string | null;
@@ -83,14 +84,18 @@ export async function getDealsForPipeline(
   filters: PipelineFilters = {},
 ): Promise<PipelineDeal[]> {
   const supabase = await createClient();
+  // Aberto sempre aparece; ganho/perdido só nos últimos 30 dias — senão o
+  // card de "Ganho"/"Perdido" some do board pra sempre no próximo load
+  // (o deal fica órfão, sem nenhuma tela pra consultar depois).
+  const recentCutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   let q = supabase
     .from("deals")
     .select(
-      `id,title,amount,currency,stage_id,owner_id,contact_id,company_id,position,expected_close_date,status,source,tags,created_at`,
+      `id,title,amount,currency,stage_id,owner_id,contact_id,company_id,position,expected_close_date,status,source,tags,created_at,probability`,
     )
     .eq("organization_id", orgId)
     .eq("pipeline_id", pipelineId)
-    .eq("status", "open")
+    .or(`status.eq.open,and(status.in.(won,lost),closed_at.gte.${recentCutoff})`)
     .order("position", { ascending: true })
     .limit(500);
 
@@ -118,6 +123,7 @@ export async function getDealsForPipeline(
     source: string | null;
     tags: string[] | null;
     created_at: string;
+    probability: number | null;
   };
   const rows = (data ?? []) as Row[];
   if (rows.length === 0) return [];
@@ -184,10 +190,42 @@ export async function getDealsForPipeline(
     source: d.source,
     tags: d.tags ?? null,
     created_at: d.created_at,
+    probability: d.probability,
     company_name: d.company_id ? companyMap.get(d.company_id) ?? null : null,
     contact_name: d.contact_id ? contactMap.get(d.contact_id) ?? null : null,
     owner_name: d.owner_id ? ownerMap.get(d.owner_id) ?? null : null,
   }));
+}
+
+/**
+ * Taxa de conversão de verdade — TODOS os deals ganhos/perdidos da vida do
+ * pipeline, não só os que aparecem no board (que só mostra fechados dos
+ * últimos 30 dias). Sem isso o card "Conversão" no topo do Pipeline é
+ * matematicamente preso em 0% (nunca recebe um deal won/lost pra contar).
+ */
+export async function getPipelineConversionStats(
+  orgId: string,
+  pipelineId: string,
+): Promise<{ won: number; lost: number; conversion: number }> {
+  const supabase = await createClient();
+  const [wonRes, lostRes] = await Promise.all([
+    supabase
+      .from("deals")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", orgId)
+      .eq("pipeline_id", pipelineId)
+      .eq("status", "won"),
+    supabase
+      .from("deals")
+      .select("id", { count: "exact", head: true })
+      .eq("organization_id", orgId)
+      .eq("pipeline_id", pipelineId)
+      .eq("status", "lost"),
+  ]);
+  const won = wonRes.count ?? 0;
+  const lost = lostRes.count ?? 0;
+  const closed = won + lost;
+  return { won, lost, conversion: closed > 0 ? Math.round((won / closed) * 100) : 0 };
 }
 
 export async function getDealOwnersForOrg(orgId: string) {

@@ -13,6 +13,8 @@ type Props = {
   contacts: { id: string; full_name: string; email: string | null }[];
   members: { user_id: string; label: string; role: string }[];
   currentUserId: string;
+  /** Veio do botão "+" de uma coluna do kanban — pré-seleciona pipeline+etapa. */
+  initialStageId?: string;
 };
 
 export function NewDealForm({
@@ -22,18 +24,25 @@ export function NewDealForm({
   contacts,
   members,
   currentUserId,
+  initialStageId,
 }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const [pipelineId, setPipelineId] = useState(pipelines[0]?.id ?? "");
+  const preselected = stages.find((s) => s.id === initialStageId);
+
+  const [pipelineId, setPipelineId] = useState(
+    preselected?.pipeline_id ?? pipelines[0]?.id ?? "",
+  );
   const stageOptions = useMemo(
     () => stages.filter((s) => s.pipeline_id === pipelineId),
     [stages, pipelineId],
   );
 
-  const [stageId, setStageId] = useState(stageOptions[0]?.id ?? "");
+  const [stageId, setStageId] = useState(
+    preselected?.id ?? stageOptions[0]?.id ?? "",
+  );
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
   const [probability, setProbability] = useState("50");

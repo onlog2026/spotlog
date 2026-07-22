@@ -10,6 +10,7 @@ import {
   getDealOwnersForOrg,
   getDealsForPipeline,
   getOrCreateDefaultPipeline,
+  getPipelineConversionStats,
   getPipelineStages,
 } from "@/lib/queries/pipeline";
 
@@ -36,10 +37,11 @@ export default async function PipelinePage({
     q: typeof sp.q === "string" ? sp.q : undefined,
   };
 
-  const [stages, deals, owners] = await Promise.all([
+  const [stages, deals, owners, conversionStats] = await Promise.all([
     getPipelineStages(ctx.org.id, pipeline.id),
     getDealsForPipeline(ctx.org.id, pipeline.id, filters),
     getDealOwnersForOrg(ctx.org.id),
+    getPipelineConversionStats(ctx.org.id, pipeline.id),
   ]);
 
   const sources = Array.from(
@@ -68,7 +70,7 @@ export default async function PipelinePage({
         </Button>
       </div>
 
-      <PipelineSummary stages={stages} deals={deals} />
+      <PipelineSummary stages={stages} deals={deals} conversionStats={conversionStats} />
 
       <PipelineFilters owners={owners} sources={sources} />
 

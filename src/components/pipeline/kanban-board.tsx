@@ -427,8 +427,9 @@ function DealCard({
             <Badge
               variant="outline"
               className="text-[10px] px-1.5 py-0 h-4 leading-none"
+              title="Probabilidade deste negócio"
             >
-              {stage.probability}%
+              {deal.probability ?? stage.probability}%
             </Badge>
             {deal.source && (
               <Badge

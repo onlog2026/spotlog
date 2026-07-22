@@ -6,8 +6,13 @@ import { NewDealForm } from "@/components/pipeline/new-deal-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewDealPage() {
+export default async function NewDealPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ stage?: string }>;
+}) {
   const ctx = await requireSession();
+  const sp = await searchParams;
   const supabase = await createClient();
 
   const [pipelines, stages, companies, contacts, members] = await Promise.all([
@@ -101,6 +106,7 @@ export default async function NewDealPage() {
         }
         members={memberOptions}
         currentUserId={ctx.user.id}
+        initialStageId={sp.stage}
       />
     </div>
   );

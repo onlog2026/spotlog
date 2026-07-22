@@ -6,25 +6,29 @@ import type { PipelineDeal, PipelineStage } from "@/lib/queries/pipeline";
 export function PipelineSummary({
   stages,
   deals,
+  conversionStats,
 }: {
   stages: PipelineStage[];
   deals: PipelineDeal[];
+  conversionStats: { won: number; lost: number; conversion: number };
 }) {
-  const total = deals.length;
-  const totalValue = deals.reduce((acc, d) => acc + d.amount, 0);
+  // `deals` inclui ganho/perdido dos últimos 30 dias (pro board não ficar
+  // vazio) — os cards de "aberto" precisam filtrar isso, senão contam
+  // negócio já fechado como se ainda estivesse em andamento.
   const wonStages = new Set(stages.filter((s) => s.is_won).map((s) => s.id));
   const lostStages = new Set(stages.filter((s) => s.is_lost).map((s) => s.id));
-  const won = deals.filter((d) => wonStages.has(d.stage_id)).length;
-  const closed = deals.filter(
-    (d) => wonStages.has(d.stage_id) || lostStages.has(d.stage_id),
-  ).length;
-  const conversion = closed > 0 ? Math.round((won / closed) * 100) : 0;
+  const openDeals = deals.filter(
+    (d) => !wonStages.has(d.stage_id) && !lostStages.has(d.stage_id),
+  );
+  const total = openDeals.length;
+  const totalValue = openDeals.reduce((acc, d) => acc + d.amount, 0);
+  const conversion = conversionStats.conversion;
 
   // Tempo médio: diferença entre created_at e hoje (proxy enquanto não temos stage_history)
   const avgDays =
     total > 0
       ? Math.round(
-          deals.reduce((acc, d) => {
+          openDeals.reduce((acc, d) => {
             const ms = Date.now() - new Date(d.created_at).getTime();
             return acc + ms / (1000 * 60 * 60 * 24);
           }, 0) / total,
