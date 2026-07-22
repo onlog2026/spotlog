@@ -123,19 +123,36 @@ export async function deleteOrganization(orgId: string) {
   idSchema.parse(orgId);
   const admin = createAdminClient();
 
-  // Safety check — só apaga orgs sem leads/deals/tickets
-  const [{ count: leads }, { count: deals }, { count: tickets }] = await Promise.all([
+  // Safety check — só apaga orgs sem dado real. Antes só contava
+  // leads/deals/tickets; companies/proposals/integrations (com credenciais
+  // salvas) caíam junto via ON DELETE CASCADE sem nenhum aviso.
+  const [
+    { count: leads },
+    { count: deals },
+    { count: tickets },
+    { count: companies },
+    { count: proposals },
+    { count: integrations },
+  ] = await Promise.all([
     admin.from("leads").select("*", { count: "exact", head: true }).eq("organization_id", orgId),
     admin.from("deals").select("*", { count: "exact", head: true }).eq("organization_id", orgId),
     admin
       .from("support_tickets")
       .select("*", { count: "exact", head: true })
       .eq("organization_id", orgId),
+    admin.from("companies").select("*", { count: "exact", head: true }).eq("organization_id", orgId),
+    admin.from("proposals").select("*", { count: "exact", head: true }).eq("organization_id", orgId),
+    admin
+      .from("integrations")
+      .select("*", { count: "exact", head: true })
+      .eq("organization_id", orgId),
   ]);
 
-  if ((leads ?? 0) + (deals ?? 0) + (tickets ?? 0) > 0) {
+  const total =
+    (leads ?? 0) + (deals ?? 0) + (tickets ?? 0) + (companies ?? 0) + (proposals ?? 0) + (integrations ?? 0);
+  if (total > 0) {
     throw new Error(
-      "Org tem leads/deals/tickets. Use 'Suspender' ou exclua os dados antes (operação manual).",
+      `Org tem dado real (leads:${leads ?? 0} deals:${deals ?? 0} tickets:${tickets ?? 0} empresas:${companies ?? 0} propostas:${proposals ?? 0} integrações:${integrations ?? 0}). Use 'Suspender' ou exclua os dados antes (operação manual).`,
     );
   }
 

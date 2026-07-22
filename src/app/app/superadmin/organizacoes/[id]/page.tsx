@@ -176,8 +176,8 @@ export default async function OrgDetailPage({ params }: { params: Params }) {
               />
             )}
             <DangerButton
-              label="Promover dono → super admin"
-              confirmText={org.slug}
+              label="Promover dono → super admin (ACESSO GLOBAL, não só desta org)"
+              confirmText="ACESSO GLOBAL"
               onConfirm={async () => {
                 await promoteOwnerToSuperAdmin(org.id);
               }}

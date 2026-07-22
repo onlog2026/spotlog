@@ -83,6 +83,13 @@ export default async function PermissoesPage({
         description="Libere ou restrinja acesso de usuários a módulos específicos do Spotlog (CRM, tickets, área cliente, etc.)."
       />
 
+      <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-500">
+        <strong>Ainda não bloqueia nada de verdade.</strong> O que você configurar
+        aqui é salvo, mas nenhuma tela do app checa essa permissão hoje — restringir
+        um usuário aqui não impede ele de acessar o módulo. Avise o dono antes de
+        confiar nisso pra controlar acesso real.
+      </div>
+
       <BulkApplyClienteExterno />
 
       <form className="mb-4 flex gap-2" action="" method="get">
