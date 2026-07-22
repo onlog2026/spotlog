@@ -45,8 +45,10 @@ export async function POST(req: NextRequest) {
           continue;
         }
         const data = item.data;
-        // Upsert company
-        const { data: company } = await supabase
+        // Upsert company — requer unique(organization_id, cnpj) no banco
+        // (scripts/sql/fix-companies-cnpj-unique.sql); sem essa constraint
+        // o Postgres rejeita o ON CONFLICT (42P10) e a empresa não é salva.
+        const { data: company, error: companyError } = await supabase
           .from("companies")
           .upsert(
             {
@@ -70,13 +72,19 @@ export async function POST(req: NextRequest) {
           )
           .select("id, name")
           .single();
+        if (companyError) {
+          console.warn(`[sdr/enrich] upsert companies falhou (${item.cnpj}):`, companyError.message);
+        }
 
-        // Cria lead correspondente (se ainda não houver)
+        // Cria lead correspondente (se ainda não houver) — escopado por
+        // origem, senão um lead inbound/manual com o mesmo nome de empresa
+        // "rouba" o enriquecimento em vez do SDR criar um lead próprio.
         const { data: existingLead } = await supabase
           .from("leads")
           .select("id")
           .eq("organization_id", ctx.org.id)
           .eq("company_name", company?.name ?? "")
+          .in("source", ["enrichment", "sdr_outbound", "prospecting"])
           .maybeSingle();
 
         let leadId = existingLead?.id;

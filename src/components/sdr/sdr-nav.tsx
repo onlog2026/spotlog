@@ -1,12 +1,13 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Sparkles, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Users, Sparkles, ShieldCheck, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
   { href: "/app/sdr", label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/app/sdr/leads", label: "Leads SDR", icon: Users },
+  { href: "/app/sdr/agenda", label: "Agenda", icon: Calendar },
   { href: "/app/sdr/enriquecer", label: "Enriquecer", icon: Sparkles },
   { href: "/app/sdr/lgpd", label: "LGPD", icon: ShieldCheck },
 ];
