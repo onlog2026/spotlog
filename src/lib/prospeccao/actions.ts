@@ -753,6 +753,39 @@ export async function reexecutarCampanha(formData: FormData) {
 }
 
 /**
+ * Pausar/retomar campanha — o cron diário (/api/prospecting/run) só pega
+ * campanhas com status 'running', então pausar de verdade impede o
+ * próximo tick de continuar processando essa campanha.
+ */
+export async function pausarCampanha(formData: FormData) {
+  const ctx = await requireSession();
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("id obrigatório");
+  const admin = createAdminClient();
+  await admin
+    .from("prospecting_campaigns")
+    .update({ status: "paused" })
+    .eq("organization_id", ctx.org.id)
+    .eq("id", id);
+  revalidatePath("/app/prospeccao");
+  revalidatePath(`/app/prospeccao/${id}`);
+}
+
+export async function retomarCampanha(formData: FormData) {
+  const ctx = await requireSession();
+  const id = String(formData.get("id") ?? "");
+  if (!id) throw new Error("id obrigatório");
+  const admin = createAdminClient();
+  await admin
+    .from("prospecting_campaigns")
+    .update({ status: "running" })
+    .eq("organization_id", ctx.org.id)
+    .eq("id", id);
+  revalidatePath("/app/prospeccao");
+  revalidatePath(`/app/prospeccao/${id}`);
+}
+
+/**
  * "Informar CNPJ" — pros resultados da busca de internet (que não têm CNPJ).
  * Roda o enrichment oficial (BrasilAPI, grátis) e preenche razão social,
  * CNAE e SÓCIOS (decisores prováveis) no resultado. Dado real, nunca inventado.

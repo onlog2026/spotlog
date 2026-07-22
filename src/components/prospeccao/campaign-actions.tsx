@@ -2,7 +2,7 @@
 import { useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Loader2, Trash2, RefreshCw, Sparkles } from "lucide-react";
+import { Loader2, Trash2, RefreshCw, Sparkles, Pause, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Rocket } from "lucide-react";
 import { Radar } from "lucide-react";
@@ -13,6 +13,8 @@ import {
   rodarTudo,
   iniciarBuscaProfunda,
   coletarBuscaProfunda,
+  pausarCampanha,
+  retomarCampanha,
 } from "@/lib/prospeccao/actions";
 
 /**
@@ -186,6 +188,43 @@ export function DeleteCampaignButton({ id }: { id: string }) {
         <Trash2 className="h-3 w-3" />
       )}
       Excluir
+    </Button>
+  );
+}
+
+export function PauseResumeCampaignButton({
+  id,
+  status,
+}: {
+  id: string;
+  status: string;
+}) {
+  const [pending, start] = useTransition();
+  const isRunning = status === "running";
+  function onClick() {
+    const fd = new FormData();
+    fd.set("id", id);
+    start(async () => {
+      try {
+        await (isRunning ? pausarCampanha : retomarCampanha)(fd);
+        toast.success(isRunning ? "Campanha pausada" : "Campanha retomada");
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : "Falha";
+        if (!/NEXT_REDIRECT/.test(msg)) toast.error(msg);
+      }
+    });
+  }
+  if (status !== "running" && status !== "paused") return null;
+  return (
+    <Button variant="ghost" size="sm" onClick={onClick} disabled={pending}>
+      {pending ? (
+        <Loader2 className="h-3 w-3 animate-spin" />
+      ) : isRunning ? (
+        <Pause className="h-3 w-3" />
+      ) : (
+        <Play className="h-3 w-3" />
+      )}
+      {isRunning ? "Pausar" : "Retomar"}
     </Button>
   );
 }

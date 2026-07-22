@@ -16,6 +16,7 @@ import {
   RunAllButton,
   DeepSearchButton,
   AutoCollect,
+  PauseResumeCampaignButton,
 } from "@/components/prospeccao/campaign-actions";
 import {
   ConvertOneButton,
@@ -128,6 +129,7 @@ export default async function CampaignDetailPage({
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <StatusBadge status={campaign.status} />
+            <PauseResumeCampaignButton id={campaign.id} status={campaign.status} />
             <RunAllButton id={campaign.id} />
             {tipo === "internet" && <DeepSearchButton id={campaign.id} />}
             <EnrichCampaignButton id={campaign.id} />
