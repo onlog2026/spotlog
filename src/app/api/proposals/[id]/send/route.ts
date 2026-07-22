@@ -4,6 +4,7 @@ import { requireSession } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/integrations/email";
 import { sendWhatsapp } from "@/lib/integrations/whatsapp";
+import { renderEmailLayout } from "@/lib/email/layout";
 
 const schema = z.object({ channel: z.enum(["email", "whatsapp"]) });
 
@@ -42,11 +43,18 @@ export async function POST(
   if (channel === "email") {
     if (!p.contact?.email)
       return NextResponse.json({ error: "contato sem e-mail" }, { status: 400 });
-    const html = `
-      <p>Olá ${greet},</p>
-      <p>Segue o link da sua proposta comercial: <a href="${url}">${p.title}</a>.</p>
-      <p>Qualquer dúvida, é só responder este e-mail.</p>
-    `;
+    const html = renderEmailLayout({
+      heading: `Olá, ${greet}!`,
+      bodyHtml: `<p>Segue sua proposta comercial. Dá pra ver os itens, valores e aceitar direto pelo link abaixo.</p>`,
+      highlight: {
+        label: "PROPOSTA",
+        title: p.title,
+        subtitle: `Valor total: ${Number(p.total).toLocaleString("pt-BR", { style: "currency", currency: p.currency || "BRL" })}`,
+      },
+      ctaLabel: "Ver proposta completa",
+      ctaUrl: url,
+      footerNote: "Qualquer dúvida, é só responder este e-mail.",
+    });
     const r = await sendEmail({
       organization_id: ctx.org.id,
       to: p.contact.email,
