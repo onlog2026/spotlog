@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       scheduled_window_end: body.window_end
         ? new Date(body.window_end).toISOString()
         : null,
-      status: "requested",
+      status: "solicitada", // CHECK CONSTRAINT só aceita português — "requested" quebrava todo insert
       volumes: body.volumes ?? 1,
       weight_kg: body.weight_kg ?? null,
       notes: body.notes ?? null,

@@ -11,7 +11,7 @@ type Shipment = {
   id: string;
   code: string | null;
   recipient_name: string | null;
-  destination_address: string | null;
+  destination_address: { street?: string; city?: string; uf?: string } | null;
   status: string | null;
   created_at: string | null;
   sla_deadline: string | null;
@@ -54,7 +54,12 @@ export default async function PortalRemessasPage() {
       ) : (
         <Card>
           <CardContent className="p-0 divide-y divide-white/5">
-            {shipments.map((s) => (
+            {shipments.map((s) => {
+              const addr = s.destination_address;
+              const addrLabel = addr
+                ? [addr.city, addr.uf].filter(Boolean).join("/")
+                : "";
+              return (
               <Link
                 key={s.id}
                 href={`/portal/remessas/${s.code ?? s.id}`}
@@ -64,7 +69,7 @@ export default async function PortalRemessasPage() {
                   <div className="font-semibold">{s.code ?? "Sem código"}</div>
                   <div className="text-xs text-muted-foreground truncate">
                     {s.recipient_name ?? "—"}
-                    {s.destination_address ? ` · ${s.destination_address}` : ""}
+                    {addrLabel ? ` · ${addrLabel}` : ""}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
@@ -72,7 +77,8 @@ export default async function PortalRemessasPage() {
                   <ArrowRight className="h-4 w-4 text-muted-foreground" />
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
       )}

@@ -71,7 +71,13 @@ export default async function RemessaDetalhePage({
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm">
-          <p>{(data as { destination_address?: string }).destination_address ?? "—"}</p>
+          <p>
+            {(() => {
+              const addr = (data as { destination_address?: { street?: string; number?: string; city?: string; uf?: string; cep?: string } }).destination_address;
+              if (!addr) return "—";
+              return [addr.street, addr.number, addr.city, addr.uf, addr.cep].filter(Boolean).join(", ");
+            })()}
+          </p>
           {(data as { sla_deadline?: string }).sla_deadline && (
             <p className="text-muted-foreground flex items-center gap-1">
               <Calendar className="h-3 w-3" /> SLA até{" "}

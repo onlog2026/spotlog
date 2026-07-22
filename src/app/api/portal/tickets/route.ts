@@ -30,6 +30,17 @@ export async function POST(req: Request) {
   const company_id = ctx.company.id;
   const organization_id = ctx.organization.id;
 
+  // A coluna só aceita valores em português (CHECK CONSTRAINT) — o form do
+  // portal manda em inglês, então sem esse mapa TODO chamado quebrava com
+  // erro de constraint do Postgres.
+  const PRIORITY_MAP: Record<string, string> = {
+    low: "baixa",
+    normal: "media",
+    high: "alta",
+    urgent: "urgente",
+  };
+  const priority = PRIORITY_MAP[body.priority ?? "normal"] ?? "media";
+
   const supabase = await createClient();
   const protocol = genProtocol();
   const { data, error } = await supabase
@@ -40,9 +51,9 @@ export async function POST(req: Request) {
       protocol,
       subject: body.subject.trim(),
       category: body.category ?? "geral",
-      priority: body.priority ?? "normal",
+      priority,
       description: body.description.trim(),
-      status: "open",
+      status: "aberto",
       created_by: ctx.user.id,
       opened_at: new Date().toISOString(),
     })
