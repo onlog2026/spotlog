@@ -1,14 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Plus, Users2, Search } from "lucide-react";
+import { Plus, Users2, Search } from "lucide-react";
 import { requireOrgModule } from "@/lib/entitlements";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { initials } from "@/lib/utils";
 import { FlashBanner } from "@/components/crm/flash-banner";
 import { FiltersUfCidade } from "@/components/crm/filters-uf-cidade";
+import { ContactsTable } from "@/components/contatos/contacts-table";
 import { listContacts } from "@/lib/queries/contatos";
 import { listCompanyOptions } from "@/lib/queries/empresas";
 
@@ -105,94 +103,7 @@ export default async function ContatosPage({
 
       <Card>
         <CardContent className="p-0">
-          {contacts.length === 0 ? (
-            <Empty />
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b border-border text-xs text-muted-foreground">
-                  <tr>
-                    <th className="text-left p-4">Nome</th>
-                    <th className="text-left p-4 hidden md:table-cell">
-                      Empresa
-                    </th>
-                    <th className="text-left p-4 hidden md:table-cell">
-                      Cargo
-                    </th>
-                    <th className="text-left p-4 hidden lg:table-cell">
-                      E-mail
-                    </th>
-                    <th className="text-left p-4 hidden lg:table-cell">
-                      Telefone
-                    </th>
-                    <th className="text-left p-4 hidden xl:table-cell">
-                      Cidade/UF
-                    </th>
-                    <th />
-                  </tr>
-                </thead>
-                <tbody>
-                  {contacts.map((ct) => (
-                    <tr
-                      key={ct.id}
-                      className="border-b border-border hover:bg-muted/40 transition-colors"
-                    >
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="text-xs bg-navy-900 text-white">
-                              {initials(ct.full_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <Link
-                              href={`/app/contatos/${ct.id}`}
-                              className="font-medium hover:underline flex items-center gap-1.5"
-                            >
-                              {ct.full_name}
-                              {ct.is_decision_maker ? (
-                                <Badge variant="orange" className="text-[9px]">
-                                  Decisor
-                                </Badge>
-                              ) : null}
-                              {ct.do_not_contact ? (
-                                <Badge variant="destructive" className="text-[9px]">
-                                  DNC
-                                </Badge>
-                              ) : null}
-                            </Link>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden md:table-cell text-muted-foreground">
-                        {ct.companies?.name ?? "—"}
-                      </td>
-                      <td className="p-4 hidden md:table-cell text-muted-foreground">
-                        {ct.job_title ?? "—"}
-                      </td>
-                      <td className="p-4 hidden lg:table-cell text-muted-foreground text-xs">
-                        {ct.email ?? "—"}
-                      </td>
-                      <td className="p-4 hidden lg:table-cell text-muted-foreground text-xs">
-                        {ct.whatsapp ?? ct.phone ?? "—"}
-                      </td>
-                      <td className="p-4 hidden xl:table-cell text-muted-foreground text-xs">
-                        {[ct.city, ct.state].filter(Boolean).join("/") || "—"}
-                      </td>
-                      <td className="p-4">
-                        <Link
-                          href={`/app/contatos/${ct.id}`}
-                          className="text-spotorange-500 hover:underline text-xs flex items-center gap-1"
-                        >
-                          Abrir <ArrowRight className="h-3 w-3" />
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {contacts.length === 0 ? <Empty /> : <ContactsTable contacts={contacts} />}
         </CardContent>
       </Card>
     </div>

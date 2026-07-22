@@ -159,3 +159,29 @@ export async function deleteContact(id: string) {
   revalidatePath("/app/contatos");
   redirect("/app/contatos?deleted=1");
 }
+
+/** Exclusão em massa — usada pelo "Selecionar todos" da lista de contatos. */
+export async function deleteContactsBulk(ids: string[]) {
+  const ctx = await requireSession();
+  if (!ids.length) return { ok: false as const, error: "Nenhum contato selecionado." };
+  const supabase = await createClient();
+  const { error, count } = await supabase
+    .from("contacts")
+    .delete({ count: "exact" })
+    .in("id", ids)
+    .eq("organization_id", ctx.org.id);
+
+  if (error) return { ok: false as const, error: error.message };
+
+  await supabase.from("audit_logs").insert({
+    organization_id: ctx.org.id,
+    user_id: ctx.user.id,
+    entity: "contact",
+    entity_id: ids[0],
+    action: "delete_bulk",
+    diff: { ids, count },
+  });
+
+  revalidatePath("/app/contatos");
+  return { ok: true as const, count: count ?? ids.length };
+}
