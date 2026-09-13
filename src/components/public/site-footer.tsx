@@ -123,7 +123,7 @@ export function SiteFooter() {
                     <Mail className="h-4 w-4 text-white" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[10px] uppercase tracking-wider font-bold text-ink-300">{e.label}</div>
+                    <div className="text-xs uppercase tracking-wider font-bold text-ink-300">{e.label}</div>
                     <div className="text-sm font-semibold text-white break-all group-hover:text-spotorange-300 transition-colors">{e.value}</div>
                   </div>
                 </a>
@@ -137,7 +137,7 @@ export function SiteFooter() {
                   <Phone className="h-4 w-4 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[10px] uppercase tracking-wider font-bold text-ink-300">Telefone / WhatsApp</div>
+                  <div className="text-xs uppercase tracking-wider font-bold text-ink-300">Telefone / WhatsApp</div>
                   <div className="text-sm font-semibold text-white group-hover:text-spotorange-300 transition-colors">(11) 97834-8288</div>
                 </div>
               </a>
@@ -152,7 +152,7 @@ export function SiteFooter() {
                   <Instagram className="h-4 w-4 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[10px] uppercase tracking-wider font-bold text-ink-300">Instagram</div>
+                  <div className="text-xs uppercase tracking-wider font-bold text-ink-300">Instagram</div>
                   <div className="text-sm font-semibold text-white group-hover:text-spotorange-300 transition-colors">@spotlogoficial</div>
                 </div>
               </a>
@@ -162,7 +162,7 @@ export function SiteFooter() {
                   <MapPin className="h-4 w-4 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[10px] uppercase tracking-wider font-bold text-ink-300">Endereço</div>
+                  <div className="text-xs uppercase tracking-wider font-bold text-ink-300">Endereço</div>
                   <div className="text-sm font-semibold text-white">São Paulo, SP — Brasil</div>
                 </div>
               </div>
@@ -246,7 +246,7 @@ export function SiteFooter() {
               <div className="flex-1 text-center sm:text-left">
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-spotorange-50 border border-spotorange-200 px-3 py-1 mb-2">
                   <ShieldCheck className="h-3.5 w-3.5 text-spotorange-600" />
-                  <span className="text-[11px] font-bold text-spotorange-700 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-spotorange-700 uppercase tracking-wider">
                     Credenciada AFE Anvisa
                   </span>
                 </div>
@@ -293,7 +293,7 @@ export function SiteFooter() {
                   {segmentos.map((s) => (
                     <span
                       key={s}
-                      className="text-[10px] font-semibold uppercase tracking-wider bg-white/10 text-ink-200 px-2 py-0.5 rounded-full"
+                      className="text-xs font-semibold uppercase tracking-wider bg-white/10 text-ink-200 px-2 py-0.5 rounded-full"
                     >
                       {s}
                     </span>
@@ -317,7 +317,7 @@ export function SiteFooter() {
                 </ul>
                 <Link
                   href="/abrangencia"
-                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-spotorange-400 hover:text-spotorange-300 mt-2"
+                  className="inline-flex items-center gap-1 text-xs font-semibold text-spotorange-400 hover:text-spotorange-300 mt-2"
                 >
                   Ver todas
                   <ArrowRight className="h-3 w-3" />
@@ -372,7 +372,7 @@ function CredItem({
         {icon}
       </div>
       <div className="text-sm font-bold text-white leading-tight">{title}</div>
-      <div className="text-[10px] uppercase tracking-wider text-ink-400 mt-0.5">
+      <div className="text-xs uppercase tracking-wider text-ink-400 mt-0.5">
         {subtitle}
       </div>
     </div>

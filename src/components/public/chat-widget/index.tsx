@@ -445,7 +445,7 @@ export function ChatWidget() {
               <p className="text-sm font-semibold leading-tight">
                 Bia · Atendimento Spotlog
               </p>
-              <p className="flex items-center gap-1.5 text-[11px] text-white/80">
+              <p className="flex items-center gap-1.5 text-xs text-white/80">
                 <span className="size-1.5 rounded-full bg-emerald-400" />
                 {headerSubtitle}
               </p>
@@ -498,7 +498,7 @@ export function ChatWidget() {
 
           {/* Consentimento LGPD */}
           {!consentAccepted ? (
-            <div className="border-t border-[#011960]/10 bg-[#F5F7FB] px-3 py-2 text-[11px] text-[#011960]">
+            <div className="border-t border-[#011960]/10 bg-[#F5F7FB] px-3 py-2 text-xs text-[#011960]">
               Suas mensagens podem ser revisadas pra melhorar nosso atendimento.{" "}
               <Link href="/privacidade" className="font-medium underline">
                 Privacidade

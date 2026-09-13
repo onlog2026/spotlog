@@ -6,7 +6,7 @@ import { CategoryFilter } from "@/components/public/blog/category-filter";
 export const metadata: Metadata = {
   title: "Blog Spotlog: Logística, E-commerce e Farma",
   description:
-    "Conteúdo Spotlog sobre logística inteligente, última milha, e-commerce, farma e operação de alta performance.",
+    "Conteúdo Spotlog sobre logística inteligente, última milha, e-commerce, farma e operação de alta performance — cases reais e boas práticas do setor.",
   alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog Spotlog",

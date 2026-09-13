@@ -36,10 +36,10 @@ const SOCIALS: [string, string][] = [
 ];
 
 // Contatos diretos (WhatsApp do site + página de contato).
-const CONTACTS: { ic: React.ReactNode; href: string; ext?: boolean }[] = [
-  { ic: <Icon.Whatsapp/>, href: "https://wa.me/5511978348288", ext: true },
-  { ic: <Icon.Mail/>, href: "/contato" },
-  { ic: <Icon.Phone/>, href: "/contato" },
+const CONTACTS: { ic: React.ReactNode; href: string; label: string; ext?: boolean }[] = [
+  { ic: <Icon.Whatsapp/>, href: "https://wa.me/5511978348288", label: "Falar no WhatsApp", ext: true },
+  { ic: <Icon.Mail/>, href: "/contato", label: "Enviar e-mail (página de contato)" },
+  { ic: <Icon.Phone/>, href: "/contato", label: "Ligar (página de contato)" },
 ];
 
 export function Footer() {
@@ -68,6 +68,7 @@ export function Footer() {
                   href={x.href}
                   target={x.ext ? "_blank" : undefined}
                   rel={x.ext ? "noopener noreferrer" : undefined}
+                  aria-label={x.label}
                   className="foot-social"
                 >{x.ic}</a>
               ))}

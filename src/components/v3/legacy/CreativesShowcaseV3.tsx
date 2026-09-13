@@ -106,7 +106,7 @@ export function CreativesShowcaseV3({ content }: { content?: Record<string, Card
 
                 <div className="absolute top-3 right-3 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur px-2.5 py-1 rounded-full shadow-soft">
                   {it.isVideo && <Play className="h-3 w-3 text-navy-500 fill-navy-500" />}
-                  <span className="text-[10px] font-bold text-navy-900 uppercase tracking-wider">
+                  <span className="text-xs font-bold text-navy-900 uppercase tracking-wider">
                     {it.tag}
                   </span>
                 </div>

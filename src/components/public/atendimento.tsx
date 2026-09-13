@@ -35,7 +35,7 @@ export function Atendimento() {
                   <div className="bg-white/95 backdrop-blur rounded-2xl p-4 shadow-card border border-white/40">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="h-2 w-2 rounded-full bg-success-500 animate-pulse-soft" />
-                      <span className="text-[10px] uppercase tracking-wider font-bold text-ink-500">
+                      <span className="text-xs uppercase tracking-wider font-bold text-ink-500">
                         Online agora
                       </span>
                     </div>
@@ -55,7 +55,7 @@ export function Atendimento() {
                   <MessageCircle className="h-4 w-4 text-white" />
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase tracking-wider font-bold text-ink-500">
+                  <div className="text-xs uppercase tracking-wider font-bold text-ink-500">
                     Tempo médio
                   </div>
                   <div className="text-sm font-bold text-navy-900">{"<"} 5 min</div>
@@ -64,7 +64,7 @@ export function Atendimento() {
 
               {/* Badge SLA */}
               <div className="absolute -bottom-5 left-6 bg-gradient-to-br from-spotorange-500 to-spotorange-600 rounded-2xl shadow-orange-glow p-3 text-white hidden lg:block z-20">
-                <div className="text-[10px] uppercase tracking-wider font-semibold opacity-80">
+                <div className="text-xs uppercase tracking-wider font-semibold opacity-80">
                   Satisfação
                 </div>
                 <div className="text-lg font-bold leading-tight">97%</div>

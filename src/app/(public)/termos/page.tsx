@@ -1,4 +1,7 @@
-export const metadata = { title: "Termos de uso" };
+export const metadata = {
+  title: "Termos de Uso da Plataforma — Spotlog",
+  alternates: { canonical: "/termos" },
+};
 
 export default function TermosPage() {
   return (

@@ -1,0 +1,52 @@
+# Spotlog — Logística inteligente com rastreamento total
+
+> Operador logístico para e-commerce, farma, manipulação e operações B2B em São Paulo e região metropolitana, com rastreabilidade ponta a ponta, atendimento integrado e controle operacional em tempo real.
+
+Site: https://www.spotlog.com.br
+Contato: +55 11 97834-8288 (WhatsApp/telefone) · https://www.spotlog.com.br/contato
+Áreas: Instagram @spotlogoficial · Facebook /spotlogoficial · LinkedIn /company/spotlog
+Cobertura: estado de São Paulo e região metropolitana.
+
+## O que a Spotlog faz
+
+Empresa de logística e transportes que atende diversos segmentos com motoboy, utilitários/vans e mão de obra operacional, com padronização de equipe, rastreamento em tempo real e comprovação de entrega (foto/assinatura/status).
+
+## Soluções (https://www.spotlog.com.br/solucoes)
+
+- **Armazenagem e Fulfillment** (/solucoes/armazenagem): recebimento e conferência, armazenagem com controle de estoque em tempo real, separação (picking), embalagem, expedição, integração com marketplaces.
+- **E-commerce Express** (/solucoes/ecommerce-express): coleta programada no CD/loja, entregas expressas em São Paulo e Grande SP, rastreamento em tempo real, notificações automáticas, comprovante com foto.
+- **Farma e Saúde** (/solucoes/express-pharma): transporte de medicamentos e correlatos com checklist, evidência fotográfica, assinatura digital, boas práticas do setor.
+- **Same Day / Next Day** (/solucoes/same-day): entrega no mesmo dia ou no dia seguinte, priorização inteligente de rotas.
+- **Coletas Programadas** (/solucoes/coletas): janelas fixas de retirada, checklist e confirmação em tempo real.
+- **Moto Fixa** (/solucoes/moto-fixa): entregador dedicado com escala combinada, ideal para demanda constante.
+- **Logística Reversa** (/solucoes/reversa): coleta de devoluções/trocas com a mesma rastreabilidade da ida.
+- **Utilitários e Vans** (/solucoes/vans): cargas maiores, mudanças comerciais, transferências entre filiais.
+- **Operação Sob Demanda** (/solucoes/sob-demanda): estrutura escalável para picos sazonais, lançamentos e eventos.
+
+## Segmentos atendidos
+
+Marketplaces, Moda e Vestuário, Cosméticos, Saúde, Eletrônicos, Autopeças, Papelaria e Livros, Atacado e Varejo, Restaurantes, Empresas de Tecnologia, Fintechs, Laboratórios, e Pequenas/Médias/Grandes Empresas em geral — cada um com página própria em spotlog.com.br/{segmento}.
+
+## Serviços de transporte
+
+- **Transporte Rodoviário** (/transporte-rodoviario): cargas fracionadas e dedicadas, transferências entre filiais/CDs.
+- **Transporte Aéreo** (/transporte-aereo): entregas de longa distância com prazo curto.
+- **Documentos e Malotes** (/documentos): coleta e entrega com sigilo e cadeia de custódia.
+
+## Tecnologia (/tecnologia)
+
+App do entregador (rotas, check-in/out, foto, assinatura, ocorrências), painel do cliente (dashboard com métricas, entregas, faturas, relatórios), API e webhooks para integração com loja/ERP/WMS, IA de apoio ao atendimento e triagem.
+
+## Rastreamento (/rastreamento)
+
+Página pública onde o destinatário digita o código de rastreio e acompanha status, previsão e histórico da entrega em tempo real.
+
+## Empresa
+
+- **Quem Somos** (/sobre): empresa de logística e transportes séria e responsável, atendendo diversos segmentos em todo o estado de São Paulo e região metropolitana.
+- **Cases** (/cases) e **Blog** (/blog): resultados de clientes e conteúdo sobre logística, e-commerce e farma.
+- **Área de Cobertura** (/abrangencia): detalhamento de onde a Spotlog opera.
+
+## Como conversar com a Spotlog
+
+Formulário em /contato ou WhatsApp direto em +55 11 97834-8288. Diagnóstico/orçamento sem compromisso.

@@ -161,7 +161,7 @@ function HeroVisual() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success-500 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-success-500"></span>
           </span>
-          <span className="text-[10px] font-bold text-navy-900 uppercase tracking-wider">
+          <span className="text-xs font-bold text-navy-900 uppercase tracking-wider">
             Em operação
           </span>
         </div>
@@ -178,7 +178,7 @@ function HeroVisual() {
           <span className="text-xs font-bold uppercase tracking-wider text-ink-500">
             Rastreamento
           </span>
-          <span className="text-[10px] font-bold text-success-700 bg-success-50 px-2 py-0.5 rounded-full">
+          <span className="text-xs font-bold text-success-700 bg-success-50 px-2 py-0.5 rounded-full">
             Em rota
           </span>
         </div>
@@ -194,7 +194,7 @@ function HeroVisual() {
               </div>
               <div className="flex-1">
                 <div className={`text-xs font-semibold ${s.done ? "text-navy-900" : "text-ink-400"}`}>{s.label}</div>
-                <div className="text-[10px] text-ink-500">{s.time}</div>
+                <div className="text-xs text-ink-500">{s.time}</div>
               </div>
             </div>
           ))}
@@ -236,7 +236,7 @@ function HeroVisual() {
         className="absolute -bottom-6 right-6 lg:right-12 bg-gradient-to-br from-spotorange-500 to-spotorange-600 rounded-2xl shadow-orange-glow p-4 text-white w-40 hidden md:block z-20"
       >
         <ShieldCheck className="h-6 w-6 mb-2" />
-        <div className="text-[10px] uppercase tracking-wider font-semibold opacity-80">
+        <div className="text-xs uppercase tracking-wider font-semibold opacity-80">
           Operação
         </div>
         <div className="text-sm font-bold leading-tight">

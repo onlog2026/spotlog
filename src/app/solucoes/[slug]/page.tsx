@@ -35,13 +35,16 @@ export function generateStaticParams() {
   return allSolucaoSlugs().map((slug) => ({ slug }));
 }
 
-/** Corta no fim de frase/palavra antes de ~155 chars — pro meta description
- * ideal do Google (120-160), sem tocar no texto completo exibido na página. */
-function toMetaDescription(text: string, max = 155): string {
+/** Corta no fim de frase/palavra perto de ~155 chars — pro meta description
+ * ideal do Google (120-160), sem tocar no texto completo exibido na página.
+ * Só aceita cortar num ponto-final se ele já cair dentro da faixa ideal
+ * (>= min); senão a 1ª frase do intro (comum ter ~100 chars) deixava a
+ * description curta demais — corta por palavra perto do max nesse caso. */
+function toMetaDescription(text: string, max = 155, min = 120): string {
   if (text.length <= max) return text;
   const cut = text.slice(0, max);
   const lastDot = cut.lastIndexOf(". ");
-  if (lastDot > max * 0.6) return cut.slice(0, lastDot + 1);
+  if (lastDot >= min) return cut.slice(0, lastDot + 1);
   const lastSpace = cut.lastIndexOf(" ");
   return cut.slice(0, lastSpace > 0 ? lastSpace : max) + "…";
 }

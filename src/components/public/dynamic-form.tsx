@@ -411,10 +411,10 @@ function FieldRenderer({ field, value, onChange, error, tokens }: FieldRendererP
       )}
 
       {field.help_text && !error && (
-        <p className={`text-[11px] ${tokens.helpText}`}>{field.help_text}</p>
+        <p className={`text-xs ${tokens.helpText}`}>{field.help_text}</p>
       )}
       {error && (
-        <p role="alert" className="text-[11px] text-red-500">
+        <p role="alert" className="text-xs text-red-500">
           {error}
         </p>
       )}

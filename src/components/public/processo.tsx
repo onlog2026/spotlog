@@ -72,7 +72,7 @@ export function Processo() {
               <div className="relative">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="h-2 w-2 rounded-full bg-success-500 animate-pulse-soft" />
-                  <span className="text-[10px] uppercase tracking-wider text-ink-300 font-bold">
+                  <span className="text-xs uppercase tracking-wider text-ink-300 font-bold">
                     Ao vivo
                   </span>
                 </div>
@@ -91,7 +91,7 @@ export function Processo() {
                       className="bg-white rounded-xl p-3 shadow-soft hover:shadow-card transition-shadow"
                     >
                       <m.icon className="h-4 w-4 text-spotorange-600 mb-2" />
-                      <div className="text-[10px] text-ink-500 mb-0.5 font-medium">{m.label}</div>
+                      <div className="text-xs text-ink-500 mb-0.5 font-medium">{m.label}</div>
                       <div className="text-xl font-bold text-navy-900">{m.value}</div>
                     </div>
                   ))}

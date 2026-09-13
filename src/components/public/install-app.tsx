@@ -91,7 +91,7 @@ export function InstallApp() {
               <div className="w-64 h-[500px] bg-white rounded-[40px] shadow-card-hover p-3 border-8 border-navy-950">
                 <div className="w-full h-full bg-gradient-to-br from-navy-50 to-white rounded-[28px] overflow-hidden relative p-4">
                   {/* Status bar */}
-                  <div className="flex items-center justify-between mb-4 text-[10px] font-bold text-navy-900">
+                  <div className="flex items-center justify-between mb-4 text-xs font-bold text-navy-900">
                     <span>09:41</span>
                     <span>●●●●●</span>
                   </div>
@@ -102,14 +102,14 @@ export function InstallApp() {
                       <span className="text-navy-900">SPOT</span>
                       <span className="text-spotorange-500">LOG</span>
                     </div>
-                    <div className="grid h-7 w-7 place-items-center rounded-full bg-navy-100 text-[10px] font-bold text-navy-900">A</div>
+                    <div className="grid h-7 w-7 place-items-center rounded-full bg-navy-100 text-xs font-bold text-navy-900">A</div>
                   </div>
 
                   {/* Card métrica */}
                   <div className="bg-navy-900 text-white rounded-2xl p-4 mb-3">
-                    <div className="text-[10px] uppercase tracking-wider opacity-80">Hoje</div>
+                    <div className="text-xs uppercase tracking-wider opacity-80">Hoje</div>
                     <div className="text-2xl font-bold mt-1">12 entregas</div>
-                    <div className="text-[10px] mt-2 opacity-80">SLA cumprido 98%</div>
+                    <div className="text-xs mt-2 opacity-80">SLA cumprido 98%</div>
                   </div>
 
                   {/* Lista de entregas */}
@@ -122,9 +122,9 @@ export function InstallApp() {
                       <div key={d.code} className="bg-white border border-ink-200 rounded-xl p-3 flex items-center justify-between">
                         <div>
                           <div className="text-xs font-bold text-navy-900">{d.code}</div>
-                          <div className="text-[10px] text-ink-500">Pedido</div>
+                          <div className="text-xs text-ink-500">Pedido</div>
                         </div>
-                        <div className={`text-[10px] font-bold text-white ${d.color} px-2 py-0.5 rounded-full`}>
+                        <div className={`text-xs font-bold text-white ${d.color} px-2 py-0.5 rounded-full`}>
                           {d.status}
                         </div>
                       </div>

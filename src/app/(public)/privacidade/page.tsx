@@ -1,4 +1,7 @@
-export const metadata = { title: "Política de privacidade" };
+export const metadata = {
+  title: "Política de Privacidade e Proteção de Dados — Spotlog",
+  alternates: { canonical: "/privacidade" },
+};
 
 export default function PrivacidadePage() {
   return (

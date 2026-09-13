@@ -86,7 +86,7 @@ export function SiteHeader() {
                         >
                           <span>{c.label}</span>
                           {c.badge && (
-                            <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                            <span className="text-xs font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
                               {c.badge}
                             </span>
                           )}
@@ -104,7 +104,7 @@ export function SiteHeader() {
               >
                 {l.label}
                 {l.badge && (
-                  <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                  <span className="text-xs font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
                     {l.badge}
                   </span>
                 )}
@@ -171,7 +171,7 @@ export function SiteHeader() {
                     >
                       <span>{c.label}</span>
                       {c.badge && (
-                        <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                        <span className="text-xs font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
                           {c.badge}
                         </span>
                       )}
@@ -187,7 +187,7 @@ export function SiteHeader() {
                 >
                   <span>{l.label}</span>
                   {l.badge && (
-                    <span className="text-[9px] font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
+                    <span className="text-xs font-bold uppercase tracking-wider bg-spotorange-500 text-white px-1.5 py-0.5 rounded">
                       {l.badge}
                     </span>
                   )}

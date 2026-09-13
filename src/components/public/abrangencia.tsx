@@ -187,10 +187,10 @@ export function Abrangencia() {
                       <div className="font-bold text-navy-900 text-sm">
                         {r.name}
                       </div>
-                      <div className="text-[11px] text-ink-500 mt-0.5 truncate">
+                      <div className="text-xs text-ink-500 mt-0.5 truncate">
                         {r.ceps}
                       </div>
-                      <div className="inline-block mt-2 text-[10px] font-semibold text-spotorange-700 bg-spotorange-50 px-2 py-0.5 rounded">
+                      <div className="inline-block mt-2 text-xs font-semibold text-spotorange-700 bg-spotorange-50 px-2 py-0.5 rounded">
                         {r.servico}
                       </div>
                     </div>

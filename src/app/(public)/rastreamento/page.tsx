@@ -89,7 +89,7 @@ export default async function RastreamentoPage() {
                           <Icon className={`h-3.5 w-3.5 ${cfg.text}`} />
                           {d.code}
                           <span
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${cfg.badge} ${cfg.badgeText}`}
+                            className={`rounded-full px-2 py-0.5 text-xs font-bold uppercase ${cfg.badge} ${cfg.badgeText}`}
                           >
                             {cfg.short}
                           </span>

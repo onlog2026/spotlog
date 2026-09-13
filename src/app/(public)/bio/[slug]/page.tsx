@@ -97,7 +97,7 @@ export default async function PublicBioPage({
             <p className="text-xs opacity-70">Nenhum link cadastrado ainda.</p>
           )}
         </div>
-        <p className="text-[10px] opacity-60 pt-4">
+        <p className="text-xs opacity-60 pt-4">
           Powered by Spotlog
         </p>
       </div>

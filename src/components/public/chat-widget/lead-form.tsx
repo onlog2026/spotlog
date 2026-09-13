@@ -89,7 +89,7 @@ export function LeadForm({
         autoComplete="organization"
       />
       <label className="block">
-        <span className="text-[11px] font-medium text-[#011960]/80">Mensagem</span>
+        <span className="text-xs font-medium text-[#011960]/80">Mensagem</span>
         <textarea
           value={values.message}
           onChange={(e) => setValues({ ...values, message: e.target.value })}
@@ -141,7 +141,7 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-medium text-[#011960]/80">{label}</span>
+      <span className="text-xs font-medium text-[#011960]/80">{label}</span>
       <input
         type={type}
         value={value}
@@ -151,7 +151,7 @@ function Field({
         className="mt-1 w-full rounded-lg border border-[#011960]/20 bg-white px-2.5 py-1.5 text-sm text-[#011960] placeholder:text-[#011960]/40 focus:outline-none focus:ring-2 focus:ring-[#BA0102]/30 focus:border-[#BA0102]"
       />
       {error ? (
-        <span className="mt-1 block text-[11px] text-[#BA0102]">{error}</span>
+        <span className="mt-1 block text-xs text-[#BA0102]">{error}</span>
       ) : null}
     </label>
   );

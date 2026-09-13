@@ -47,7 +47,7 @@ export function CaseCard({ item }: { item: CmsCase }) {
             {kpis.map(([k, v]) => (
               <div key={k} className="text-center">
                 <div className="text-base font-bold text-spotorange-600">{v}</div>
-                <div className="text-[10px] uppercase tracking-wider text-ink-500 mt-0.5 truncate">{k}</div>
+                <div className="text-xs uppercase tracking-wider text-ink-500 mt-0.5 truncate">{k}</div>
               </div>
             ))}
           </div>

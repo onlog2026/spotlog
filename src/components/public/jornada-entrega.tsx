@@ -120,7 +120,7 @@ export function JornadaEntrega() {
                   </div>
                   <p className="text-sm text-ink-600 leading-relaxed">{s.desc}</p>
                   <div
-                    className={`mt-2 inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded ${s.badge}`}
+                    className={`mt-2 inline-block text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${s.badge}`}
                   >
                     Etapa {s.n} de 6
                   </div>

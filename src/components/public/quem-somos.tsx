@@ -47,7 +47,7 @@ export function QuemSomos() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-navy-950/70 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 text-white">
-                <div className="text-[10px] uppercase tracking-wider font-bold opacity-80 mb-1">
+                <div className="text-xs uppercase tracking-wider font-bold opacity-80 mb-1">
                   Centro operacional
                 </div>
                 <div className="text-sm font-bold">São Paulo capital · 7 dias / semana</div>
