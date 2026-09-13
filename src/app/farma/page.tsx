@@ -7,6 +7,7 @@ export const metadata = {
   title: "Transporte Farmacêutico com AFE Anvisa — Spotlog",
   description:
     "AFE — Autorização de Funcionamento para Transporte da Anvisa, com farmacêutico responsável e controle contínuo para medicamentos, termolábeis e correlatos.",
+  alternates: { canonical: "/farma" },
 };
 
 const garantias = [

@@ -4,9 +4,10 @@ import { PostCard } from "@/components/public/blog/post-card";
 import { CategoryFilter } from "@/components/public/blog/category-filter";
 
 export const metadata: Metadata = {
-  title: "Blog | Spotlog",
+  title: "Blog Spotlog: Logística, E-commerce e Farma",
   description:
     "Conteúdo Spotlog sobre logística inteligente, última milha, e-commerce, farma e operação de alta performance.",
+  alternates: { canonical: "/blog" },
   openGraph: {
     title: "Blog Spotlog",
     description: "Insights, cases e novidades sobre logística que funciona.",

@@ -3,7 +3,10 @@ import { V3Shell } from "@/components/v3/V3Shell";
 import { getSiteImage } from "@/lib/site-image";
 
 export const revalidate = 60;
-export const metadata = { title: "Tecnologia — Spotlog" };
+export const metadata = {
+  title: "Tecnologia: App, Painel e API para Logística — Spotlog",
+  alternates: { canonical: "/tecnologia" },
+};
 
 const stack = [
   { title: "App do entregador", desc: "Rotas, check-in/out, foto, assinatura e ocorrências." },

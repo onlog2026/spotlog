@@ -3,7 +3,10 @@ import { V3Shell } from "@/components/v3/V3Shell";
 import { getSiteImage } from "@/lib/site-image";
 
 export const revalidate = 60;
-export const metadata = { title: "E-commerce — Spotlog" };
+export const metadata = {
+  title: "Entregas para E-commerce e Same Day — Spotlog",
+  alternates: { canonical: "/ecommerce" },
+};
 
 const beneficios = [
   { title: "Same Day Delivery", desc: "Entrega de produtos aos clientes no mesmo dia da compra — ideal para e-commerces que precisam encantar." },

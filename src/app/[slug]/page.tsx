@@ -50,7 +50,9 @@ export async function generateMetadata({
   const { slug } = await params;
   const p = getLandingPage(slug);
   return {
-    title: p ? `${p.nome} — Spotlog` : "Spotlog",
+    // título usa p.title (a chamada da página, já pensada pra SEO) em vez de
+    // p.nome (rótulo curto do menu) — evita título genérico tipo "Saúde — Spotlog".
+    title: p ? `${p.title.replace(/[.!]+$/, "")} — Spotlog` : "Spotlog",
     description: p ? toMetaDescription(p.intro) : undefined,
     alternates: { canonical: `/${slug}` },
   };

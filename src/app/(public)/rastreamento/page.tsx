@@ -12,9 +12,10 @@ import { getDemoShipmentCodes } from "@/lib/queries/tracking-public";
 import { getStatusConfig } from "@/components/public/tracking/status-config";
 
 export const metadata = {
-  title: "Rastrear entrega | Spotlog",
+  title: "Rastrear Entrega em Tempo Real — Spotlog",
   description:
     "Digite seu código de rastreio Spotlog e acompanhe o status, previsão e histórico completo da sua entrega em tempo real.",
+  alternates: { canonical: "/rastreamento" },
 };
 
 // revalida com frequência média pra refletir novos shipments do demo

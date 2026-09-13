@@ -2,7 +2,10 @@ import { V3Shell } from "@/components/v3/V3Shell";
 import { FormularioComercialV3 } from "@/components/v3/legacy/FormularioComercialV3";
 
 export const revalidate = 60;
-export const metadata = { title: "Contato — Spotlog" };
+export const metadata = {
+  title: "Fale com a Spotlog — Atendimento Comercial",
+  alternates: { canonical: "/contato" },
+};
 
 export default async function ContatoPage() {
   return (

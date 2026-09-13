@@ -1,7 +1,10 @@
 import { Abrangencia } from "@/components/public/abrangencia";
 import { CtaBanner } from "@/components/public/cta-banner";
 
-export const metadata = { title: "Abrangência" };
+export const metadata = {
+  title: "Área de Cobertura em São Paulo e Região — Spotlog",
+  alternates: { canonical: "/abrangencia" },
+};
 
 export default function AbrangenciaPage() {
   return (

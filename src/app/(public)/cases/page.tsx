@@ -3,9 +3,10 @@ import { getPublicCases } from "@/lib/queries/cms";
 import { CaseCard } from "@/components/public/blog/case-card";
 
 export const metadata: Metadata = {
-  title: "Cases | Spotlog",
+  title: "Cases Spotlog: Resultados Reais de Clientes",
   description:
     "Resultados reais Spotlog em e-commerce, farma, manipulação e dermo. Veja como nossos clientes escalaram com a gente.",
+  alternates: { canonical: "/cases" },
   openGraph: {
     title: "Cases Spotlog",
     description: "Resultados reais de operação logística que funciona.",

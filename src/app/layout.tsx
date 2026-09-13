@@ -41,10 +41,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const favicon = (await getSiteFavicon()) ?? "/logo-simbolo.png";
   return {
     metadataBase: new URL(resolveBaseUrl()),
-    title: {
-      default: "Spotlog — Logística inteligente com rastreamento total",
-      template: "%s | Spotlog",
-    },
+    // Sem `template` de propósito: toda página da Spotlog já monta seu próprio
+    // título com "— Spotlog"/"| Spotlog" no fim. Um template aqui duplicava a
+    // marca (ex.: "Saúde — Spotlog | Spotlog") em quase toda página do site.
+    title: "Spotlog — Logística inteligente com rastreamento total",
     description:
       "Logística para e-commerce, farma, manipulação e operações B2B com rastreabilidade, atendimento integrado e controle operacional em tempo real.",
     keywords: [

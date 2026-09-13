@@ -3,7 +3,10 @@ import { V3Shell } from "@/components/v3/V3Shell";
 import { getSiteImage } from "@/lib/site-image";
 
 export const revalidate = 60;
-export const metadata = { title: "Quem Somos — Spotlog" };
+export const metadata = {
+  title: "Quem Somos: Logística Séria em São Paulo — Spotlog",
+  alternates: { canonical: "/sobre" },
+};
 
 const valores = [
   { title: "Equipe treinada", desc: "Profissionais capacitados continuamente para entregar o melhor serviço à sua empresa." },

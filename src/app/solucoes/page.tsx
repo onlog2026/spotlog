@@ -2,7 +2,10 @@ import { V3Shell } from "@/components/v3/V3Shell";
 import { SolucoesGridV3 } from "@/components/v3/legacy/SolucoesGridV3";
 
 export const revalidate = 60;
-export const metadata = { title: "Soluções — Spotlog" };
+export const metadata = {
+  title: "Soluções em Logística: Armazenagem, Coletas e Mais — Spotlog",
+  alternates: { canonical: "/solucoes" },
+};
 
 export default async function SolucoesPage() {
   return (
