@@ -311,7 +311,7 @@ export function Cobertura({ content }: { content?: Record<string, CardContent> }
                       color: "#EAF0FF",
                       padding: "4px 10px",
                       borderRadius: 999,
-                      fontSize: 11.5,
+                      fontSize: 12,
                       fontFamily: "'JetBrains Mono',monospace",
                       whiteSpace: "nowrap",
                       boxShadow: `0 0 14px -4px ${st.glow}`,

@@ -101,7 +101,7 @@ export function Header({ logoUrl, logoSize, megaImages, menuLabels = {} }: { log
   return (
     <header className={`header ${scrolled ? "scrolled" : ""}`}>
       <div className="shell header-row">
-        <a href="/" aria-label="Spotlog — página inicial"><Logo logoUrl={logoUrl} logoSize={logoSize}/></a>
+        <a href="/" aria-label="Spotlog — página inicial"><Logo logoUrl={logoUrl} logoSize={logoSize}/><span className="sr-only">Spotlog — página inicial</span></a>
 
         <nav className="h-nav" style={{ display:"flex", gap: 20, marginLeft: 16, flex: 1, justifyContent:"center", alignItems:"center" }}>
           {/* Mega groups */}

@@ -112,7 +112,7 @@ export function Hero({ content }: { content?: HeroContent }) {
                     {v}
                     <span className="u">{u}</span>
                   </div>
-                  <div className="kicker no-rule muted" style={{ marginTop: 8, fontSize: 10 }}>
+                  <div className="kicker no-rule muted" style={{ marginTop: 8, fontSize: 12 }}>
                     {l}
                   </div>
                 </div>
@@ -146,14 +146,14 @@ export function Hero({ content }: { content?: HeroContent }) {
               <div className="hero-chip" style={{ top: 70, right: 22 }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--green)" }} />
                 <div>
-                  <div className="mono" style={{ fontSize: 10, color: "#6B739A" }}>
+                  <div className="mono" style={{ fontSize: 12, color: "#6B739A" }}>
                     EM ROTA
                   </div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: "#0C1640" }}>SPL-2841 · ETA 11h42</div>
                 </div>
               </div>
               <div className="hero-banner-tag">
-                <div className="mono" style={{ fontSize: 11, letterSpacing: ".2em", opacity: 0.85 }}>
+                <div className="mono" style={{ fontSize: 12, letterSpacing: ".2em", opacity: 0.85 }}>
                   SPOTLOG · OPERAÇÃO
                 </div>
                 <div className="big">

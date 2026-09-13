@@ -110,7 +110,7 @@ export function Processo({ content }: { content?: Record<string, CardContent> })
 
           {/* caption */}
           <div style={{ position:"absolute", left: 22, top: 20, zIndex: 2, color:"#FFF" }}>
-            <div className="mono" style={{ fontSize: 11, letterSpacing:".18em", opacity:.85 }}>
+            <div className="mono" style={{ fontSize: 12, letterSpacing:".18em", opacity:.85 }}>
               {playing ? "REPRODUZINDO" : "PASSE O CURSOR"} · OPERAÇÃO SPOTLOG
             </div>
             <div style={{ fontFamily:"'Bricolage Grotesque','Geist',sans-serif", fontSize: 26, marginTop: 4, ...frames[frame].capStyle }}>

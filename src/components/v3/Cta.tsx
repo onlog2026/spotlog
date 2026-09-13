@@ -137,7 +137,7 @@ export function Cta({ content }: { content?: Record<string, CardContent> }) {
               {contactCards.map((x,i)=>(
                 <div key={i} style={{ display:"grid", gridTemplateColumns:"32px 90px 1fr", gap: 16, padding:"16px 0", borderTop:"1px solid rgba(255,255,255,.18)", alignItems:"center" }}>
                   <span style={{ width:28,height:28,borderRadius:"50%",background:"rgba(255,255,255,.08)",color:"#FFF",display:"flex",alignItems:"center",justifyContent:"center" }}>{x.ic}</span>
-                  <span className="kicker no-rule muted" style={{ fontSize: 10, ...x.lStyle }}>{x.l}</span>
+                  <span className="kicker no-rule muted" style={{ fontSize: 12, ...x.lStyle }}>{x.l}</span>
                   <span className="mono" style={{ fontSize: 15, color:"#FFF", ...x.vStyle }}>{x.v}</span>
                 </div>
               ))}

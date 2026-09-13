@@ -70,7 +70,7 @@ export function Footer() {
                   rel={x.ext ? "noopener noreferrer" : undefined}
                   aria-label={x.label}
                   className="foot-social"
-                >{x.ic}</a>
+                >{x.ic}<span className="sr-only">{x.label}</span></a>
               ))}
             </div>
             <div style={{ display:"flex", gap: 14, marginTop: 4 }}>
@@ -90,7 +90,7 @@ export function Footer() {
         {/* Segmentos atendidos + Principais serviços (divididos) */}
         <div className="ft-seg" style={{ display:"grid", gridTemplateColumns:"2fr 1fr", gap: 40, marginTop: 48, paddingBottom: 44, borderBottom:"1px solid rgba(255,255,255,.12)" }}>
           <div>
-            <div className="mono" style={{ fontSize: 10.5, letterSpacing:".18em", color:"#FF6B6F", marginBottom: 16, textTransform:"uppercase" }}>Segmentos atendidos</div>
+            <div className="mono" style={{ fontSize: 12, letterSpacing:".18em", color:"#FF6B6F", marginBottom: 16, textTransform:"uppercase" }}>Segmentos atendidos</div>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(190px,1fr))", gap:"9px 16px" }}>
               {MENU_SEGMENTOS.map(({ label, href }) => (
                 <a key={href + label} href={href} className="foot-link">{label}</a>
@@ -98,7 +98,7 @@ export function Footer() {
             </div>
           </div>
           <div>
-            <div className="mono" style={{ fontSize: 10.5, letterSpacing:".18em", color:"#FF6B6F", marginBottom: 16, textTransform:"uppercase" }}>Principais serviços</div>
+            <div className="mono" style={{ fontSize: 12, letterSpacing:".18em", color:"#FF6B6F", marginBottom: 16, textTransform:"uppercase" }}>Principais serviços</div>
             <div style={{ display:"flex", flexDirection:"column", gap: 9 }}>
               {MENU_SERVICOS.map(({ label, href }) => (
                 <a key={href + label} href={href} className="foot-link">{label}</a>
@@ -122,7 +122,7 @@ export function Footer() {
           </div>
           {COLS.map((c,i)=>(
             <div key={i}>
-              <div className="mono" style={{ fontSize: 10.5, letterSpacing:".18em", color:"#FF6B6F", marginBottom: 14, textTransform:"uppercase" }}>{c.h}</div>
+              <div className="mono" style={{ fontSize: 12, letterSpacing:".18em", color:"#FF6B6F", marginBottom: 14, textTransform:"uppercase" }}>{c.h}</div>
               <div style={{ display:"flex", flexDirection:"column", gap: 9 }}>
                 {c.l.map(([label,href],j)=>(
                   <a key={j} href={href} className="foot-link">{label}</a>
@@ -136,10 +136,10 @@ export function Footer() {
       {/* Bottom bar */}
       <div style={{ borderTop:"1px solid rgba(255,255,255,.12)" }}>
         <div className="shell" style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"22px 0", flexWrap:"wrap", gap: 12 }}>
-          <div className="mono" style={{ fontSize: 11, color:"#8C95C2", letterSpacing:".1em" }}>
+          <div className="mono" style={{ fontSize: 12, color:"#8C95C2", letterSpacing:".1em" }}>
             © {new Date().getFullYear()} SPOTLOG · CNPJ 00.000.000/0001-00 · SÃO PAULO/SP
           </div>
-          <div className="mono" style={{ fontSize: 11, color:"#8C95C2", letterSpacing:".1em", display:"flex", alignItems:"center", gap: 8 }}>
+          <div className="mono" style={{ fontSize: 12, color:"#8C95C2", letterSpacing:".1em", display:"flex", alignItems:"center", gap: 8 }}>
             <span style={{ width:7,height:7,borderRadius:"50%",background:"var(--green)",display:"inline-block" }}/>
             OPERAÇÃO ONLINE · ATENDIMENTO 24/7
           </div>

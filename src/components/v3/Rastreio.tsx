@@ -136,7 +136,7 @@ export function Rastreio({ content }: { content?: Record<string, CardContent> })
             <div className="phone">
               <div className="phone-screen" style={{ background: "#FFF", display: "flex", flexDirection: "column" }}>
                 <div style={{ background: "#0D1B45", padding: "20px 16px 16px", color: "#FFF" }}>
-                  <div className="mono" style={{ fontSize: 10, opacity: .7 }}>SPOTLOG APP</div>
+                  <div className="mono" style={{ fontSize: 12, opacity: .7 }}>SPOTLOG APP</div>
                   <div style={{ fontFamily: "'Bricolage Grotesque','Geist',sans-serif", fontSize: 22, marginTop: 4 }}>Suas entregas</div>
                   <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
                     <span className="tag" style={{ background: "rgba(255,255,255,.14)", color: "#FFF", height: 24 }}>12 hoje</span>
@@ -153,8 +153,8 @@ export function Rastreio({ content }: { content?: Record<string, CardContent> })
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: "#F4F5FA", border: "1px solid rgba(18,26,51,.10)" }}>
                       <span style={{ width: 8, height: 8, borderRadius: "50%", background: c }} />
                       <div style={{ flex: 1 }}>
-                        <div className="mono" style={{ fontSize: 11, color: "#121A33" }}>{id}</div>
-                        <div style={{ fontSize: 11, color: "#6B739A" }}>{st}</div>
+                        <div className="mono" style={{ fontSize: 12, color: "#121A33" }}>{id}</div>
+                        <div style={{ fontSize: 12, color: "#6B739A" }}>{st}</div>
                       </div>
                       <span style={{ color: "#6B739A" }}><Icon.Arrow size={13} /></span>
                     </div>
@@ -202,7 +202,7 @@ export function Rastreio({ content }: { content?: Record<string, CardContent> })
                   <div>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                       <div>
-                        <div className="mono" style={{ fontSize: 11, color: "var(--ink-mute)" }}>{result.code}</div>
+                        <div className="mono" style={{ fontSize: 12, color: "var(--ink-mute)" }}>{result.code}</div>
                         <div style={{ fontWeight: 600, fontSize: 16, marginTop: 4 }}>{result.title}</div>
                         <div style={{ fontSize: 13, color: "var(--ink-mute)", marginTop: 2 }}>{result.driver} · {result.route} · {result.eta}</div>
                       </div>
@@ -215,7 +215,7 @@ export function Rastreio({ content }: { content?: Record<string, CardContent> })
                       {result.steps.map((s, i) => (
                         <div key={i} className="tl-step">
                           <div className={`tl-node ${s.done ? "done" : s.active ? "active" : ""}`}>{s.done ? <Icon.Check size={12} stroke={3} /> : s.active ? "•" : ""}</div>
-                          <div><div style={{ fontWeight: 500, fontSize: 13.5 }}>{s.t}</div><div className="mono" style={{ fontSize: 10.5, color: "var(--ink-mute)", marginTop: 2 }}>{s.d}</div></div>
+                          <div><div style={{ fontWeight: 500, fontSize: 13.5 }}>{s.t}</div><div className="mono" style={{ fontSize: 12, color: "var(--ink-mute)", marginTop: 2 }}>{s.d}</div></div>
                           <div>{s.active && <span className="tag tag-red">agora</span>}</div>
                         </div>
                       ))}

@@ -104,13 +104,13 @@ export function Blog({ content }: { content?: Record<string, CardContent> }) {
           {posts.map((p, i) => (
             <a key={i} href={(p as { href?: string }).href || "/blog"} className="blog-card">
               <div style={{ position:"relative" }}>
-                <Photo scene={p.scene} src={p.img} alt={p.title}/>
+                <Photo scene={p.scene} src={p.img} alt={p.title} sizes="(max-width: 620px) 100vw, (max-width: 980px) 50vw, 33vw"/>
                 <span className="tag tag-red" style={{ position:"absolute", top: 14, right: 14 }}>{p.cat}</span>
               </div>
               <div className="blog-card-body">
                 <h4 style={{ fontSize: 21, ...p.titleStyle }}>{p.title}</h4>
                 <p style={{ fontSize: 14, ...p.descStyle }}>{p.excerpt}</p>
-                <div className="kicker no-rule muted" style={{ marginTop:"auto", fontSize: 10 }}>
+                <div className="kicker no-rule muted" style={{ marginTop:"auto", fontSize: 12 }}>
                   Leitura {p.read} <span className="divider-dot"/> Blog Spotlog
                 </div>
               </div>

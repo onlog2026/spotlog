@@ -68,7 +68,7 @@ function MetricCell({ m }: { m: Metric }) {
       <div className="num">
         {m.suffix}{display}<span className="u" style={m.unitStyle}>{m.u}</span>
       </div>
-      <div className="kicker no-rule muted" style={{ marginTop: 12, fontSize: 10, ...m.labelStyle }}>{m.label}</div>
+      <div className="kicker no-rule muted" style={{ marginTop: 12, fontSize: 12, ...m.labelStyle }}>{m.label}</div>
     </div>
   );
 }

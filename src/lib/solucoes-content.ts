@@ -38,7 +38,7 @@ export const SOLUCOES: SolucaoContent[] = [
   {
     slug: "armazenagem",
     eyebrow: "Armazenagem & Fulfillment",
-    title: "Transforme sua Logística em uma Máquina de Crescimento",
+    title: "Sua Logística Como Máquina de Crescimento",
     intro:
       "Seu e-commerce está crescendo. Sua operação acompanha? Vender é apenas o começo — o verdadeiro desafio é armazenar, separar, embalar e entregar cada pedido com rapidez, precisão e qualidade. É exatamente para isso que existe o nosso serviço de Armazenagem Inteligente e Fullfillment.",
     image: U("1553413077-190dd305871c"),
@@ -220,7 +220,7 @@ export const SOLUCOES: SolucaoContent[] = [
   {
     slug: "reversa",
     eyebrow: "Pós-venda",
-    title: "Logística reversa com a mesma rastreabilidade da ida",
+    title: "Logística Reversa com Rastreabilidade Total",
     intro:
       "Devolução, troca e retorno de mercadoria fazem parte do jogo — e mal resolvidos custam caro em reputação. Cuidamos da coleta reversa com o mesmo padrão de rastreamento e evidência da entrega, para fechar o ciclo sem dor de cabeça.",
     image: U("1586528116493-a029325540fa"),
