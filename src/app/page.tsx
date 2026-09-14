@@ -11,6 +11,8 @@ import { Dores } from "@/components/v3/Dores";
 import { Portfolio } from "@/components/v3/Portfolio";
 import { Cobertura } from "@/components/v3/Cobertura";
 import { Blog } from "@/components/v3/Blog";
+import { FAQ } from "@/components/public/faq";
+import { faqs } from "@/lib/faq-content";
 import { Footer } from "@/components/v3/Footer";
 import { SiteScroll } from "@/components/v3/site-scroll";
 import { SolucoesGridV3 } from "@/components/v3/legacy/SolucoesGridV3";
@@ -35,9 +37,24 @@ export default async function Home() {
   for (const [slot, card] of Object.entries(cards.solucoes ?? {})) {
     if (card?.title) menuLabels[slot] = card.title;
   }
+  // FAQPage schema — ajuda o Google (rich results) e IA (busca por voz/GEO)
+  // a lerem as mesmas perguntas que já aparecem na seção de FAQ da home.
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
   return (
     <>
       <span className={v3FontsClassName} style={{ display: "none" }} aria-hidden="true" />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <style dangerouslySetInnerHTML={{ __html: buildThemeCss(theme) }} />
       <div className="v3-root">
         <Header
@@ -73,6 +90,7 @@ export default async function Home() {
             <JornadaEntregaV3 />
           </div>
           <Blog content={cards.blog} />
+          <FAQ />
           <section id="contato" className="section section-paper section-rule">
             <div className="shell">
               <div className="contato-grid">

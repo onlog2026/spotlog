@@ -1,9 +1,52 @@
 "use client";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { Play, Sparkles } from "lucide-react";
 import type { CardContent } from "@/components/v3/cms";
 import { HeadingHL } from "@/components/v3/highlight";
+
+/**
+ * Fade-in ao entrar na viewport (uma vez), via IntersectionObserver + CSS —
+ * substitui o framer-motion (que só era usado aqui) pra tirar a lib inteira
+ * do bundle da home por causa de UMA animação.
+ */
+function useInViewOnce<T extends HTMLElement>(margin = "-50px") {
+  const ref = useRef<T | null>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: `0px 0px ${margin} 0px`, threshold: 0.1 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [margin]);
+  return [ref, inView] as const;
+}
+
+function FadeInCard({ delay, className, children }: { delay: number; className?: string; children: React.ReactNode }) {
+  const [ref, inView] = useInViewOnce<HTMLDivElement>();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: inView ? 1 : 0,
+        transform: inView ? "translateY(0)" : "translateY(20px)",
+        transition: `opacity 0.5s ease ${delay}s, transform 0.5s ease ${delay}s`,
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
 /**
  * Criativos verticais 9:16 (vídeos + imagens) da campanha Spotlog.
@@ -73,12 +116,9 @@ export function CreativesShowcaseV3({ content }: { content?: Record<string, Card
         <div className="-mx-4 px-4 overflow-x-auto pb-4 scrollbar-thin">
           <div className="flex gap-4 lg:gap-6 min-w-min">
             {items.map((it, i) => (
-              <motion.div
+              <FadeInCard
                 key={it.slot}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
+                delay={i * 0.08}
                 className="group relative shrink-0 w-[260px] lg:w-[288px] aspect-[9/16] rounded-3xl overflow-hidden shadow-card hover:shadow-card-hover border-2 border-transparent hover:border-[color:var(--navy)] transition-all bg-navy-900"
               >
                 {it.isVideo ? (
@@ -116,7 +156,7 @@ export function CreativesShowcaseV3({ content }: { content?: Record<string, Card
                     {it.title}
                   </div>
                 </div>
-              </motion.div>
+              </FadeInCard>
             ))}
           </div>
         </div>
